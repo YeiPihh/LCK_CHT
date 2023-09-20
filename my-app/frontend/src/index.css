@@ -1,0 +1,113 @@
+/* Variables */
+:root {
+  --main-bg-color: #333;
+  --text-color: white;
+  --nav-bg-color: #444;
+  --hover-bg-color: #ddd;
+  --hover-text-color: black;
+  --main-content-bg: #f1f1f1;
+  --main-color: #007bff;
+}
+
+.no-select, img {
+  -webkit-touch-callout: none; /* iOS Safari */
+  -webkit-user-select: none;   /* Chrome/Safari/Opera */
+  -khtml-user-select: none;    /* Konqueror */
+  -moz-user-select: none;      /* Firefox */
+  -ms-user-select: none;       /* Internet Explorer/Edge */
+  user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+}
+
+.swal2-container {
+  position: fixed !important;
+  top: 30% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  border: 1px solid #000 !important;
+  border-radius: 10px ;
+  padding: 15px !important;
+  background-color: #a8a8a881!important;
+  min-width: 300px!important;
+}
+
+#swal2-html-container {
+  text-align: center !important;
+}
+
+.swal2-actions {
+  margin-top: 12px!important;
+  justify-content: center !important;
+  align-items: center !important;
+}
+
+body {
+  font-family: system-ui ,'Lato', sans-serif, 'Courier New', 'Courier';
+  margin: 0;
+  padding: 0;
+}
+
+a { 
+  color: var(--main-color);
+  text-decoration: none;
+  font-weight: bold;
+}
+
+a:hover {
+  color: #0056b3;
+}
+
+/* Estilo para móvil */
+/* Estilos para modo móvil */
+
+#contactNameText {
+  margin-left: 8px;
+  letter-spacing: 4px;
+  font-size: 25px;
+  font-weight: bold;
+}
+
+/* Estilos generales */
+
+
+.center-text {
+text-align: center;
+}
+
+.padding-1em {
+padding: 1em;
+}
+
+/* Estilos para la cabecera y el pie de página */
+.header, .footer {
+background-color: var(--main-bg-color);
+color: var(--text-color);
+text-align: center;
+padding: 1em;
+}
+
+/* Estilos para el menú de navegación */
+.nav {
+background-color: var(--nav-bg-color);
+overflow: hidden;
+}
+
+.nav a {
+float: left;
+display: block;
+color: var(--text-color);
+text-align: center;
+padding: 14px 16px;
+text-decoration: none;
+}
+
+.nav a:hover {
+background-color: var(--hover-bg-color);
+color: var(--hover-text-color);
+}
+
+/* Estilos para el contenido principal */
+.main {
+margin: 15px;
+padding: 15px;
+background-color: var(--main-content-bg);
+}
