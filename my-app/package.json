@@ -6,5 +6,8 @@
     "start": "concurrently \"yarn run start-frontend\" \"yarn run start-backend\"",
     "start-frontend": "cd frontend && yarn start",
     "start-backend": "cd backend && yarn start"
+  },
+  "dependencies": {
+    "sweetalert2": "^11.7.28"
   }
 }

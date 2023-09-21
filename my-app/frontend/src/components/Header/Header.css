@@ -1,0 +1,12 @@
+.tittleHeader{
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+.lockTalk {
+    margin: auto;
+    font-size: 50px;
+    font-weight: bolder;
+    letter-spacing: 20px;
+}

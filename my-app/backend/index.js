@@ -85,8 +85,8 @@ async function getLastMessage(userId, contactId) {
   }
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
-app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Configura las sesiones ANTES de las rutas y Passport
@@ -102,7 +102,7 @@ app.use(passport.initialize());
 app.use(passport.session()); // <-- Asegúrate de que esta línea esté después de la configuración de session
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+    res.sendFile(__dirname + '../frontend/index.js' );
 });
 
 function ensureAuthenticated(req, res, next) {
@@ -114,19 +114,19 @@ function ensureAuthenticated(req, res, next) {
 
 
 
-app.use('/register', registerRoute);
-app.use('/login', loginRoute);
+app.use('/api/register', registerRoute);
+app.use('/api/login', loginRoute);
 
 app.get('/login', (req, res) => {
-    res.sendFile(__dirname + '/public/login.html');
+     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.get('/register', (req, res) => {
-    res.sendFile(__dirname + '/public/register.html');
+     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.get('/index', (req, res) => {
-    res.sendFile(__dirname + '/public/index.html');
+     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 app.get('/chat', ensureAuthenticated, async (req, res) => {
@@ -161,8 +161,11 @@ app.get('/friend-requests', ensureAuthenticated, async (req, res) => {
   res.json({ success: true, friendRequests: friendRequestsData });
 });
 
-  
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
+  
 
 
 
