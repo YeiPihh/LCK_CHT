@@ -12,6 +12,12 @@ const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRoute');
 const mysql = require('mysql2/promise');
 
+const hostdb = 'containers-us-west-145.railway.app';
+const userdb = 'root';
+const passdb = 'SRGLy6fQXQmmq2isbnOA';
+const databasedb = 'railway';
+const portdb = 7680;
+
 app.use(cors());
 require('./config/passport-config')(passport);
 require('./socket.js')(socketio);
@@ -19,10 +25,11 @@ require('./socket.js')(socketio);
 // conexion a la base de datos
 let connection;
 mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'toor',
-  database: 'dbChat'
+  host: hostdb,
+  user: userdb,
+  password: passdb,
+  database: databasedb,
+  port: portdb
 }).then(conn => {
     connection = conn;
 }).catch(err => {

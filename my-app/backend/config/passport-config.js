@@ -1,19 +1,20 @@
 const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
-const url = require('url');
 
-/*const clearDBUrl = process.env.CLEARDB_DATABASE_URL; // URL de ClearDB de Heroku
-const parsedUrl = url.parse(clearDBUrl);
-const [username, password] = parsedUrl.auth.split(':');*/
-
-// Tu conexión existente a la base de datos
-var connection;
+const hostdb = 'containers-us-west-145.railway.app';
+const userdb = 'root';
+const passdb = 'SRGLy6fQXQmmq2isbnOA';
+const databasedb = 'railway';
+const portdb = 7680;
+// conexion a la base de datos
+let connection;
 mysql.createConnection({
-  host: 'localhost',
-  user: 'root',
-  password: 'toor',
-  database: 'dbChat'
+  host: hostdb,
+  user: userdb,
+  password: passdb,
+  database: databasedb,
+  port: portdb
 }).then(conn => {
     connection = conn;
 }).catch(err => {
