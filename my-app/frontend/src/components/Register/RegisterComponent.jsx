@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
 import Button from '../Button/ButtonComponent.jsx'
 import './Register.css'
@@ -12,6 +12,8 @@ const Register = () => {
 
   const { username, password, confirmPassword } = formData;
 
+  const [passwordMatch, setPasswordMatch] = useState(true);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -20,8 +22,15 @@ const Register = () => {
     });
   };
 
+  useEffect(() => {
+    if (confirmPassword.length >= password.length) {
+      setPasswordMatch(password === confirmPassword);
+    }
+  }, [password, confirmPassword]); // Dependencias del efecto
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
+    
 
     if (password !== confirmPassword) {
       Swal.fire({
@@ -34,7 +43,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:4567/api/register', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -67,19 +76,24 @@ const Register = () => {
   };
   return (
     <div className="register-container">
+
       <h2>Registro</h2>
       <form onSubmit={handleSubmit} id="register-form">
+
         <label htmlFor="username">Usuario:</label>
         <input type="text" id="username" name="username" value={username} onChange={handleChange} required />
         <label htmlFor="password">Contraseña:</label>
-        <input type="password" id="password" name="password" value={password} onChange={handleChange} required />
+        <input type="password" id="password" name="password" value={password} onChange={handleChange} required className={passwordMatch ? '' : 'error'} />
         <label htmlFor="confirm-password">Confirmar contraseña:</label>
-        <input type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required />
+        <input type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required className={passwordMatch ? '' : 'error'} />
+        {!passwordMatch && <small className="errorText">Las contraseñas no coinciden</small>}
         <Button text="Registrarse" />
+        
       </form>
       <p className="login-link">
         ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
       </p>
+
     </div>
   );
 };

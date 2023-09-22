@@ -1,3 +1,8 @@
+input:focus {
+    border: transparent;
+    outline: none;            
+}
+
 .register-container {
     max-width: 300px;
     margin: 20px auto;
@@ -24,6 +29,14 @@
     padding: 5px;
     border: 1px solid #ccc;
     border-radius: 5px;
+}
+
+.error {
+    border-color: red !important;
+}
+
+.errorText {
+    color: red;
 }
 
 .login-link {

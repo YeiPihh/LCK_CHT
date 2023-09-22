@@ -1,6 +1,7 @@
 .returnImg {
-    width: 40px;
-    height: 36px;
+    width: 35px;
+    height: 35px;
+    transition: filter 0.4s ease;
 }
 
 .returnImg:hover {

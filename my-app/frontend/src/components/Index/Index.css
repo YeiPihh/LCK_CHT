@@ -1,4 +1,4 @@
-.main-content {
+.mainContent {
     padding: 20px; /* Añadir un espacio a los lados */
     max-width: 800px;
     margin: 0 auto; /* Centrar el contenido principal */
@@ -6,7 +6,7 @@
     /*border: 1px solid #ccc;*/
 }
 
-.hero {
+.introductionContainer {
     background-color: #f9f9f9;
     color: #333;
     padding: 40px;
@@ -15,14 +15,14 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Agregar sombra al contenido */
 }
 
-.hero-title {
+.introductionTitle {
     margin: 0;
     margin-bottom: 20px; /* Añadir un margen inferior */
     font-size: 24px;
 }
 
 /* Estilos para los botones de llamada a la acción (CTA) */
-.cta-buttons {
+.introductionButtons {
     margin-top: 30px;
 }
 
@@ -34,9 +34,10 @@
     color: #fff;
     text-decoration: none;
     border-radius: 30px;
-    transition: background-color 0.2s ease; /* Añadir transición al cambio de color */
+    transition: background-color 0.3s ease; /* Añadir transición al cambio de color */
 }
 
 .cta-button:hover {
     background-color: #0056b3;
+    color: var(--text-color)
 }
