@@ -1,3 +1,4 @@
+// loginRoute
 var express = require('express');
 var router = express.Router();
 var mysql = require('mysql2/promise');
@@ -34,7 +35,8 @@ router.post('/', function(req, res, next) {
             if (err) {
                 return res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
             }
-            return res.json({ message: 'Logged in successfully' });
+            
+            return res.json({ succes: true, message: 'Logged in successfully' });
         });
     })(req, res, next);
 

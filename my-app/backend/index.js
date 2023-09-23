@@ -12,15 +12,18 @@ const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRoute');
 const mysql = require('mysql2/promise');
 
+app.use(cors({
+  origin: 'http://localhost:3000',  // Cambia esto al origen de tu frontend
+  credentials: true
+}));
+require('./config/passportConfig')(passport);
+require('./socket.js')(socketio);
+
 const hostdb = 'containers-us-west-145.railway.app';
 const userdb = 'root';
 const passdb = 'SRGLy6fQXQmmq2isbnOA';
 const databasedb = 'railway';
 const portdb = 7680;
-
-app.use(cors());
-require('./config/passport-config')(passport);
-require('./socket.js')(socketio);
 
 // conexion a la base de datos
 let connection;
@@ -121,20 +124,8 @@ function ensureAuthenticated(req, res, next) {
 
 
 
-app.use('/api/register', registerRoute);
-app.use('/api/login', loginRoute);
-
-app.get('/login', (req, res) => {
-     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.get('/register', (req, res) => {
-     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
-
-app.get('/index', (req, res) => {
-     res.sendFile(path.join(__dirname, 'build', 'index.html'));
-});
+app.use('/register', registerRoute);
+app.use('/login', loginRoute);
 
 app.get('/chat', ensureAuthenticated, async (req, res) => {
   const user = {
@@ -143,7 +134,7 @@ app.get('/chat', ensureAuthenticated, async (req, res) => {
   };
     
   const contacts = await getContactsForUser(user.id);
-  res.render('chat', { user: user, contacts: contacts });
+  res.json({succes:true, user: user, contacts: contacts });
 });
 
 app.get('/logout', (req, res) => {

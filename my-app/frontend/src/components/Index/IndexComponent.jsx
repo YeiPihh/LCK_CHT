@@ -1,9 +1,12 @@
 import React from "react";
+import Header from '../Header/HeaderComponent.jsx'
 import './Index.css'
 
 const Index = () => {
     return(
-        <main className="mainContent">
+        <>
+            <Header />
+            <main className="mainContent">
             <section className="introductionContainer">
                 <h2 className="introductionTittle">Bienvenido al chat de texto con mas privacidad y funcionalidades</h2>
                 <p className="introductionText">Únete y chatea con plena seguridad y privacidad.</p>
@@ -13,6 +16,8 @@ const Index = () => {
                 </div>
             </section>
         </main>
+        </>
+        
     )
 };
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import Swal from 'sweetalert2';
+import Header from '../Header/HeaderComponent.jsx'
 import Button from '../Button/ButtonComponent.jsx'
 import './Register.css'
 
@@ -43,7 +44,7 @@ const Register = () => {
     }
 
     try {
-      const response = await fetch('http://localhost:4567/api/register', {
+      const response = await fetch('http://localhost:4567/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,11 +76,14 @@ const Register = () => {
     }
   };
   return (
-    <div className="register-container">
+    <>
+      <Header />
+
+      <div className="register-container">
 
       <h2>Registro</h2>
-      <form onSubmit={handleSubmit} id="register-form">
 
+      <form onSubmit={handleSubmit} id="register-form">
         <label htmlFor="username">Usuario:</label>
         <input type="text" id="username" name="username" value={username} onChange={handleChange} required />
         <label htmlFor="password">Contraseña:</label>
@@ -88,13 +92,15 @@ const Register = () => {
         <input type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required className={passwordMatch ? '' : 'error'} />
         {!passwordMatch && <small className="errorText">Las contraseñas no coinciden</small>}
         <Button text="Registrarse" />
-        
       </form>
+
       <p className="login-link">
         ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
       </p>
 
-    </div>
+      </div>
+    </>
+
   );
 };
 
