@@ -117,16 +117,6 @@
     border-radius: 50%;
 }
 
-.material-symbols-outlined {
-    cursor: pointer;
-    background-color: #007bff;
-    padding: 6px 8px;   
-    border-radius: 50%;
-    color: #ecf0f1;
-    font-size: 20px;
-    user-select: none;
-}
-
 .chat-container {
     display: flex;
     height: 100vh;
@@ -425,9 +415,6 @@
         box-sizing: border-box;
     }
 
-    .material-symbols-outlined {
-        font-size: 18px;
-    }
     .nav-list-logout,
     .contact-icon {
         left: 10px; 

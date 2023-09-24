@@ -91,6 +91,8 @@ module.exports = function(socketio) {
 
         socket.on('sendFriendRequest', async (receiverUsername) => {
             const senderId = parseInt(userIds[socket.id]);
+            console.log(userIds[socket.id])
+
             try {
               const [results] = await connection.query('SELECT id FROM users WHERE username = ?', [receiverUsername]);
               if (results.length === 0) {

@@ -6,14 +6,20 @@ const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 const server = require('http').Server(app);
-const socketio = require('socket.io')(server);
+const socketio = require('socket.io')(server, {
+  cors: {
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST"],
+    credentials: true
+  }
+});
 const passport = require('passport');
 const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRoute');
 const mysql = require('mysql2/promise');
 
 app.use(cors({
-  origin: 'http://localhost:3000',  // Cambia esto al origen de tu frontend
+  origin: 'http://localhost:3000',
   credentials: true
 }));
 require('./config/passportConfig')(passport);
@@ -95,7 +101,7 @@ async function getLastMessage(userId, contactId) {
   }
 }
 
-app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
@@ -122,8 +128,6 @@ function ensureAuthenticated(req, res, next) {
     res.redirect('/login');
 }
 
-
-
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
 
@@ -132,9 +136,10 @@ app.get('/chat', ensureAuthenticated, async (req, res) => {
     username: req.user.username,
     id: req.user.id // Aquí es donde obtienes el ID del usuario desde tu base de datos o sesión
   };
-    
+  
   const contacts = await getContactsForUser(user.id);
-  res.json({succes:true, user: user, contacts: contacts });
+  res.json({success:true, user: user, contacts: contacts });
+  // console.log(user, contacts)
 });
 
 app.get('/logout', (req, res) => {
@@ -160,7 +165,7 @@ app.get('/friend-requests', ensureAuthenticated, async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+  res.sendFile(path.join(__dirname));
 });
 
   

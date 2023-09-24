@@ -1,25 +1,36 @@
 // ChatComponent.jsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import './Chat.css'
+import { io } from "socket.io-client";
+
+const socket = io('http://localhost:4567');
 
 const ChatComponent = () => {
   const [contacts, setContacts] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
   const [menuVisibility, setMenuVisibility] = useState(false);
+  const [addFormVisibility, setAddFormVisibility] = useState(false);
+  const [friendRequestVisibility, setFriendRequestVisibility] = useState(false);
+  const [shouldShowParagraph, setShouldShowParagraph] = useState(false);
+  const [username, setUsername ] = useState('');
+  const formRef = useRef(null);
+  const [newContactUsername, setNewContactUsername] = useState('')
 
   useEffect(() => {
-    // Suponiendo que tienes alguna forma de autenticación como un token
+
     fetch('http://localhost:4567/chat', {
       credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
     })
     .then(response => response.json())
     .then(data => {
+      
       if (data.success) {
         setContacts(data.contacts);
+        setUsername(data.user.username);
       }
     })
     .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
@@ -39,37 +50,81 @@ const ChatComponent = () => {
 
   const handleContactClick = (contact) => {
     setSelectedContact(contact.contact_id);
-    // Aquí podrías hacer más cosas, como mostrar/ocultar diferentes partes de la UI
+    //
   };
 
-  const handleMeuVisibility = (click) => {
-    setMenuVisibility(!menuVisibility)
+  const handleClickOutside = (e) => {
+    if (formRef.current && !formRef.current.contains(e.target)) {
+      setMenuVisibility(false);
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+    }
   };
+
+  const handleMenuVisibility = (e) => {
+    e.stopPropagation(); // Detiene la propagación del evento
+    setMenuVisibility(!menuVisibility); // Cambia la visibilidad del menú
+    if (menuVisibility === true) {
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+    }
+  };
+
+  const handleAddFormVisibility = () => {
+    setAddFormVisibility(!addFormVisibility);
+  };
+
+  const handleFriendRequestVisibility = () => {
+    setFriendRequestVisibility(!friendRequestVisibility);
+  };
+
+  const handleAddContact = async(e) => {
+    e.preventDefault();
+    socket.emit('sendFriendRequest', newContactUsername)
+    // Escuchar el evento de éxito al enviar una solicitud de amistad
+    socket.on('friendRequestSuccess', (message) => {
+      console.log("Éxito: ", message);
+      // Aquí puedes añadir cualquier lógica adicional que quieras ejecutar cuando la solicitud se envíe con éxito.
+    });
+    
+    // Escuchar el evento de error al enviar una solicitud de amistad
+    socket.on('friendRequestError', (message) => {
+      console.log("Error: ", message);
+      // Aquí puedes añadir cualquier lógica adicional que quieras ejecutar cuando ocurra un error.
+    });
+    setAddFormVisibility(false);
+  };
+
+  useEffect(() => {
+    const wrapper = document.getElementById('friendRequestsWrapper');
+    setShouldShowParagraph(wrapper.childNodes.length <= 1 && friendRequestVisibility === true);
+     // ¡¡¡¡¡¡¡¡¡¡ CUANDO SE HABILITEN LAS SOLICITUDES DE AMISTAD HAY QUE ALMACENAR LA CANTIDAD DE SOLICITUDES EN UNA VARIABLE Y MODIFICAR ESTE EFFECT PARA NO ACCEDER AL DOM DIRECTAMENTE DESDE REACT!!!!!!!!!
+  }, [friendRequestVisibility]);
 
   return (
-    <div className="chat-container">
+    <div className="chat-container" onClick={handleClickOutside}>
       <div className="chat-sidebar">
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
-          <span id="menuButton" className="material-symbols-outlined" onClick={handleMeuVisibility}>menu</span>
-                <div id="menuChat" className={menuVisibility ? 'visible' : 'hidden'}>
+          <button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
+                <div id="menuChat" className={menuVisibility ? 'visible' : 'hidden'} ref={formRef}>
                     <div id="homeButton">
                         <button className="material-symbols-outlined">home</button>
                         <span className="text">Volver al incio</span>
                     </div>
                     <div className="contact-icon">
-                        <form id="addContactForm">
-                            <input type="text" id="newContactUsername" placeholder="Usuario del contacto" autoComplete="off" name="nombre_usuario_añadir" />
+                        <form id="addContactForm" className={addFormVisibility ? 'visible' : 'hidden'} onSubmit={handleAddContact}>
+                            <input type="text" id="newContactUsername" placeholder="Usuario del contacto" autoComplete="off" name="nombre_usuario_añadir" value={newContactUsername} onChange={(e) => setNewContactUsername(e.target.value)} />
                             <button type="submit">Añadir</button>
                         </form>
-                        <button id="contactButton" className="material-symbols-outlined">add_circle</button>
+                        <button id="contactButton" className="material-symbols-outlined" onClick={handleAddFormVisibility}>add_circle</button>
                         <span className="text">Añadir contacto</span>
                     </div>
                     <div className="solicitud">
-                        <div id="friendRequestsWrapper" className="hidden">
-                            Aquí se mostrarán las solicitudes de amistad
+                        <div id="friendRequestsWrapper" className={friendRequestVisibility ? 'visible' : 'hidden'}>
+                            <p className={shouldShowParagraph ? 'visible' : 'hidden'}>No tienes ninguna solicitud pendiente</p>
                         </div>
-                        <button id="friendRequestButton" className="material-symbols-outlined">mail</button>
+                        <button id="friendRequestButton" className="material-symbols-outlined" onClick={handleFriendRequestVisibility}>mail</button>
                         <span className="text">Solicitudes entrantes</span>
                     </div>
                     <div className="nav-list-logout">
@@ -77,7 +132,7 @@ const ChatComponent = () => {
                         <span className="text">Cerrar Sesion</span>
                     </div>
                 </div>
-          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username="USERNAME" />
+          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username={username} />
         </div>
         
       </div>

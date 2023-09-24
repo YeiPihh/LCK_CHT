@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:ital@0;1&display=swap');
 /* Variables */
 :root {
   --main-bg-color: #333;
@@ -16,6 +17,18 @@
   -moz-user-select: none;      /* Firefox */
   -ms-user-select: none;       /* Internet Explorer/Edge */
   user-select: none;           /* Non-prefixed version, currently supported by Chrome, Opera and Firefox */
+}
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 200, 'GRAD' 200, 'opsz' 40;
+}
+.material-symbols-outlined {
+  cursor: pointer;
+  background-color: #007bff;
+  padding: 6px 6px;   
+  border-radius: 50%;
+  color: #ecf0f1;
+  user-select: none;
 }
 
 div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {

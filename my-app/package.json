@@ -8,10 +8,12 @@
     "start-backend": "cd backend && yarn start"
   },
   "dependencies": {
+    "cors": "^2.8.5",
     "google-auth-library": "^9.0.0",
     "googleapis": "^126.0.1",
     "mysql2": "^3.6.1",
     "nodemon": "^3.0.1",
+    "socket.io-client": "^4.7.2",
     "sweetalert2": "^11.7.28"
   }
 }
