@@ -44,7 +44,7 @@ module.exports = function(socketio) {
 
       
           socket.on('openChat', async (contactId) => {
-            const userId = userIds[socket.id]; // Asumiendo que tienes una manera de obtener el userId
+            const userId = userIds[socket.id]; 
             const [messages] = await connection.query('SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp', [userId, contactId, contactId, userId]);
       
             // Enviar los mensajes al cliente
@@ -145,19 +145,12 @@ module.exports = function(socketio) {
             const { senderId, receiverId, content } = data;
             console.log('socket',receiverId);
             await saveMessage(senderId, receiverId, content);
-          
-            // Puedes reenviar el mensaje al destinatario si es necesario
-            // socket.to(receiverId).emit('receiveMessage', content);
 
-            const receiverSocket = userSockets[receiverId]; // Asegúrate de tener una forma de obtener el socket del destinatario
+            const receiverSocket = userSockets[receiverId];
             if (receiverSocket) {
               receiverSocket.emit('receiveMessage', data);
             }
 
           });
-          
-        
-        
-
     });
 };

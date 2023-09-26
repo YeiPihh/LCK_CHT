@@ -7,10 +7,78 @@
 .profileImagenContainer #imagenProfile {
     margin-right: 5px;
 }
+*/
 
-.username-side{
-    margin-right: 20px;
-    font-size: 25px!important;
+.profileImagenContainer {
+    width: auto;
+    position: relative;
+    height: 3.5em;
+    border: 3px ridge var(--main-color);
+    outline: none;
+    background-color: transparent;
+    color: white;
+    transition: 1s;
+    border-radius: 0.3em;
+    font-size: 16px;
     font-weight: bold;
+    justify-content: center;
+    padding: 3px 7px;
+}
+
+.profileImagenContainer::after {
+  content: "";
+  position: absolute;
+  top: -10px;
+  left: 3%;
+  width: 95%;
+  height: 20%;
+  background-color: #333333;;
+  transition: 0.5s;
+  transform-origin: center;
+}
+
+.profileImagenContainer::before {
+  content: "";
+  transform-origin: center;
+  position: absolute;
+  top: 90%;
+  left: 3%;
+  width: 95%;
+  height: 20%;
+  background-color: #333333;;
+  transition: 0.5s;
+}
+
+.profileImagenContainer:hover::before, .profileImagenContainer:hover::after {
+  transform: scale(0)
+}
+
+.profileImagenContainer:hover {
+  box-shadow: inset 0px 0px 25px var(--main-color);
+}
+
+.usernameSide{
+    margin-right: 5px;
+    font-size: 20px;
+    font-weight: 600;
     letter-spacing: 3px;
-} */
+}
+
+@media (max-width: 1150px) {
+.usernameSide {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+}
+
+@media (max-width: 900px){
+    .usernameSide {
+        display: none;
+    }
+    .profileImagenContainer {
+        padding: 0px 20px;
+    }
+}
+  
+

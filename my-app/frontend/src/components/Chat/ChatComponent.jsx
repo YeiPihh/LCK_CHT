@@ -1,10 +1,12 @@
 // ChatComponent.jsx
 import React, { useState, useEffect, useRef } from 'react';
+import { io } from "socket.io-client";
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
+import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
 import './Chat.css'
-import { io } from "socket.io-client";
+
 
 const socket = io('http://localhost:4567');
 
@@ -37,9 +39,9 @@ const ChatComponent = () => {
   }, []);
   
   useEffect(() => {
-    // Aquí harías la petición al servidor para obtener los mensajes del contacto seleccionado
+    // Aquí se hara la petición al servidor para obtener los mensajes del contacto seleccionado
     // Por ejemplo: fetch(`/api/messages/${selectedContact}`).then(/* actualizar el estado con los nuevos mensajes */)
-    // Para este ejemplo, utilizaremos datos de muestra:
+    // Por ahora solo se usanran datos de muestra:
     if (selectedContact) {
       setMessages([
         { content: 'Hola', isOwnMessage: true },
@@ -84,14 +86,14 @@ const ChatComponent = () => {
     // Escuchar el evento de éxito al enviar una solicitud de amistad
     socket.on('friendRequestSuccess', (message) => {
       console.log("Éxito: ", message);
-      // Aquí puedes añadir cualquier lógica adicional que quieras ejecutar cuando la solicitud se envíe con éxito.
+      //añadir alerta
     });
     
     // Escuchar el evento de error al enviar una solicitud de amistad
     socket.on('friendRequestError', (message) => {
       console.log("Error: ", message);
-      // Aquí puedes añadir cualquier lógica adicional que quieras ejecutar cuando ocurra un error.
-    });
+    //añadir alerta    
+  });
     setAddFormVisibility(false);
   };
 
@@ -106,7 +108,9 @@ const ChatComponent = () => {
       <div className="chat-sidebar">
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
-          <button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
+          {//<button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
+          }
+          <MenuButtonComponent id="menuButton" onClick={handleMenuVisibility} ref={formRef}/>
                 <div id="menuChat" className={menuVisibility ? 'visible' : 'hidden'} ref={formRef}>
                     <div id="homeButton">
                         <button className="material-symbols-outlined">home</button>

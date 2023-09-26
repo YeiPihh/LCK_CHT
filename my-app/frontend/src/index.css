@@ -2,12 +2,13 @@
 /* Variables */
 :root {
   --main-bg-color: #333;
-  --text-color: white;
+  --text-color: #f5f5f5;
   --nav-bg-color: #444;
   --hover-bg-color: #ddd;
   --hover-text-color: black;
-  --main-content-bg: #f1f1f1;
+  --main-content-bg: #dddbdb;
   --main-color: #007bff;
+  --main-color-dark: #0056b3;
 }
 
 .no-select, img {
@@ -24,11 +25,16 @@
 }
 .material-symbols-outlined {
   cursor: pointer;
-  background-color: #007bff;
+  background-color: var(--main-color);
   padding: 6px 6px;   
   border-radius: 50%;
-  color: #ecf0f1;
+  color: #ffffff;
   user-select: none;
+  border: none;
+}
+.material-symbols-outlined:hover {
+
+  background-color: #0056b3;
 }
 
 div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
@@ -46,9 +52,10 @@ div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
 }
 
 body {
-  font-family: system-ui ,'Lato', sans-serif, 'Courier New', 'Courier';
+  font-family: Verdana, system-ui ,'Lato', sans-serif, 'Courier New', 'Courier';
   margin: 0;
   padding: 0;
+  background-color: var(--main-content-bg);
 }
 
 a { 

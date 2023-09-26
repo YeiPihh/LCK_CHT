@@ -105,17 +105,17 @@ app.use(express.static(path.join(__dirname, '../frontend/build')));
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// Configura las sesiones ANTES de las rutas y Passport
+// Configurar las sesiones ANTES de las rutas y Passport
 app.use(session({
   secret: '020901',
   resave: false,
   saveUninitialized: true,
-  cookie: { secure: false } // Cambia a true si estás usando HTTPS
+  cookie: { secure: false } // Cambiar a true si estás usando HTTPS
 }));
 
 // Inicialización de Passport
 app.use(passport.initialize());
-app.use(passport.session()); // <-- Asegúrate de que esta línea esté después de la configuración de session
+app.use(passport.session()); // <-- esta línea después de la configuración de session
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '../frontend/index.js' );
@@ -134,7 +134,7 @@ app.use('/login', loginRoute);
 app.get('/chat', ensureAuthenticated, async (req, res) => {
   const user = {
     username: req.user.username,
-    id: req.user.id // Aquí es donde obtienes el ID del usuario desde tu base de datos o sesión
+    id: req.user.id // Aquí es donde se obtiene el ID del usuario desde la base de datos o sesión
   };
   
   const contacts = await getContactsForUser(user.id);
@@ -152,7 +152,7 @@ app.get('/chat-history/:contactId', ensureAuthenticated, async (req, res) => {
   const contactId = req.params.contactId;
   const userId = req.user.id;
 
-  // Aquí debes obtener el historial del chat desde la base de datos
+  // obtener el historial del chat desde la base de datos
   const chatHistory = await getChatHistory(userId, contactId);
 
   res.json({ success: true, messages: chatHistory });

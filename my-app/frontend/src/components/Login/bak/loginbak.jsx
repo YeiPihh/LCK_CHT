@@ -47,30 +47,33 @@ const Login = () => {
   };
 
   return (
-    <div id="form-ui" className="login-container">
-    <form onSubmit={handleSubmit} id="login-form">
-      <div id="form-body">
-        <div id="welcome-lines">
-          <div id="welcome-line-1">LCK CHT</div>
-          <div id="welcome-line-2">Welcome to Lock Chat</div>
-        </div>
-        <div id="input-area">
-          <div class="form-inp">
-            <input placeholder="Username" type="text" id="username" required value={username} onChange={e => setUsername(e.target.value)}  />
-          </div>
-          <div class="form-inp">
-            <input placeholder="Password" type="password" id="password" required value={password} onChange={e => setPassword(e.target.value)}  />
-          </div>
-        </div>
-        <div id="submit-button-cvr">
-          <button id="submit-button" type="submit">Login</button>
-        </div>
-        <div id="forgot-pass" className="login-link">
-        ¿No tienes una cuenta? <a href="/register">Regístrate aquí</a>
-        </div>
+  
+  
+      <div className="login-container">
+        <h2>Iniciar Sesión</h2>
+        <form onSubmit={handleSubmit} id="login-form">
+          <label htmlFor="username">Usuario:</label>
+          <input 
+            type="text" 
+            id="username" 
+            required 
+            value={username} 
+            onChange={e => setUsername(e.target.value)} 
+          />
+          <label htmlFor="password">Contraseña:</label>
+          <input 
+            type="password" 
+            id="password" 
+            required 
+            value={password} 
+            onChange={e => setPassword(e.target.value)} 
+          />
+          <Button text="Iniciar Sesion" />
+        </form>
+        <p className="login-link">
+          ¿No tienes una cuenta? <a href="/register">Regístrate aquí</a>
+        </p>
       </div>
-    </form>
-    </div>
   
   );
 };
