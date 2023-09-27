@@ -1,56 +1,171 @@
-input:focus {
-    border: transparent;
-    outline: none;            
-}
-
-.register-container {
-    max-width: 300px;
-    margin: 20px auto;
-    padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 20px;
-    background-color: #fff;
-}
-
-.register-container h2 {
-    text-align: center;
-}
-
 #register-form {
-    display: flex;
-    flex-direction: column;
-}
-
-#register-form label {
-    margin: 10px 0;
-}
-
-#register-form input {
-    padding: 5px;
-    border: 1px solid #ccc;
+    display: grid;
+    place-items: center;
+    width: 350px;
+    height: 550px;
+    padding: 25px;
+    background-color: #161616;
+    box-shadow: 0px 15px 60px var(--main-color-dark);
+    outline: 1px solid var(--main-color);
+    border-radius: 10px;
+    margin: auto;
+    margin-top: 20vh;
+  }
+  
+  #form-body {
+    width: 300px;
+  }
+  
+  #welcome-lines {
+    text-align: center;
+    line-height: 1;
+  }
+  
+  #welcome-line-1 {
+    position: relative;
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: 3px;
+    border: 2px solid white;
     border-radius: 5px;
-}
+    padding: 13px 10px;
+    transition: transform 0.9s ease-in-out;
+    transition: box-shadow 0.4s ease-in-out;
+  }
 
-.error {
-    border-color: red !important;
-}
+  #welcome-line-1::after {
+    content: "";
+    position: absolute;
+    top: -10%;
+    left: 3%;
+    width: 95%;
+    height: 20%;
+    background-color: #161616;;
+    transition: 0.5s;
+    transform-origin: center;
+  }
+  
+  #welcome-line-1::before {
+    content: "";
+    transform-origin: center;
+    position: absolute;
+    top: 90%;
+    left: 3%;
+    width: 95%;
+    height: 20%;
+    background-color: #161616;;
+    transition: 0.5s;
+  }
 
-.errorText {
-    color: red;
-}
+  #welcome-line-1:hover::before, #welcome-line-1:hover::after {
+    transform: scale(0)
+  }
 
-.login-link {
-    margin-top: 10px;
+  #welcome-line-1:hover {
+    cursor: pointer;
+    transform: scale(1.0);
+    color: var(--main-color-dark);
+    box-shadow: inset 0px 0px 12px white;
+  }
+  
+  #welcome-line-2 {
+    color: #ffffff;
+    font-size: 18px;
+    margin-top: 17px;
+  }
+  
+  #input-area {
+    margin-top: 40px;
+  }
+  
+  .form-inp {
+    padding: 11px 25px;
+    background: transparent;
+    border: 1px solid #e3e3e3;
+    line-height: 1;
+    border-radius: 8px;
+    margin-bottom: 15px;
+  }
+  
+  .form-inp:focus {
+    border: 1px solid var(--main-color);
+  }
+  
+  
+  .form-inp input {
+    width: 100%;
+    background: none;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--main-color);
+    border: none;
+    padding: 0;
+    margin: 0
+  }
+  
+  .form-inp input:focus {
+    outline: none;
+  }
+  .form-inp.focused {
+    transform: scale(1.05);
+    box-shadow: 5px 5px 10px var(--main-color-dark),
+               -5px -5px 10px var(--main-color-dark);
+
+  }
+  
+  #submit-button-cvr {
+    margin-top: 20px;
+  }
+  
+  #submit-button {
+    display: block;
+    width: 100%;
+    color: var(--main-color);
+    background-color: transparent;
+    font-weight: 600;
     font-size: 14px;
-}
+    margin: 0;
+    padding: 14px 13px 12px 13px;
+    border: 0;
+    outline: 1px solid var(--main-color);
+    border-radius: 8px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all ease-in-out .3s;
+  }
+  
+  #submit-button:hover {
+    transform: scale(1.05);
+    transition: all ease-in-out .3s;
+    background-color: var(--main-color);
+    color: #161616;
+    cursor: pointer;
+  }
+  
+  .error{
+    border: 1px solid red !important;
+  }
 
-.login-link a {
+  small {
+    color: red;
+    font-weight: 600;
+  }
+  
+  #forgot-pass {
+    text-align: center;
+    margin-top: 30px;
+    color: var(--text-color);
+    font-size: 15px;
+  }
+  
+  #forgot-pass a {
     text-decoration: none;
-    color: #007bff;
-    font-weight: bold;
-    transition: color 0.2s ease;
-}
+    font-size: 15px;
+    transition: font-size 0.2s ease-in-out;
+    cursor: pointer;
+  }
 
-.login-link a:hover {
-    color: #0056b3;
-}
+  #forgot-pass a:hover {
+    font-size: 16px;
+  }

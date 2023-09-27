@@ -1,8 +1,8 @@
 #login-form {
     display: grid;
     place-items: center;
-    width: 300px;
-    height: 472px;
+    width: 350px;
+    height: 550px;
     padding: 25px;
     background-color: #161616;
     box-shadow: 0px 15px 60px var(--main-color-dark);
@@ -13,7 +13,7 @@
   }
   
   #form-body {
-    width: 230px;
+    width: 300px;
   }
   
   #welcome-lines {
@@ -22,10 +22,51 @@
   }
   
   #welcome-line-1 {
+    position: relative;
     color: var(--main-color);
     font-weight: 600;
     font-size: 40px;
-    letter-spacing: 5px;
+    letter-spacing: 3px;
+    border: 2px solid white;
+    border-radius: 5px;
+    padding: 13px 10px;
+    transition: transform 0.9s ease-in-out;
+    transition: box-shadow 0.4s ease-in-out;
+  }
+
+  #welcome-line-1::after {
+    content: "";
+    position: absolute;
+    top: -10%;
+    left: 3%;
+    width: 95%;
+    height: 20%;
+    background-color: #161616;;
+    transition: 0.5s;
+    transform-origin: center;
+  }
+  
+  #welcome-line-1::before {
+    content: "";
+    transform-origin: center;
+    position: absolute;
+    top: 90%;
+    left: 3%;
+    width: 95%;
+    height: 20%;
+    background-color: #161616;;
+    transition: 0.5s;
+  }
+
+  #welcome-line-1:hover::before, #welcome-line-1:hover::after {
+    transform: scale(0)
+  }
+
+  #welcome-line-1:hover {
+    cursor: pointer;
+    transform: scale(1.0);
+    color: var(--main-color-dark);
+    box-shadow: inset 0px 0px 12px white;
   }
   
   #welcome-line-2 {
@@ -57,15 +98,22 @@
   .form-inp input {
     width: 100%;
     background: none;
-    font-size: 13.4px;
+    font-size: 15px;
+    font-weight: 600;
     color: var(--main-color);
     border: none;
     padding: 0;
-    margin: 0;
+    margin: 0
   }
   
   .form-inp input:focus {
     outline: none;
+  }
+  .form-inp.focused {
+    transform: scale(1.05);
+    box-shadow: 5px 5px 10px var(--main-color-dark),
+               -5px -5px 10px var(--main-color-dark);
+
   }
   
   #submit-button-cvr {
@@ -90,6 +138,7 @@
   }
   
   #submit-button:hover {
+    transform: scale(1.05);
     transition: all ease-in-out .3s;
     background-color: var(--main-color);
     color: #161616;
@@ -98,40 +147,18 @@
   
   #forgot-pass {
     text-align: center;
-    margin-top: 10px;
-    color: var(--text-color)
+    margin-top: 30px;
+    color: var(--text-color);
+    font-size: 15px;
   }
   
   #forgot-pass a {
-    font-size: 12px;
     text-decoration: none;
+    font-size: 15px;
+    transition: font-size 0.2s ease-in-out;
+    cursor: pointer;
   }
-  
-  #bar {
-    position: absolute;
-    left: 50%;
-    bottom: -50px;
-    width: 28px;
-    height: 8px;
-    margin-left: -33px;
-    background-color: var(--main-color);
-    border-radius: 10px;
+
+  #forgot-pass a:hover {
+    font-size: 16px;
   }
-  
-  #bar:before,
-  #bar:after {
-    content: "";
-    position: absolute;
-    width: 8px;
-    height: 8px;
-    background-color: #ececec;
-    border-radius: 50%;
-  }
-  
-  #bar:before {
-    right: -20px;
-  }
-  
-  #bar:after {
-    right: -38px;
-  }  
