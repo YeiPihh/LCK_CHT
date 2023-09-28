@@ -19,7 +19,7 @@ const loginRoute = require('./routes/loginRoute');
 const mysql = require('mysql2/promise');
 
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: 'http://localhost:3001',
   credentials: true
 }));
 require('./config/passportConfig')(passport);

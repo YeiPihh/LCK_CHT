@@ -1,6 +1,7 @@
 // ChatComponent.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from "socket.io-client";
+import Swal from 'sweetalert2';
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
@@ -86,13 +87,23 @@ const ChatComponent = () => {
     // Escuchar el evento de éxito al enviar una solicitud de amistad
     socket.on('friendRequestSuccess', (message) => {
       console.log("Éxito: ", message);
-      //añadir alerta
+      Swal.fire({
+        title: 'Success',
+        text: message,
+        icon: 'success',
+        confirmButtonText: 'Aceptar'
+      });
     });
     
     // Escuchar el evento de error al enviar una solicitud de amistad
     socket.on('friendRequestError', (message) => {
       console.log("Error: ", message);
-    //añadir alerta    
+      Swal.fire({
+        title: 'Error ',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      })  
   });
     setAddFormVisibility(false);
   };

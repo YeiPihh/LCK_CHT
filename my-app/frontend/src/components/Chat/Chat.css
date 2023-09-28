@@ -1,4 +1,3 @@
-/*chat.ejs*/
 /* Estilos generales para el chat */
 .chat-messages {
     display: flex;
@@ -128,7 +127,7 @@
     display: flex;
     flex-direction: column;
     width: 30vw;
-    background-color: #333; /* Oscuro igual que el footer de index.html */
+    background-color: var(--main-bg-color); /* Oscuro igual que el footer de index.html */
     color: #ecf0f1;
 }
 
@@ -185,12 +184,45 @@
 }
 
 #addContactForm{
+    display: flex;
+    flex-direction: column;
     position: absolute;
     background-color: #ffffffef;
-    padding: 15px;
+    padding: 15px 20px;
     border-radius: 10px;
     top: 105%;
     left: 0%;
+    width: 85%;
+}
+
+#addContactForm input {
+    font-size: 14px;
+    padding: 5px;
+    border-radius: 5px;
+    transition: all 0.4 ease-in-out;    
+}
+
+#addContactForm input:focus {
+    transform: scale(1.05);
+    background-color: var(--main-color-dark);
+}
+
+#addContactForm button {
+    font-size: 14px;
+    font-weight: 600;
+    color: #fff;
+    background-color: var(--main-color);
+    padding: 8px 8px;
+    border: 0px;
+    border-radius: 5px;
+    margin-top: 5px;
+    cursor: pointer;
+    transition: all 0.4 ease-in-out;
+    width: fit-content;
+}
+
+#addContactForm button:hover {
+    transform: scale(1.03);
 }
 
 #friendRequestsWrapper{
@@ -245,7 +277,7 @@
     padding: 0 30px;
     background-color: #ffffffe1;
     border-radius: 15px;
-    color: #333;
+    color: black;
     display: flex;
     flex-direction: column;
     box-sizing:content-box;

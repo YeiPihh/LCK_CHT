@@ -1,7 +1,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Lato:ital@0;1&display=swap');
 /* Variables */
 :root {
-  --main-bg-color: #333;
+  --main-bg-color: #161616;
   --text-color: #f5f5f5;
   --nav-bg-color: #444;
   --hover-bg-color: #ddd;
@@ -9,6 +9,7 @@
   --main-content-bg: #dddbdb;
   --main-color: #007bff;
   --main-color-dark: #0056b3;
+  --textColor: #fff;
 }
 
 .no-select, img {

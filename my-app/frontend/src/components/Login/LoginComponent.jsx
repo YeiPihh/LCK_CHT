@@ -1,32 +1,21 @@
 import React, { useState } from 'react';
-import Button from '../Button/ButtonComponent.jsx';
-import Header from '../Header/HeaderComponent.jsx'
 import './Login.css';
 import { useNavigate, Link  } from 'react-router-dom';
+import Swal from 'sweetalert2';
 
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isFocused, setFocus] = useState(false);
-  const [isFocused1, setFocus1] = useState(false);
   const navigate = useNavigate();
 
 
-  const handleFocus = () => {
-    setFocus(true);
+  const handleFocus = (id) => {
+    setFocus(id);
   };
-
   const handleBlur = () => {
     setFocus(false);
-  };
-
-  const handleFocus1 = () => {
-    setFocus1(true);
-  };
-
-  const handleBlur1 = () => {
-    setFocus1(false);
   };
 
   const handleLogin = (event) => {
@@ -56,13 +45,29 @@ const Login = () => {
       if (err.status === 401) {
         err.json().then(errorData => {
           if (errorData.error === 'Usuario o contraseña incorrecta') {
-            alert(errorData.error);
-            // Aquí puedes actualizar el estilo de los inputs si es necesario
+            Swal.fire({
+              title: 'Error ',
+              text: errorData.error,
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            })
           } else {
             console.error(errorData);
+            Swal.fire({
+              title: 'Error ',
+              text: 'Unexpected error, please try again later',
+              icon: 'error',
+              confirmButtonText: 'Aceptar'
+            })
           }
         });
       } else {
+        Swal.fire({
+          title: 'Error ',
+          text: 'Unexpected error, please try again later',
+          icon: 'error',
+          confirmButtonText: 'Aceptar'
+        })
         console.error('Unhandled error:', err);
       }
     });
@@ -71,20 +76,20 @@ const Login = () => {
   return (
     <div id="form-ui" className="login-container">
     <form onSubmit={handleLogin} id="login-form">
-      <div id="form-body">
+      <div id="formBodyLogin">
         <div id="welcome-lines">
           <div id="welcome-line-1"><Link to ="/">LCK CHT</Link></div>
           <div id="welcome-line-2">Welcome to Lock Chat</div>
         </div>
         <div id="input-area">
-          <div className={`form-inp ${isFocused ? "focused" : ""}`}>
-            <input placeholder="Username" type="text" id="username" required value={username} onChange={e => setUsername(e.target.value)} onFocus={handleFocus} onBlur={handleBlur} />
+          <div className={`form-inp ${isFocused==='input1' ? "focused" : ""}`}>
+            <input placeholder="Username" type="text" id="username" required value={username} onChange={e => setUsername(e.target.value)} onFocus={() => handleFocus('input1')} onBlur={handleBlur} />
           </div>
-          <div className={`form-inp ${isFocused1 ? "focused" : ""}`}>
-            <input placeholder="Password" type="password" id="password" required value={password} onChange={e => setPassword(e.target.value)} onFocus={handleFocus1} onBlur={handleBlur1}  />
+          <div className={`form-inp ${isFocused ==='input2' ? "focused" : ""}`}>
+            <input placeholder="Password" type="password" id="password" required value={password} onChange={e => setPassword(e.target.value)} onFocus={() => handleFocus('input2')} onBlur={handleBlur}  />
           </div>
         </div>
-        <div id="submit-button-cvr">
+        <div id="submitButtonLogin">
           <button id="submit-button" type="submit">Login</button>
         </div>
         <div id="forgot-pass" className="login-link">

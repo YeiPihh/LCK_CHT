@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from 'react-router-dom';
-import './Index.css'
+import './IndexComponent.css'
 
 const Index = () => {
     return(
@@ -12,9 +12,9 @@ const Index = () => {
                   <div id="welcome-line-2">Welcome to Lock Chat, enjoy the privacy and security</div>
                 </div>
             
-                <div id="submit-button-cvr">
-                  <button id="submit-button" className="indexRegister" type="submit"><Link to="/register" />Register</button>
-                  <button id="submit-button" className="indexLogin" type="submit">Log in</button>
+                <div id="submitButtonIndex">
+                <Link to="/Register"><button id="submit-button" className="indexRegister" type="submit">Register</button></Link>
+                <Link to="/Login"><button id="submit-button" className="indexLogin" type="submit">Log in</button></Link>
                 </div>
           
               </div>
@@ -25,23 +25,3 @@ const Index = () => {
 };
 
 export default Index;
-
-
-
-
-
-/*                 <Header />
-            <main className="mainContent">
-            <section className="introductionContainer">
-                <h2 className="introductionTittle">Bienvenido al chat de texto con mas privacidad y funcionalidades</h2>
-                <p className="introductionText">Únete y chatea con plena seguridad y privacidad.</p>
-                <div className="introductionButtons">
-                    <Link to="/login" className="cta-button login-button">Iniciar Sesión</Link>
-                    <Link to="/register" className="cta-button register-button">Registrarse</Link>
-                </div>
-            </section>
-            </main>  
-            
-            
-            */
-          

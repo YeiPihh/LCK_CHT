@@ -12,7 +12,7 @@
     margin-top: 20vh;
   }
   
-  #form-body {
+  #formBodyLogin {
     width: 300px;
   }
   
@@ -116,8 +116,10 @@
 
   }
   
-  #submit-button-cvr {
+  #submitButtonLogin {
     margin-top: 20px;
+    justify-content: center;
+    display: flex;
   }
   
   #submit-button {

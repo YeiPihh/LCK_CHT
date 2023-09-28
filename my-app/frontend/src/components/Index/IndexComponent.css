@@ -31,17 +31,19 @@
   }
   
 
-  #submit-button-cvr {
+  #submitButtonIndex {
     width: 100%;
     margin-top: 40px;
     display: flex;
     gap: 20%;
+    justify-content: space-between;
   }
 
 
   #submit-button {
-    display: block;
-    width: 100%;
+    display: flex;
+    width: 130px;
+    justify-content: center;
     color: var(--main-color);
     background-color: transparent;
     font-weight: 600;
@@ -53,65 +55,10 @@
     border-radius: 8px;
     line-height: 1;
     cursor: pointer;
-    transition: all ease-in-out .3s;
+    transition: all ease-in-out .5s;
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/* .mainContent {
-    padding: 20px; 
-    max-width: 800px;
-    margin: 0 auto; 
-    margin-top: 20px;
-
-}
-
-.introductionContainer {
-    background-color: #f9f9f9;
-    color: #333;
-    padding: 40px;
-    text-align: center;
-    border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-}
-
-.introductionTitle {
-    margin: 0;
-    margin-bottom: 20px; 
-    font-size: 24px;
-}
-
-.introductionButtons {
-    margin-top: 30px;
-}
-
-.cta-button {
-    display: inline-block;
-    padding: 12px 24px;
-    margin: 10px;
-    background-color: #007bff;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 30px;
-    transition: background-color 0.3s ease;
-}
-
-.cta-button:hover {
-    background-color: #0056b3;
-    color: var(--text-color)
-}  */
+  #submit-button:hover {
+    transform: scale(1.05);
+    color: var(--textColor);
+  }
