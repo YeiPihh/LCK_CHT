@@ -8,7 +8,6 @@ import {
 import Register from './components/Register/RegisterComponent.jsx';
 import Login from './components/Login/LoginComponent.jsx';
 import Index from './components/Index/IndexComponent.jsx';
-import Return from './components/Return/ReturnComponent.jsx';
 import Chat from './components/Chat/ChatComponent.jsx';
 import './index.css';
 

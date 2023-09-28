@@ -1,9 +1,84 @@
-.mainContent {
-    padding: 20px; /* Añadir un espacio a los lados */
+.index-container {
+    display: grid;
+    place-items: center;
+    width: 30vw;
+    height: auto;
+    padding: 40px;
+    background-color: #161616;
+    box-shadow: 0px 15px 60px var(--main-color-dark);
+    outline: 1px solid var(--main-color);
+    border-radius: 10px;
+    margin: auto;
+    margin-top: 20vh;
+  }
+
+  #form-body {
+    width: auto;
+  }
+
+  #welcome-line-1 {
+    position: relative;
+    color: var(--main-color);
+    font-weight: 600;
+    font-size: 40px;
+    letter-spacing: 3px;
+    border: 2px solid white;
+    border-radius: 5px;
+    padding: 13px 10px;
+    transition: transform 0.9s ease-in-out;
+    transition: box-shadow 0.4s ease-in-out;
+    margin-bottom: 30px;
+  }
+  
+
+  #submit-button-cvr {
+    width: 100%;
+    margin-top: 40px;
+    display: flex;
+    gap: 20%;
+  }
+
+
+  #submit-button {
+    display: block;
+    width: 100%;
+    color: var(--main-color);
+    background-color: transparent;
+    font-weight: 600;
+    font-size: 14px;
+    margin: 0;
+    padding: 14px 13px 12px 13px;
+    border: 0;
+    outline: 1px solid var(--main-color);
+    border-radius: 8px;
+    line-height: 1;
+    cursor: pointer;
+    transition: all ease-in-out .3s;
+  }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .mainContent {
+    padding: 20px; 
     max-width: 800px;
-    margin: 0 auto; /* Centrar el contenido principal */
+    margin: 0 auto; 
     margin-top: 20px;
-    /*border: 1px solid #ccc;*/
+
 }
 
 .introductionContainer {
@@ -12,16 +87,15 @@
     padding: 40px;
     text-align: center;
     border-radius: 20px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Agregar sombra al contenido */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
 }
 
 .introductionTitle {
     margin: 0;
-    margin-bottom: 20px; /* Añadir un margen inferior */
+    margin-bottom: 20px; 
     font-size: 24px;
 }
 
-/* Estilos para los botones de llamada a la acción (CTA) */
 .introductionButtons {
     margin-top: 30px;
 }
@@ -34,10 +108,10 @@
     color: #fff;
     text-decoration: none;
     border-radius: 30px;
-    transition: background-color 0.3s ease; /* Añadir transición al cambio de color */
+    transition: background-color 0.3s ease;
 }
 
 .cta-button:hover {
     background-color: #0056b3;
     color: var(--text-color)
-}
+}  */
