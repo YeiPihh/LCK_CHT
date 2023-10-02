@@ -7,9 +7,17 @@
   --hover-bg-color: #ddd;
   --hover-text-color: black;
   --main-content-bg: #dddbdb;
-  --main-color: #007bff;
-  --main-color-dark: #0056b3;
+  --main-color: #20caca/*007bff*/;
+  --main-color-dark: #18a0a0/*0056b3*/;
   --textColor: #fff;
+}
+
+.containerAll {
+  display: flex;
+  background-image: url(https://wallpaperaccess.com/full/1567665.png);
+  height: 100vh;
+  background-position: center;
+  background-size: cover;
 }
 
 .no-select, img {
@@ -29,13 +37,16 @@
   background-color: var(--main-color);
   padding: 6px 6px;   
   border-radius: 50%;
-  color: #ffffff;
+  color: black;
+  font-weight: 600;
   user-select: none;
   border: none;
+  transition: background-color .2s ease-in-out;
+  align-items: center;
+  justify-content: center;
 }
 .material-symbols-outlined:hover {
-
-  background-color: #0056b3;
+  background-color: var(--main-color-dark);
 }
 
 div:where(.swal2-container) button:where(.swal2-styled).swal2-confirm {
@@ -67,7 +78,7 @@ a {
 }
 
 a:hover {
-  color: #0056b3;
+  color: var(--main-color-dark);
 }
 
 /* Estilo para móvil */

@@ -2,16 +2,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { io } from "socket.io-client";
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
-import './Chat.css'
+import './Chat.css';
 
 
 const socket = io('http://localhost:4567');
 
 const ChatComponent = () => {
+  const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
   const [messages, setMessages] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -21,7 +23,61 @@ const ChatComponent = () => {
   const [shouldShowParagraph, setShouldShowParagraph] = useState(false);
   const [username, setUsername ] = useState('');
   const formRef = useRef(null);
-  const [newContactUsername, setNewContactUsername] = useState('')
+  const [newContactUsername, setNewContactUsername] = useState('');
+
+  useEffect(() => {
+    fetch('http://localhost:4567/check-authentication',{
+      credentials: 'include',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      })
+      .then(response=> {
+        if(response.ok){
+            return response.json();
+        } else {
+          throw new Error('Failed to authenticate')
+        }
+      })
+      .then(data=>{
+        
+        if (data.isAuthenticated === false){
+          navigate('/Login')
+          console.log(data.isAuthenticated)
+          Swal.fire({
+            title: 'Error ',
+            text: 'Authenticator error! You need to log in first',
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+          })
+        } else {
+          console.log('Autenticacion exitosa')
+        }
+      })
+      .catch(error=>{
+        console.error('Error during authentication:', error);
+      });
+  }, []); 
+
+  const handleLogout = () => {
+    fetch('http://localhost:4567/logout', {
+      credentials: 'include',
+      method: 'GET',
+    })
+    .then(response => response.json())
+    .then(data =>{
+      if (data.status === 'success') {
+        navigate('/Login');
+        
+      } else {
+        console.error('Logout failed');
+      }
+    })
+    .catch(error => {
+      console.error('An error occurred:', error);
+    });
+  };
 
   useEffect(() => {
 
@@ -75,10 +131,12 @@ const ChatComponent = () => {
 
   const handleAddFormVisibility = () => {
     setAddFormVisibility(!addFormVisibility);
+    setFriendRequestVisibility(false);    
   };
 
   const handleFriendRequestVisibility = () => {
     setFriendRequestVisibility(!friendRequestVisibility);
+    setAddFormVisibility(false);
   };
 
   const handleAddContact = async(e) => {
@@ -122,7 +180,7 @@ const ChatComponent = () => {
           {//<button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
           }
           <MenuButtonComponent id="menuButton" onClick={handleMenuVisibility} ref={formRef}/>
-                <div id="menuChat" className={menuVisibility ? 'visible' : 'hidden'} ref={formRef}>
+                <div id="menuChat" className={`no-select ${menuVisibility ? 'visible' : ''}`} ref={formRef}>
                     <div id="homeButton">
                         <button className="material-symbols-outlined">home</button>
                         <span className="text">Volver al incio</span>
@@ -156,7 +214,7 @@ const ChatComponent = () => {
       </div>
       </div>
       
-      <div className="chat-main">
+      <div className="chat-main containerAll">
         {selectedContact && (
           <div>
             <div className="chat-messages">

@@ -17,11 +17,6 @@ const passport = require('passport');
 const registerRoute = require('./routes/registerRoute');
 const loginRoute = require('./routes/loginRoute');
 const mysql = require('mysql2/promise');
-
-app.use(cors({
-  origin: 'http://localhost:3001',
-  credentials: true
-}));
 require('./config/passportConfig')(passport);
 require('./socket.js')(socketio);
 
@@ -113,6 +108,11 @@ app.use(session({
   cookie: { secure: false } // Cambiar a true si estás usando HTTPS
 }));
 
+app.use(cors({
+  origin: 'http://localhost:3001',
+  credentials: true
+}));
+
 // Inicialización de Passport
 app.use(passport.initialize());
 app.use(passport.session()); // <-- esta línea después de la configuración de session
@@ -125,12 +125,22 @@ function ensureAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
       return next();
     }
-    res.redirect('/login');
+    res.status(401).json({ message: 'Unauthorized' });
 }
 
 app.use('/register', registerRoute);
 app.use('/login', loginRoute);
 
+// Endpoint para verificar el estado de autenticación
+app.get('/check-authentication', (req, res) => {
+  if (req.isAuthenticated()) {
+    res.json({ isAuthenticated: true });
+  } else {
+    res.json({ isAuthenticated: false });
+  }
+});
+
+// Endpoint para enviar la informacion de username y id al frontend
 app.get('/chat', ensureAuthenticated, async (req, res) => {
   const user = {
     username: req.user.username,
@@ -144,7 +154,11 @@ app.get('/chat', ensureAuthenticated, async (req, res) => {
 
 app.get('/logout', (req, res) => {
     req.session.destroy(function(err) {
-        res.redirect('/login');  // Redirecciona al usuario a la página de inicio de sesión
+        if (err) {
+          res.status(500).json({ status: 'failed', message: 'Logout failed' });
+        } else {
+          res.status(200).json({ status:'success', message: 'Logged out successfully' });
+        }
     });
 });
 

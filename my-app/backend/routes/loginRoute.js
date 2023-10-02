@@ -1,8 +1,8 @@
 // loginRoute
-var express = require('express');
-var router = express.Router();
-var mysql = require('mysql2/promise');
-var passport = require('passport');
+const express = require('express');
+const router = express.Router();
+const mysql = require('mysql2/promise');
+const passport = require('passport');
 
 const hostdb = 'containers-us-west-145.railway.app';
 const userdb = 'root';
@@ -35,12 +35,12 @@ router.post('/', function(req, res, next) {
             if (err) {
                 return res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
             }
-            
+            console.log(`Un nuevo usuario se ha logeado: ${req.body.username}`);
             return res.json({ succes: true, message: 'Logged in successfully' });
         });
     })(req, res, next);
 
-    console.log(`Un nuevo usuario se ha logeado: ${req.body.username}`);
+    
 
 });
 

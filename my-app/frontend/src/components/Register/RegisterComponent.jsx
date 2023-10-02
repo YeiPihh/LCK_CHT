@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import Swal from 'sweetalert2';
 import { useNavigate, Link } from 'react-router-dom';
 import './Register.css';
+import Swal from 'sweetalert2';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -86,34 +86,35 @@ const Register = () => {
     }
   };
   return (
-    <div id="form-ui" className="register-container">
-    <form onSubmit={handleRegister} id="register-form">
-      <div id="formBodyRegister">
-        <div id="welcome-lines">
-          <div id="welcome-line-1"><Link to="/">LCK CHT</Link></div>
-          <div id="welcome-line-2">Welcome to Lock Chat</div>
-        </div>
-        <div id="input-area">
-          <div className={`form-inp ${isFocused === 'input1' ? "focused" : ""}`}>
-          <input placeholder="Username" type="text" id="username" name="username" value={username} onChange={handleChange} required onFocus={() => handleFocus('input1')} onBlur={handleBlur} />
+    <div className='containerAll'>
+      <div id="form-ui" className="register-container">
+        <form onSubmit={handleRegister} id="register-form">
+          <div id="formBodyRegister">
+            <div id="welcome-lines">
+              <div id="welcome-line-1"><Link to="/">LCK CHT</Link></div>
+              <div id="welcome-line-2">Welcome to Lock Chat</div>
+            </div>
+            <div id="input-area">
+              <div className={`form-inp ${isFocused === 'input1' ? "focused" : ""}`}>
+                <input placeholder="Username" type="text" id="username" name="username" value={username} onChange={handleChange} required onFocus={() => handleFocus('input1')} onBlur={handleBlur} />
+              </div>
+              <div className={`form-inp ${isFocused === 'input2' ? "focused" : ""} ${passwordMatch ? '' : 'error'}`}>
+                <input placeholder="Password" type="password" id="password" name="password" value={password} onChange={handleChange} required onFocus={() => handleFocus('input2')} onBlur={handleBlur} />
+              </div>
+              <div className={`form-inp ${isFocused === 'input3' ? "focused" : ""} ${passwordMatch ? '' : 'error'} `}>
+                <input placeholder="Confirm Password" type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required onFocus={() => handleFocus('input3')} onBlur={handleBlur}/>
+              </div>
+              {!passwordMatch && <small className="errorText">Passwords don't match</small>}
+            </div>
+            <div id="submitButtonRegister">
+              <button id="submit-button" type="submit">Register</button>
+            </div>
+            <div id="forgot-pass" className="login-link">
+              Already have an account?<br /> <Link to="/login">Log in here</Link>
+            </div>
           </div>
-          <div className={`form-inp ${isFocused === 'input2' ? "focused" : ""} ${passwordMatch ? '' : 'error'}`}>
-            <input placeholder="Password" type="password" id="password" name="password" value={password} onChange={handleChange} required onFocus={() => handleFocus('input2')} onBlur={handleBlur} />
-            
-          </div>
-          <div className={`form-inp ${isFocused === 'input3' ? "focused" : ""} ${passwordMatch ? '' : 'error'} `}>
-            <input placeholder="Confirm Password" type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required onFocus={() => handleFocus('input3')} onBlur={handleBlur}/>
-          </div>
-          {!passwordMatch && <small className="errorText">Passwords don't match</small>}
-        </div>
-        <div id="submitButtonRegister">
-          <button id="submit-button" type="submit">Register</button>
-        </div>
-        <div id="forgot-pass" className="login-link">
-        Already have an account?<br /> <Link to="/login">Log in here</Link>
-        </div>
+        </form>
       </div>
-    </form>
     </div>
 
   );

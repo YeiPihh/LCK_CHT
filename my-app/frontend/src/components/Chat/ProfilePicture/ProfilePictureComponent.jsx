@@ -5,7 +5,7 @@ import './ProfilePicture.css';
 const ProfilePictureComponent = ({ imageUrl, username }) => {
   return (
     <div className="profileImagenContainer no-select">
-      <img src={imageUrl} alt="usuario" width="40px" height="40px" id="imagenProfile"/>
+      <img src={imageUrl} alt="usuario" width="35px" height="35px" id="imagenProfile"/>
       <span className="usernameSide">{username}</span>
     </div>
   );

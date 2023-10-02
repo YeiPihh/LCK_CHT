@@ -1,3 +1,5 @@
+
+
 .index-container {
     display: grid;
     place-items: center;
@@ -9,14 +11,14 @@
     outline: 1px solid var(--main-color);
     border-radius: 10px;
     margin: auto;
-    margin-top: 20vh;
+   
   }
 
-  #form-body {
+  #formBodyIndex {
     width: auto;
   }
 
-  #welcome-line-1 {
+  #welcomeIndex {
     position: relative;
     color: var(--main-color);
     font-weight: 600;
@@ -29,9 +31,55 @@
     transition: box-shadow 0.4s ease-in-out;
     margin-bottom: 30px;
   }
+
+  #welcomeIndex::after {
+    content: "";
+    position: absolute;
+    top: -5%;
+    left: 3%;
+    width: 95%;
+    height: 10%;
+    background-color: #161616;
+    transition: 0.5s;
+    transform-origin: center;
+  }
+  
+  #welcomeIndex::before {
+    content: "";
+    transform-origin: center;
+    position: absolute;
+    top: 95%;
+    left: 3%;
+    width: 95%;
+    height: 10%;
+    background-color: #161616;;
+    transition: 0.5s;
+  }
+
+  #welcomeIndex:hover::before, #welcomeIndex:hover::after {
+    transform: scale(0)
+  }
+
+  #welcomeIndex:hover {
+    cursor: pointer;
+    transform: scale(1.0);
+    color: var(--main-color-dark);
+    box-shadow: inset 0px 0px 12px white;
+  }
+
+  #welcomeIndex2 {
+    color: #ffffff;
+    font-size: 18px;
+    margin-top: 17px;
+  }
+
+  #welcomeLinesIndex {
+    text-align: center;
+    line-height: 1;
+  }
   
 
-  #submitButtonIndex {
+  #submitButtonIndexContainer{
     width: 100%;
     margin-top: 40px;
     display: flex;
@@ -40,8 +88,9 @@
   }
 
 
-  #submit-button {
+  #submitButtonIndex {
     display: flex;
+    flex-direction: row;
     width: 130px;
     justify-content: center;
     color: var(--main-color);
@@ -58,7 +107,7 @@
     transition: all ease-in-out .5s;
   }
 
-  #submit-button:hover {
+  #submitButtonIndex:hover {
     transform: scale(1.05);
     color: var(--textColor);
   }
