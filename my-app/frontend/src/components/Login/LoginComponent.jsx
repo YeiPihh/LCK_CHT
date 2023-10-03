@@ -10,7 +10,6 @@ const Login = () => {
   const [isFocused, setFocus] = useState(false);
   const navigate = useNavigate();
 
-
   const handleFocus = (id) => {
     setFocus(id);
   };

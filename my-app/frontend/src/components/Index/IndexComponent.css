@@ -75,7 +75,6 @@
 
   #welcomeLinesIndex {
     text-align: center;
-    line-height: 1;
   }
   
 
@@ -93,21 +92,23 @@
     flex-direction: row;
     width: 130px;
     justify-content: center;
-    color: var(--main-color);
+    color: var(--textColor);
     background-color: transparent;
     font-weight: 600;
     font-size: 14px;
     margin: 0;
     padding: 14px 13px 12px 13px;
     border: 0;
-    outline: 1px solid var(--main-color);
+    outline: 1px solid var(--textColor);
     border-radius: 8px;
     line-height: 1;
     cursor: pointer;
-    transition: all ease-in-out .5s;
+    transition: all ease-in-out .4s;
   }
 
   #submitButtonIndex:hover {
     transform: scale(1.05);
-    color: var(--textColor);
+    box-shadow: inset 0px 0px 12px var(--textColor);
+    background-color: var(--main-color);
+    font-weight: bolder;
   }

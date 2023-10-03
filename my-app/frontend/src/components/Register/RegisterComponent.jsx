@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
+import '../Login/Login.css';
 import './Register.css';
 import Swal from 'sweetalert2';
 
@@ -101,7 +102,7 @@ const Register = () => {
               <div className={`form-inp ${isFocused === 'input2' ? "focused" : ""} ${passwordMatch ? '' : 'error'}`}>
                 <input placeholder="Password" type="password" id="password" name="password" value={password} onChange={handleChange} required onFocus={() => handleFocus('input2')} onBlur={handleBlur} />
               </div>
-              <div className={`form-inp ${isFocused === 'input3' ? "focused" : ""} ${passwordMatch ? '' : 'error'} `}>
+              <div id="confirm-password-container" className={`form-inp ${isFocused === 'input3' ? "focused" : ""} ${passwordMatch ? '' : 'error'} `}>
                 <input placeholder="Confirm Password" type="password" id="confirm-password" name="confirmPassword" value={confirmPassword} onChange={handleChange} required onFocus={() => handleFocus('input3')} onBlur={handleBlur}/>
               </div>
               {!passwordMatch && <small className="errorText">Passwords don't match</small>}

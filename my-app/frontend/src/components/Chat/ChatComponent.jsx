@@ -166,6 +166,10 @@ const ChatComponent = () => {
     setAddFormVisibility(false);
   };
 
+  const handleRedirectHome = () => {
+    navigate('/');
+  }
+
   useEffect(() => {
     const wrapper = document.getElementById('friendRequestsWrapper');
     setShouldShowParagraph(wrapper.childNodes.length <= 1 && friendRequestVisibility === true);
@@ -182,7 +186,7 @@ const ChatComponent = () => {
           <MenuButtonComponent id="menuButton" onClick={handleMenuVisibility} ref={formRef}/>
                 <div id="menuChat" className={`no-select ${menuVisibility ? 'visible' : ''}`} ref={formRef}>
                     <div id="homeButton">
-                        <button className="material-symbols-outlined">home</button>
+                        <button className="material-symbols-outlined" onClick={handleRedirectHome}>home</button>
                         <span className="text">Volver al incio</span>
                     </div>
                     <div className="contact-icon">
@@ -201,7 +205,7 @@ const ChatComponent = () => {
                         <span className="text">Solicitudes entrantes</span>
                     </div>
                     <div className="nav-list-logout">
-                        <button id="logoutButton" className="material-symbols-outlined">logout</button>
+                        <button id="logoutButton" className="material-symbols-outlined" onClick={handleLogout}>logout</button>
                         <span className="text">Cerrar Sesion</span>
                     </div>
                 </div>
