@@ -8,6 +8,7 @@ import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
 import './Chat.css';
+import './MenuButton/MenuButton.css';
 
 
 const socket = io('http://localhost:4567');
@@ -18,10 +19,12 @@ const ChatComponent = () => {
   const [messages, setMessages] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
   const [menuVisibility, setMenuVisibility] = useState(false);
+  const [menuClicked, setMenuClicked] = useState(false);
   const [addFormVisibility, setAddFormVisibility] = useState(false);
   const [friendRequestVisibility, setFriendRequestVisibility] = useState(false);
   const [shouldShowParagraph, setShouldShowParagraph] = useState(false);
   const [username, setUsername ] = useState('');
+  const [userId, setUserId ] = useState('');
   const formRef = useRef(null);
   const [newContactUsername, setNewContactUsername] = useState('');
 
@@ -89,10 +92,25 @@ const ChatComponent = () => {
       
       if (data.success) {
         setContacts(data.contacts);
-        setUsername(data.user.username);
+        setUsername(data.user.username.toUpperCase());
+        setUserId(data.user.id);
+        socket.emit('informationUser', { username: username, userId: userId })
+        
       }
     })
     .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
+  }, [username, userId]);
+
+  useEffect(()=>{
+    fetch('http://localhost:4567/friend-requests', {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success){
+        
+      }
+    })
   }, []);
   
   useEffect(() => {
@@ -107,9 +125,10 @@ const ChatComponent = () => {
     }
   }, [selectedContact]);
 
+
+  // handle
   const handleContactClick = (contact) => {
     setSelectedContact(contact.contact_id);
-    //
   };
 
   const handleClickOutside = (e) => {
@@ -123,6 +142,7 @@ const ChatComponent = () => {
   const handleMenuVisibility = (e) => {
     e.stopPropagation(); // Detiene la propagación del evento
     setMenuVisibility(!menuVisibility); // Cambia la visibilidad del menú
+    setMenuClicked(!menuClicked);
     if (menuVisibility === true) {
       setFriendRequestVisibility(false);
       setAddFormVisibility(false);
@@ -170,20 +190,14 @@ const ChatComponent = () => {
     navigate('/');
   }
 
-  useEffect(() => {
-    const wrapper = document.getElementById('friendRequestsWrapper');
-    setShouldShowParagraph(wrapper.childNodes.length <= 1 && friendRequestVisibility === true);
-     // ¡¡¡¡¡¡¡¡¡¡ CUANDO SE HABILITEN LAS SOLICITUDES DE AMISTAD HAY QUE ALMACENAR LA CANTIDAD DE SOLICITUDES EN UNA VARIABLE Y MODIFICAR ESTE EFFECT PARA NO ACCEDER AL DOM DIRECTAMENTE DESDE REACT!!!!!!!!!
-  }, [friendRequestVisibility]);
-
   return (
-    <div className="chat-container" onClick={handleClickOutside}>
+    <div className="chat-container" /*onClick={handleClickOutside}*/>
       <div className="chat-sidebar">
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
           {//<button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
           }
-          <MenuButtonComponent id="menuButton" onClick={handleMenuVisibility} ref={formRef}/>
+          <MenuButtonComponent  id="menuButton" onClick={handleMenuVisibility} ref={formRef} iconClass={menuClicked ? "clicked" : ""} textClass={menuClicked ? "clicked" : ""}/>
                 <div id="menuChat" className={`no-select ${menuVisibility ? 'visible' : ''}`} ref={formRef}>
                     <div id="homeButton">
                         <button className="material-symbols-outlined" onClick={handleRedirectHome}>home</button>

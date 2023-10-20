@@ -15,10 +15,10 @@
     margin: 0px;
     position: relative;
   }
-  
+/*   
   .btn:hover {
     box-shadow: inset 0px 0px 12px var(--textColor);
-  }
+  } */
   
   .btn .icon {
     position: absolute;
@@ -34,14 +34,14 @@
     transform: translateX(55px);
   }
   
-  .btn:hover .icon {
+   .btn .icon.clicked {
     width: 115%;
-  }
+  } 
   
-  .btn:hover .text {
+   .btn .text.clicked {
     transition: all 0.5s;
     opacity: 0;
-  }
+  } 
   
   .btn:focus {
     outline: none;

@@ -9,9 +9,9 @@
     height: 550px;
     padding: 25px;
     background-color: #161616;
-    box-shadow: 0px 15px 60px var(--main-color-dark);
-    outline: 1px solid var(--main-color);
-    border-radius: 10px;
+    box-shadow: 0px 0px 0px var(--textColor);
+    outline: 1px solid var(--textColor);
+    border-radius: 0px;
   }
   
   #submitButtonRegister{

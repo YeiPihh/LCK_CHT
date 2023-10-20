@@ -36,9 +36,10 @@ const userIds = {};
 module.exports = function(socketio) {
     socketio.on('connection', (socket) => {
         console.log('Un usuario se ha conectado');
-        socket.on('registerUser', (data) => {
+        socket.on('informationUser', (data) => {
             userSockets[data.userId] = socket;
             userIds[socket.id] = data.userId;
+           
         });
 
 

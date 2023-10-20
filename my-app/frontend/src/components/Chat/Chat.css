@@ -285,36 +285,16 @@
     flex-direction: column;
     box-sizing:content-box;
     border: 3px solid var(--textColor);
-    transition: opacity .5s ease-in-out, visibility .5s ease-in-out, box-shadow .1s ease-in-out;
+    transition: opacity .3s ease-in-out, visibility .3s ease-in-out, box-shadow .1s ease-in-out;
     transform-origin: center;
     visibility: hidden;
-
 }
 
-/* #menuChat::after{
-    content: "";
-    position: absolute ;
-    display: block;
-    background-color: var(--main-bg-color);
-    height: 20px;
-    width: 80%;
-    top: -3%;
-    left: 10%;
-    transition: opacity 0.3s ease-in-out;
-    transform-origin: center;
+.material-symbols-outlined:hover {
+    font-weight: bolder;
+    filter: brightness(1.5);
+    transform: scale(1);
 }
-#menuChat::before{
-    content: "";
-    position: absolute ;
-    display: block;
-    background-color: var(--main-bg-color);
-    height: 20px;
-    width: 80%;
-    top: 97%;
-    left: 10%;
-    transition: opacity 0.3s ease-in-out;
-    transform-origin: center;
-} */
 
 #menuChat.visible {
     opacity: 1;
@@ -324,10 +304,6 @@
 
 #menuChat:hover::before, #menuChat:hover::after {
     opacity: 0;
-}
-
-#menuChat:hover{
-    box-shadow: inset 0px 0px 5px var(--textColor);
 }
 
 #menuChat  > div {
@@ -342,10 +318,11 @@
     
 }
 
-#menuChat .text {
+#menuChat div .text {
     margin-left: 10px;
     white-space: nowrap;
-    font-size: 15px;
+    font-size: 13px;
+    letter-spacing: 1px;
     font-weight:600;
     user-select: none;
 }

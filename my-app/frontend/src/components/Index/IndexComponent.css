@@ -1,15 +1,13 @@
-
-
 .index-container {
-    display: grid;
+    display: none ; /* grid */
     place-items: center;
     width: 30vw;
     height: auto;
     padding: 40px;
-    background-color: #161616;
-    box-shadow: 0px 15px 60px var(--main-color-dark);
-    outline: 1px solid var(--main-color);
-    border-radius: 10px;
+    background-color: var(--bgTransparent);
+    box-shadow: 0px 0px 4px var(--textColor);
+    outline: 1px solid var(--textColor);
+    border-radius: 0px;
     margin: auto;
    
   }
@@ -24,7 +22,7 @@
     font-weight: 600;
     font-size: 40px;
     letter-spacing: 3px;
-    border: 2px solid white;
+    border: 0px solid white;
     border-radius: 5px;
     padding: 13px 10px;
     transition: transform 0.9s ease-in-out;
@@ -32,7 +30,7 @@
     margin-bottom: 30px;
   }
 
-  #welcomeIndex::after {
+  /* #welcomeIndex::after {
     content: "";
     position: absolute;
     top: -5%;
@@ -58,14 +56,14 @@
 
   #welcomeIndex:hover::before, #welcomeIndex:hover::after {
     transform: scale(0)
-  }
+  } 
 
-  #welcomeIndex:hover {
+   #welcomeIndex:hover {
     cursor: pointer;
     transform: scale(1.0);
     color: var(--main-color-dark);
     box-shadow: inset 0px 0px 12px white;
-  }
+  } */
 
   #welcomeIndex2 {
     color: #ffffff;
@@ -100,7 +98,7 @@
     padding: 14px 13px 12px 13px;
     border: 0;
     outline: 1px solid var(--textColor);
-    border-radius: 8px;
+    border-radius: 0px;
     line-height: 1;
     cursor: pointer;
     transition: all ease-in-out .4s;
@@ -108,7 +106,83 @@
 
   #submitButtonIndex:hover {
     transform: scale(1.05);
-    box-shadow: inset 0px 0px 12px var(--textColor);
-    background-color: var(--main-color);
+    /* box-shadow: inset 0px 0px 12px var(--textColor);
+    background-color: var(--main-color); */
     font-weight: bolder;
   }
+
+
+/* NAVBARSTYLES */
+.headerIndexComponent {
+  display: flex;
+  flex-direction: row;
+  border-bottom: 0px solid var(--textColor);
+  height: 70px;
+  width: auto;
+  background-color: var(--bgTransparent);
+  justify-content: space-between;
+  box-sizing: border-box;
+  align-items: center;
+  margin: 20px;
+  border-radius: 10px;
+}
+
+.headerIndexComponent div {
+  padding: 0px 50px;
+  align-items: center;
+
+}
+
+.headerIndexComponent .tittleHeader {
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: 6px;
+  color: var(--textColor );
+}
+
+.headerIndexComponent .navBar {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: 3px;
+  height: 100%;
+  align-items: center;
+  margin-right: 30px;
+}
+
+.headerIndexComponent .navBar .registerContainer, .headerIndexComponent .navBar .loginContainer, .headerIndexComponent .navBar .infoContainer {
+  transition: transform .5s ease-in-out;
+  position: relative;
+}
+
+.headerIndexComponent .navBar .registerContainer::after, .headerIndexComponent .navBar .loginContainer::after, .headerIndexComponent .navBar .infoContainer::after {
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  height: 2px;
+  width: 60%;
+  left: 20%;
+  background-color: #ffffff;
+  transform: scale(0);
+  transform-origin:-40%;
+  transition: transform .4s ease-in-out;
+}
+
+.headerIndexComponent .navBar .registerContainer:hover::after{
+  transform: scale(1);
+}
+
+.headerIndexComponent .navBar .loginContainer:hover::after{
+  transform: scale(1);
+}
+
+.headerIndexComponent .navBar .infoContainer:hover::after {
+  transform: scale(1);
+}
+
+.headerIndexComponent .navBar div:hover {
+  filter: brightness(2);
+  
+}
