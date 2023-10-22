@@ -7,6 +7,8 @@ import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import MessageComponent from './Message/MessageComponent';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
+import FriendRequest from './FriendRequests/FriendRequests.jsx';
+
 import './Chat.css';
 import './MenuButton/MenuButton.css';
 
@@ -22,12 +24,14 @@ const ChatComponent = () => {
   const [menuClicked, setMenuClicked] = useState(false);
   const [addFormVisibility, setAddFormVisibility] = useState(false);
   const [friendRequestVisibility, setFriendRequestVisibility] = useState(false);
+  const [friendRequests, setFriendRequests] = useState([]);
   const [shouldShowParagraph, setShouldShowParagraph] = useState(false);
   const [username, setUsername ] = useState('');
   const [userId, setUserId ] = useState('');
   const formRef = useRef(null);
   const [newContactUsername, setNewContactUsername] = useState('');
 
+  // autenticacion para entrar a la pagina /chat
   useEffect(() => {
     fetch('http://localhost:4567/check-authentication',{
       credentials: 'include',
@@ -63,6 +67,95 @@ const ChatComponent = () => {
       });
   }, []); 
 
+  // hook para extraer informacion de la base de datos
+  useEffect(() => {
+
+    fetch('http://localhost:4567/chat', {
+      credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
+    })
+    .then(response => response.json())
+    .then(data => {
+      
+      if (data.success) {
+        setContacts(data.contacts);
+        setUsername(data.user.username.toUpperCase());
+        setUserId(data.user.id);
+        socket.emit('informationUser', { username: username, userId: userId })
+        
+      }
+    })
+    .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
+  }, [username, userId]);
+  
+  // visibilidad del menu
+
+  // oculta el menu si se pulsa fuera de este
+  const handleClickOutside = (e) => {
+    if (formRef.current && !formRef.current.contains(e.target)) {
+      setMenuVisibility(false);
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+      setMenuClicked(false);
+    }
+  };
+  //muestra/oculta el menu si se pulsa el menuButton
+  const handleMenuVisibility = (e) => {
+    e.stopPropagation(); // Detiene la propagación del evento
+    setMenuVisibility(!menuVisibility); // Cambia la visibilidad del menú
+    setMenuClicked(!menuClicked);
+    if (menuVisibility === true) {
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+    }
+  };
+
+  const handleFriendRequestVisibility = () => {
+    setFriendRequestVisibility(!friendRequestVisibility);
+    setAddFormVisibility(false);
+
+    fetch ('http://localhost:4567/friend-requests', {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        setFriendRequests(data.friendRequests);
+        console.log(friendRequests)
+      }
+    })
+  };
+
+  const handleAcceptRequest = (senderId) => {
+    socket.emit('acceptFriendRequest', senderId)
+    console.log(senderId)
+    socket.on('friendRequestSuccess', (message) => {
+      Swal.fire({
+          title: 'Perfecto',
+          text: message,
+          icon: 'success',
+          confirmButtonText: 'Aceptar'
+      });
+      console.log(message);
+      
+    });
+  
+    // creamos un alert si no se ha podido agregar al contacto, el mensaje de error es controlado por el servidor
+    socket.on('friendRequestError', (message) => {
+        console.log(message);
+        Swal.fire({
+            title: 'Oops...',
+            text: message,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+    });
+  }
+
+  const handleIgnoreRequest = (requestId) => {
+    console.log('pendiente por hacer en socket.js. con el request id eliminamos la peticion de la base de datos y hay que hacer algo para que se elimine de la interfaz del usuario')
+  }
+
+  //Logout handler
   const handleLogout = () => {
     fetch('http://localhost:4567/logout', {
       credentials: 'include',
@@ -82,83 +175,11 @@ const ChatComponent = () => {
     });
   };
 
-  useEffect(() => {
-
-    fetch('http://localhost:4567/chat', {
-      credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
-    })
-    .then(response => response.json())
-    .then(data => {
-      
-      if (data.success) {
-        setContacts(data.contacts);
-        setUsername(data.user.username.toUpperCase());
-        setUserId(data.user.id);
-        socket.emit('informationUser', { username: username, userId: userId })
-        
-      }
-    })
-    .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
-  }, [username, userId]);
-
-  useEffect(()=>{
-    fetch('http://localhost:4567/friend-requests', {
-      credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success){
-        
-      }
-    })
-  }, []);
-  
-  useEffect(() => {
-    // Aquí se hara la petición al servidor para obtener los mensajes del contacto seleccionado
-    // Por ejemplo: fetch(`/api/messages/${selectedContact}`).then(/* actualizar el estado con los nuevos mensajes */)
-    // Por ahora solo se usanran datos de muestra:
-    if (selectedContact) {
-      setMessages([
-        { content: 'Hola', isOwnMessage: true },
-        { content: '¿Qué tal?', isOwnMessage: false }
-      ]);
-    }
-  }, [selectedContact]);
-
-
-  // handle
-  const handleContactClick = (contact) => {
-    setSelectedContact(contact.contact_id);
-  };
-
-  const handleClickOutside = (e) => {
-    if (formRef.current && !formRef.current.contains(e.target)) {
-      setMenuVisibility(false);
-      setFriendRequestVisibility(false);
-      setAddFormVisibility(false);
-    }
-  };
-
-  const handleMenuVisibility = (e) => {
-    e.stopPropagation(); // Detiene la propagación del evento
-    setMenuVisibility(!menuVisibility); // Cambia la visibilidad del menú
-    setMenuClicked(!menuClicked);
-    if (menuVisibility === true) {
-      setFriendRequestVisibility(false);
-      setAddFormVisibility(false);
-    }
-  };
-
+  //Addcontact handlers
   const handleAddFormVisibility = () => {
     setAddFormVisibility(!addFormVisibility);
     setFriendRequestVisibility(false);    
   };
-
-  const handleFriendRequestVisibility = () => {
-    setFriendRequestVisibility(!friendRequestVisibility);
-    setAddFormVisibility(false);
-  };
-
   const handleAddContact = async(e) => {
     e.preventDefault();
     socket.emit('sendFriendRequest', newContactUsername)
@@ -186,12 +207,30 @@ const ChatComponent = () => {
     setAddFormVisibility(false);
   };
 
+  //buttonHome
   const handleRedirectHome = () => {
     navigate('/');
   }
 
+
+  // no usados
+  useEffect(() => {
+    // Aquí se hara la petición al servidor para obtener los mensajes del contacto seleccionado
+    // Por ejemplo: fetch(`/api/messages/${selectedContact}`).then(/* actualizar el estado con los nuevos mensajes */)
+    // Por ahora solo se usanran datos de muestra:
+    if (selectedContact) {
+      setMessages([
+        { content: 'Hola', isOwnMessage: true },
+        { content: '¿Qué tal?', isOwnMessage: false }
+      ]);
+    }
+  }, [selectedContact]);
+  const handleContactClick = (contact) => {
+    setSelectedContact(contact.contact_id);
+  };
+
   return (
-    <div className="chat-container" /*onClick={handleClickOutside}*/>
+    <div className="chat-container" onClick={handleClickOutside}>
       <div className="chat-sidebar">
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
@@ -213,7 +252,14 @@ const ChatComponent = () => {
                     </div>
                     <div className="solicitud">
                         <div id="friendRequestsWrapper" className={friendRequestVisibility ? 'visible' : 'hidden'}>
-                            <p className={shouldShowParagraph ? 'visible' : 'hidden'}>No tienes ninguna solicitud pendiente</p>
+                             {friendRequests.map(request => {
+                              return <FriendRequest 
+                                        acceptRequest={() => handleAcceptRequest(request.sender_id)}  
+                                        ignoreRequest= {() => handleIgnoreRequest(request.id)} 
+                                        key={request.id} 
+                                        request={request} 
+                                      />;
+                            })} 
                         </div>
                         <button id="friendRequestButton" className="material-symbols-outlined" onClick={handleFriendRequestVisibility}>mail</button>
                         <span className="text">Solicitudes entrantes</span>

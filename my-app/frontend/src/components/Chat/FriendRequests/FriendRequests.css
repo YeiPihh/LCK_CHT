@@ -1,0 +1,58 @@
+.friendRequest {
+    display: flex;
+    gap: 40px;
+    align-items: center;    
+}
+
+.buttonsContainer {
+    display: flex;
+    gap: 10px;
+}
+
+.buttonsContainer button {
+    padding: 10px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.buttonsContainer .accept, .buttonsContainer .ignore{
+    position: relative;
+    background-color: transparent;
+    z-index: 0;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.7px;
+    color: white;
+}
+
+.buttonsContainer .accept::after{
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 167%;
+    bottom: -33%;
+    left: 0%;
+    transform: scaleX(0);
+    background-color: #555555e8;
+    z-index: -1;
+    transition: all .3s;
+}
+
+.buttonsContainer .ignore::after{
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 167%;
+    bottom: -33%;
+    left: 0%;
+    transform: scaleY(0);
+    background-color: #555555e8;
+    z-index: -1;
+    transition: all .3s;
+}
+
+
+.buttonsContainer .accept:hover::after, .buttonsContainer .ignore:hover::after{
+    transform: scale(1);
+}

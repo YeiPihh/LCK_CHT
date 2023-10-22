@@ -45,7 +45,7 @@ body {
 }
 .material-symbols-outlined { 
   cursor: pointer;
-  background-color: var(--main-color);
+  background-color: var(--textColor);
   padding: 6px 6px;   
   border-radius: 50%;
   color: black;
