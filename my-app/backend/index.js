@@ -43,7 +43,7 @@ mysql.createConnection({
 async function getfriendRequestsData (userId) {
   try {
     // Realizar la consulta SQL para obtener todas las solicitudes de amistad para un usuario específico
-    const [results] = await connection.query('SELECT friend_requests.*, users.username AS senderUsername FROM friend_requests JOIN users ON friend_requests.sender_id = users.id WHERE friend_requests.receiver_id = ?', [userId]);
+    const [results] = await connection.query('SELECT friend_requests.*, users.username AS senderUsername FROM friend_requests JOIN users ON friend_requests.sender_id = users.id WHERE friend_requests.receiver_id = ? and status = ?', [userId, 'pendiente']);
 
     return results; // Esto devolverá un array de objetos, donde cada objeto representa una fila de la tabla
   } catch (error) {

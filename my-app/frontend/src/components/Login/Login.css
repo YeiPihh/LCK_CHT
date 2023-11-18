@@ -8,10 +8,11 @@
     width: 350px;
     height: 550px;
     padding: 25px;
-    background-color: #161616;
+    background-color: transparent;
     box-shadow: 0px 0px 0px var(--main-color-dark);
     border-radius: 0px;
     border: 1px solid #fff;
+    backdrop-filter: blur(10px);
   }
   
   #formBodyLogin {

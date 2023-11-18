@@ -3,24 +3,24 @@ const LocalStrategy = require('passport-local').Strategy;
 const bcrypt = require('bcryptjs');
 const mysql = require('mysql2/promise');
 
-const hostdb = 'containers-us-west-145.railway.app';
-const userdb = 'root';
-const passdb = 'SRGLy6fQXQmmq2isbnOA';
-const databasedb = 'railway';
-const portdb = 7680;
-// conexion a la base de datos
-let connection;
-mysql.createConnection({
-  host: hostdb,
-  user: userdb,
-  password: passdb,
-  database: databasedb,
-  port: portdb
-}).then(conn => {
-    connection = conn;
-}).catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
-});
+ const hostdb = 'containers-us-west-145.railway.app';
+ const userdb = 'root';
+ const passdb = 'SRGLy6fQXQmmq2isbnOA';
+ const databasedb = 'railway';
+ const portdb = 7680;
+ // conexion a la base de datos
+ let connection;
+ mysql.createConnection({
+   host: hostdb,
+   user: userdb,
+   password: passdb,
+   database: databasedb,
+   port: portdb
+ }).then(conn => {
+     connection = conn;
+ }).catch(err => {
+     console.error('No se pudo conectar a la base de datos:', err);
+ });
 
 module.exports = function(passport) {
   passport.use(

@@ -3,22 +3,23 @@
     height: 45px;
     border-radius: 5px;
     border: 1px solid var(--textColor);
-    transition: all 0.5s ease-in-out;
+    transition: all 0.5s ease-in-out background-color 0s ease-in-out;
     font-size: 17px;
     font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 600;
     display: flex;
     align-items: center;
-    background: var(--main-bg-color);
+    background: #2b9292;
     color: var(--textColor);
     padding: 0px;
     margin: 0px;
     position: relative;
+    cursor: pointer;
   }
-/*   
+ 
   .btn:hover {
-    box-shadow: inset 0px 0px 12px var(--textColor);
-  } */
+    background-color: #33333385;
+  } 
   
   .btn .icon {
     position: absolute;

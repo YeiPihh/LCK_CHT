@@ -252,14 +252,21 @@ const ChatComponent = () => {
                     </div>
                     <div className="solicitud">
                         <div id="friendRequestsWrapper" className={friendRequestVisibility ? 'visible' : 'hidden'}>
-                             {friendRequests.map(request => {
-                              return <FriendRequest 
-                                        acceptRequest={() => handleAcceptRequest(request.sender_id)}  
-                                        ignoreRequest= {() => handleIgnoreRequest(request.id)} 
-                                        key={request.id} 
-                                        request={request} 
-                                      />;
-                            })} 
+                          {
+                            friendRequests.length === 0 ? (
+                              <p>No hay solicitudes pendientes</p>
+                            ) : (
+                              friendRequests.map(request => (
+                                <FriendRequest 
+                                          acceptRequest={() => handleAcceptRequest(request.sender_id)}  
+                                          ignoreRequest= {() => handleIgnoreRequest(request.id)} 
+                                          key={request.id} 
+                                          request={request} 
+                                        />
+                              ))
+                            )
+                          }
+                             
                         </div>
                         <button id="friendRequestButton" className="material-symbols-outlined" onClick={handleFriendRequestVisibility}>mail</button>
                         <span className="text">Solicitudes entrantes</span>
@@ -273,9 +280,9 @@ const ChatComponent = () => {
         </div>
         
       </div>
-      <div className="nav-list-chat no-select">
+      
         <ChatListComponent contacts={contacts} onContactClick={handleContactClick} />
-      </div>
+      
       </div>
       
       <div className="chat-main containerAll">

@@ -107,10 +107,17 @@ module.exports = function(socketio) {
                 return;
               }
 
-              const [existingRequests] = await connection.query('SELECT * FROM friend_requests  WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)   AND status = "pendiente"', [senderId, receiverId, receiverId, senderId]);
+              const [existingRequests] = await connection.query('SELECT * FROM friend_requests  WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) AND status = "pendiente"', [senderId, receiverId, receiverId, senderId]);
 
               if (existingRequests.length > 0) {
                   socket.emit('friendRequestError', 'La solicitud ya está pendiente');
+                  return;
+              }
+
+              const [alredyAcceptedRequests] = await connection.query('SELECT * FROM contacts where (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId, receiverId, senderId]);
+
+              if (alredyAcceptedRequests.length > 0) {
+                  socket.emit('friendRequestError', 'Ya eres amigo de esta persona');
                   return;
               }
 

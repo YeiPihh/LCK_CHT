@@ -132,15 +132,16 @@
     border-right: 1px solid #20caca;
 }
 
+.nav-list-chat-heads {
+    background-color: #2b9292;
+}
+
 #contactButton {
     margin: 0;
 }
 
 
-.chat-item:hover {
-    background-color: #007bff; /* Color principal de index.html */
-    color: #fff;
-}
+
 
 .chat-main {
     flex: 1;
@@ -197,18 +198,20 @@
 
 #addContactForm input {
     font-size: 14px;
-    padding: 5px;
+    padding: 6px;
     border-radius: 5px;
     transition: all 0.4 ease-in-out;
     margin-bottom: 5px;
+    border: 0px solid var(--main-color);
+    outline: 0px solid var(--main-color);
 }
 
 #addContactForm input:focus {
     transform: scale(1.00);
     background-color: var(--main-color);
     color: #000;
-    border: 1px solid var(--main-color);
-    outline: 2px solid var(--main-color);
+    border: 0px solid var(--main-color);
+    outline: 0px solid var(--main-color);
 }
 
 #addContactForm button {
@@ -248,7 +251,7 @@
     left: 10%;
     z-index: 0;
     padding: 0 30px;
-    background-color: var(--bgTransparent);
+    background-color: var(--main-bg-color);
     border-radius: 5px;
     color: white;
     opacity: 0;
@@ -258,6 +261,7 @@
     transition: opacity .3s ease-in-out, visibility .3s ease-in-out, box-shadow .1s ease-in-out;
     transform-origin: center;
     visibility: hidden;
+    z-index: 2;
 }
 
 .material-symbols-outlined:hover {
@@ -313,57 +317,7 @@
 
 /* estilos de componentes */
 
-/* ChatListComponent */
-.nav-list-chat {
-    list-style: none;
-    flex-direction: column;
-    padding: 0;
-    display: flex;
-    padding-left: 20px;
-    padding-right: 20px;
-    align-items: center;
-}
 
-.chat-item {
-    padding: 15px;
-    border-top: 1px solid #007bff85;
-    cursor: pointer;
-    border-radius: 0px;
-    margin: 1px 1px;
-    transition: background-color 0.3s;
-    width: 100%;
-    display: flex;
-    justify-content: flex-start;
-}
-
-.contactContainer {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    margin-left: 10px;  /* Ajustar según tus necesidades */
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.chat-item .contactName {
-    font-size: 20px;
-    font-weight: bold;
-    letter-spacing: 4px;
-    margin-bottom: 5px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.lastMessage {
-    font-size: 14px;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-
-}
 
 /* MessageComponent */
 .message-left {

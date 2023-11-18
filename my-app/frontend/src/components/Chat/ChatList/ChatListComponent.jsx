@@ -8,7 +8,7 @@ const ChatListComponent = ({ contacts }) => {
     <div className="nav-list-chat no-select">
       {contacts.map((contact, index) => (
         <div key={index} className="chat-item" data-id={contact.contact_id}>
-          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username={contact.username}/>
+          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username=''/>
           <div className="contactContainer">
             <span className="contactName">{contact.username.toUpperCase()}</span>
             <span className="lastMessage">{contact.lastMessage}</span>

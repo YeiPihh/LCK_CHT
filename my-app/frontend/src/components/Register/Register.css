@@ -8,10 +8,11 @@
     width: 350px;
     height: 550px;
     padding: 25px;
-    background-color: #161616;
+    background-color: transparent /* #161616 */;
     box-shadow: 0px 0px 0px var(--textColor);
     outline: 1px solid var(--textColor);
     border-radius: 0px;
+    backdrop-filter: blur(10px);
   }
   
   #submitButtonRegister{
