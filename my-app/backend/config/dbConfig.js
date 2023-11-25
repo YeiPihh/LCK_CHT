@@ -1,33 +1,23 @@
 const mysql = require('mysql2/promise');
+require('dotenv').config();
 
-// const hostdb = 'containers-us-west-145.railway.app';
-// const userdb = 'root';
-// const passdb = 'SRGLy6fQXQmmq2isbnOA';
-// const databasedb = 'railway';
-// const portdb = 7680;
+const { DB_HOST, DB_USER, DB_PASS, DB_NAME, DB_PORT } = process.env;
 
-const hostdb = 'localhost';
-const userdb = 'root';
-const passdb = 'toor';
-const databasedb = 'dbchat';
+const hostdb = DB_HOST;
+const userdb = DB_USER;
+const passdb = DB_PASS;
+const databasedb = DB_NAME;
+const portdb = DB_PORT;
 
-let connection;
+const pool = mysql.createPool({
+  host: hostdb,
+  user: userdb,
+  password: passdb,
+  database: databasedb,
+  port: portdb,
+  waitForConnections: true,
+  connectionLimit: 10,
+  queueLimit: 0
+});
 
-export const connectDB = () => {
-    if (connection) return Promise.resolve(connection);
-  
-    return mysql.createConnection({
-      host: hostdb,
-      user: userdb,
-      password: passdb,
-      database: databasedb
-    })
-    .then(conn => {
-      connection = conn;
-      return connection;
-    })
-    .catch(err => {
-      console.error('No se pudo conectar a la base de datos:', err);
-      throw err;
-    });
-  };
+module.exports = pool;

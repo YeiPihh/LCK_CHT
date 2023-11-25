@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 
 import {
   BrowserRouter as Router,
@@ -7,7 +7,7 @@ import {
 } from 'react-router-dom';
 import Register from './components/Register/RegisterComponent.jsx';
 import Login from './components/Login/LoginComponent.jsx';
-import Index from './components/Index/IndexComponent.jsx';
+/* import Index from './components/Index/IndexComponent.jsx'; */
 import Chat from './components/Chat/ChatComponent.jsx';
 import './index.css';
 

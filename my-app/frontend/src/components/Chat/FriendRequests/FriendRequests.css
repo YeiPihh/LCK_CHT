@@ -2,6 +2,8 @@
     display: flex;
     gap: 40px;
     align-items: center;    
+    background-color: var(--bgTransparent);
+    z-index: 3;
 }
 
 .buttonsContainer {
@@ -30,8 +32,8 @@
     position: absolute;
     content: '';
     width: 100%;
-    height: 167%;
-    bottom: -33%;
+    height: 120%;
+    bottom: -15%;
     left: 0%;
     transform: scaleX(0);
     background-color: #555555e8;
@@ -43,8 +45,8 @@
     position: absolute;
     content: '';
     width: 100%;
-    height: 167%;
-    bottom: -33%;
+    height: 120%;
+    bottom: -15%;
     left: 0%;
     transform: scaleY(0);
     background-color: #555555e8;

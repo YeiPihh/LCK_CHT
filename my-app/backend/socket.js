@@ -1,29 +1,9 @@
 // socket.js
-var mysql = require('mysql2/promise');
-
-const hostdb = 'containers-us-west-145.railway.app';
-const userdb = 'root';
-const passdb = 'SRGLy6fQXQmmq2isbnOA';
-const databasedb = 'railway';
-const portdb = 7680;
-// conexion a la base de datos
-let connection;
-mysql.createConnection({
-  host: hostdb,
-  user: userdb,
-  password: passdb,
-  database: databasedb,
-  port: portdb
-}).then(conn => {
-    connection = conn;
-}).catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
-});
-
+const pool = require('./config/dbConfig.js');
 
 async function saveMessage(senderId, contactId, content) {
     try {
-      await connection.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW())', [senderId, contactId, content]);
+      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW())', [senderId, contactId, content]);
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
     }
@@ -37,125 +17,83 @@ module.exports = function(socketio) {
     socketio.on('connection', (socket) => {
         console.log('Un usuario se ha conectado');
         socket.on('informationUser', (data) => {
-            userSockets[data.userId] = socket;
-            userIds[socket.id] = data.userId;
-           
+          userSockets[data.userId] = socket;
+          userIds[socket.id] = data.userId;
         });
+        
 
-
-      
           socket.on('openChat', async (contactId) => {
             const userId = userIds[socket.id]; 
-            const [messages] = await connection.query('SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp', [userId, contactId, contactId, userId]);
+            const [messages] = await pool.query('SELECT * FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp', [userId, contactId, contactId, userId]);
       
             // Enviar los mensajes al cliente
             socket.emit('chatHistory', messages);
           });
 
-
-          /*socket.on('addContact', async (newContactUsername) => {
-            const userId = userIds[socket.id]; // Obtener el ID del usuario actual
-        
-            try {
-                // Buscar el ID del nuevo contacto en la base de datos
-                const [results] = await connection.query('SELECT id FROM users WHERE username = ?', [newContactUsername]);
-        
-                // Verificar si existe tal usuario
-                if (results.length === 0) {
-                    console.error('Usuario no encontrado');
-                    socket.emit('addContactError', 'Usuario no encontrado'); // Informar al cliente
-                    return;
-                }
-        
-                const contactId = results[0].id;
-        
-                // Comprobar si ya existe una fila con este user_id y contact_id
-                const [existingContact] = await connection.query('SELECT * FROM contacts WHERE user_id = ? AND contact_id = ?', [userId, contactId]);
-        
-                if (existingContact.length > 0) {
-                    console.log('El contacto ya existe, no se agregará nuevamente.');
-                    socket.emit('addContactError', 'El contacto ya existe'); // Informar al cliente
-                    return;
-                }
-        
-                // Insertar el nuevo contacto en la tabla 'contacts'
-                await connection.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?)', [userId, contactId]);
-                console.log('Contacto añadido exitosamente');
-                socket.emit('addContactSuccess', 'Contacto añadido exitosamente'); // Informar al cliente
-            } catch (error) {
-                console.error('Error al agregar contacto:', error);
-                socket.emit('addContactError', 'Error al agregar contacto'); // Informar al cliente
-            }
-            
-
-        }); */
-
         socket.on('sendFriendRequest', async (receiverUsername) => {
-            const senderId = parseInt(userIds[socket.id]);
-            console.log(userIds[socket.id])
+          const senderId = parseInt(userIds[socket.id]);
+          console.log(userIds[socket.id])
 
-            try {
-              const [results] = await connection.query('SELECT id FROM users WHERE username = ?', [receiverUsername]);
-              if (results.length === 0) {
-                socket.emit('friendRequestError', 'Usuario no encontrado');
-                return;
-              }
-              const receiverId = results[0].id;
-
-              if (senderId === receiverId) {
-                socket.emit('friendRequestError', 'No puedes enviarte una solicitud a ti mismo');
-                return;
-              }
-
-              const [existingRequests] = await connection.query('SELECT * FROM friend_requests  WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) AND status = "pendiente"', [senderId, receiverId, receiverId, senderId]);
-
-              if (existingRequests.length > 0) {
-                  socket.emit('friendRequestError', 'La solicitud ya está pendiente');
-                  return;
-              }
-
-              const [alredyAcceptedRequests] = await connection.query('SELECT * FROM contacts where (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId, receiverId, senderId]);
-
-              if (alredyAcceptedRequests.length > 0) {
-                  socket.emit('friendRequestError', 'Ya eres amigo de esta persona');
-                  return;
-              }
-
-              await connection.query('INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES (?, ?, "pendiente")', [senderId, receiverId]);
-              socket.emit('friendRequestSuccess', 'Solicitud enviada exitosamente');
-            } catch (error) {
-              console.error('Error al enviar la solicitud de amistad:', error);
-              socket.emit('friendRequestError', 'Error al enviar la solicitud');
+          try {
+            const [results] = await pool.query('SELECT id FROM users WHERE username = ?', [receiverUsername]);
+            const receiverId = results[0].id;
+            const [existingRequests] = await pool.query('SELECT * FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId,receiverId, receiverId, senderId]);
+            const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId,receiverId, senderId]);
+            console.log('line 43 socket.js: ',existingRequests)
+            // console.log('line 44 socket.js: ',existingRequests[0].status)
+            
+            if (results.length === 0) {
+              socket.emit('friendRequestError', 'Usuario no encontrado');
+              return;
             }
+            else if (senderId === receiverId) {
+              socket.emit('friendRequestError', 'No puedes enviarte una solicitud a ti mismo');
+              return;
+            }
+            else if (existingRequests.length > 0) {
+             if (existingRequests[0].status === 'pendiente') {
+               if (existingRequests[0].sender_id === senderId) {
+                 socket.emit('friendRequestError', 'You alredy sent a friend request to this person');
+                 return;
+               }
+               else if (existingRequests[0].sender_id !== senderId) {
+                 socket.emit('friendRequestError', 'This person alredy sent you a friend request');
+                 return;
+               }
+             }
+             else if (existingRequests[0].status === 'aceptado' && existingContacts.length > 0) {
+              socket.emit('friendRequestError', 'Ya eres amigo de esta persona');
+              return;
+             } 
+            } else {
+              await pool.query('INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES (?, ?, "pendiente")', [senderId, receiverId]);
+              socket.emit('friendRequestSuccess', 'Solicitud enviada exitosamente');
+            }
+          } catch (error) {
+            console.error('Error al enviar la solicitud de amistad:', error);
+            socket.emit('friendRequestError', 'Error al enviar la solicitud');
+          }
         });
 
         socket.on('acceptFriendRequest', async (senderId) => {
             const receiverId = userIds[socket.id];
-            console.log('senderId:', senderId);
-            console.log('receiverId:', receiverId);
+            
             try {
-              await connection.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
-              await connection.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
-              socket.emit('acceptFriendRequestSuccess', 'Solicitud aceptada exitosamente');
+              const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId, receiverId, senderId]);
+
+              if (existingContacts.length > 0) {  
+                socket.emit('acceptFriendRequestError', 'This person is alredy your friend');
+              } else {
+                await pool.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
+                await pool.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
+                socket.emit('acceptFriendRequestSuccess', 'Solicitud aceptada exitosamente');
+              }
             } catch (error) {
               console.error('Error al aceptar la solicitud de amistad:', error);
               socket.emit('acceptFriendRequestError', 'Error al aceptar la solicitud');
             }
         });
-
-      //   socket.on('acceptFriendRequest', async (senderId) => {
-      //     const receiverId = userIds[socket.id];
-      //     try {
-      //       await connection.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
-      //       await connection.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
-      //       socket.emit('acceptFriendRequestSuccess', 'Solicitud aceptada exitosamente');
-      //     } catch (error) {
-      //       console.error('Error al aceptar la solicitud de amistad:', error);
-      //       socket.emit('acceptFriendRequestError', 'Error al aceptar la solicitud');
-      //     }
-      // });
-          
-
+        
         socket.on('sendMessage', async (data) => {
             
             const { senderId, receiverId, content } = data;

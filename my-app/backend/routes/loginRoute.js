@@ -1,27 +1,9 @@
 // loginRoute
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2/promise');
+const pool = require('../config/dbConfig.js');
 const passport = require('passport');
 
-const hostdb = 'containers-us-west-145.railway.app';
-const userdb = 'root';
-const passdb = 'SRGLy6fQXQmmq2isbnOA';
-const databasedb = 'railway';
-const portdb = 7680;
-// conexion a la base de datos
-let connection;
-mysql.createConnection({
-  host: hostdb,
-  user: userdb,
-  password: passdb,
-  database: databasedb,
-  port: portdb
-}).then(conn => {
-    connection = conn;
-}).catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
-});
 
 router.post('/', function(req, res, next) {
     passport.authenticate('local', function(err, user, info) {
@@ -43,6 +25,5 @@ router.post('/', function(req, res, next) {
     
 
 });
-
 
 module.exports = router;

@@ -1,27 +1,8 @@
-var express = require('express');
-var router = express.Router();
-var mysql = require('mysql2/promise'); // Usa la versión promisificada para async/await
-var { check, validationResult } = require('express-validator');
+const express = require('express');
+const router = express.Router();
+const pool = require('../config/dbConfig.js'); // Usa la versión promisificada para async/await
+const { check, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-
-const hostdb = 'containers-us-west-145.railway.app';
-const userdb = 'root';
-const passdb = 'SRGLy6fQXQmmq2isbnOA';
-const databasedb = 'railway';
-const portdb = 7680;
-// conexion a la base de datos
-let connection;
-mysql.createConnection({
-  host: hostdb,
-  user: userdb,
-  password: passdb,
-  database: databasedb,
-  port: portdb
-}).then(conn => {
-    connection = conn;
-}).catch(err => {
-    console.error('No se pudo conectar a la base de datos:', err);
-});
 
 router.post('/', [
     // Validación de los datos del usuario
@@ -40,14 +21,14 @@ router.post('/', [
         const { username, password } = req.body;
         
         // Comprueba si el usuario ya existe
-        const [rows] = await connection.execute('SELECT * FROM users WHERE username = ?', [username]);
+        const [rows] = await pool.execute('SELECT * FROM users WHERE username = ?', [username]);
         if (rows.length > 0) {
             return res.status(400).json({ msg: 'User already exists' });
         }
 
         // Crea un nuevo usuario y hashea la contraseña
         const hashedPassword = await bcrypt.hash(password, 10);
-        await connection.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
+        await pool.execute('INSERT INTO users (username, password) VALUES (?, ?)', [username, hashedPassword]);
         res.status(201).json({ msg: 'User registered successfully' });
         
 

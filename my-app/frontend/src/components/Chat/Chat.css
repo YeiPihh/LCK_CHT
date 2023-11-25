@@ -243,6 +243,15 @@
     width: max-content;
     flex-direction: column;
     background-color: var(--bgTransparent);
+    min-width: 20vw;
+    min-height: 7vh;
+    gap: 10px;
+}
+
+.noRequests {
+    position: absolute;
+    width: max-content;
+    top: 25%;
 }
 
 #menuChat {
@@ -310,9 +319,12 @@
 }
 
 .hidden {
+    width: 0px!important;
     opacity: 0;
-    display: none;
+    display: none!important;
 }
+
+
 
 
 /* estilos de componentes */
