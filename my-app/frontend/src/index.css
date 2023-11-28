@@ -18,13 +18,14 @@ body {
   font-family:'Poppins', Verdana, system-ui ,'Lato', sans-serif, 'Courier New', 'Courier';
   margin: 0;
   padding: 0;
-  background-color: var(--main-content-bg);
+  background-color: var(--main-bg-color);
 }
 
 .containerAll {
   display: flex;
   flex-direction: column;
-  background-image: url(https://wallpaperaccess.com/full/1567665.png);
+  background-image: url("https://i.postimg.cc/YSqz9s48/hollowed-boxes.png");
+  /* background-image: url(https://wallpaperaccess.com/full/1567665.png); */
   height: 100vh;
   background-position: center;
   background-size: cover;

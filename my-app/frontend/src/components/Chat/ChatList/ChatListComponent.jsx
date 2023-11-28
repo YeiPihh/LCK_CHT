@@ -1,21 +1,35 @@
 // ChatListComponent.jsx
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import ProfilePictureComponent from '../ProfilePicture/ProfilePictureComponent';
 import './ChatList.css';
+import { createUseStyles } from 'react-jss';
 
-const ChatListComponent = ({ contacts }) => {
+const useStyles = createUseStyles({
+  textTransparent: {
+      opacity:'0',
+      width:'0px'
+  }
+});
+  
+
+const ChatListComponent = ({ contacts, onContactClick }) => {
+  
+  const classes = useStyles();
+
   return (
-    <div className="nav-list-chat no-select">
-      {contacts.map((contact, index) => (
-        <div key={index} className="chat-item" data-id={contact.contact_id}>
-          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username=''/>
+    <> 
+    {contacts.map((contact, index) => {
+      
+      return(
+      <div key={index} className="chat-item" onClick={() => onContactClick(contact)}>
+          <ProfilePictureComponent />
           <div className="contactContainer">
             <span className="contactName">{contact.username.toUpperCase()}</span>
-            <span className="lastMessage">{contact.lastMessage}</span>
+            <span className={`lastMessage ${contact.lastMessage ? '' : classes.textTransparent}`}>{contact.lastMessage ? contact.lastMessage : '.'}</span>
           </div>
-        </div>
-      ))}
-    </div>
+        </div> )
+    })}
+      </>
   );
 };
 

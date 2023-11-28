@@ -11,13 +11,6 @@
     box-sizing: border-box;
 }
 
-.messageContainer {
-    align-self: flex-start;
-    background-color:#bbbbbb;
-    color: #000;
-    padding: 15px;
-}
-
 .myMessageContainer {
     align-self: flex-end;
     background-color:#007bff;
@@ -147,7 +140,6 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-color: #f9f9f9; /* Fondo claro similar al hero de index.html */
 }
 
 .chat-header {
@@ -332,20 +324,42 @@
 
 
 /* MessageComponent */
-.message-left {
-    text-align: left;
-    background-color: #e0e0e0;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px;
+.messagesContainer {
+    display: flex;
+    height:calc(100vh - 130px);
+    padding: 20px 10px;
+    align-items: flex-end;
+    flex-direction: column;
+    justify-content: flex-end;
+    font-size: 20px;
+    letter-spacing: 0px;
 }
 
-.message-right {
-    text-align: right;
-    background-color: #f0f0f0;
-    padding: 10px;
-    margin: 5px;
-    border-radius: 10px; 
+.messageLeft, .messageRight{
+    display: flex;
+    background-color: #e0e0e0;
+    padding: 1% 2%;
+    border-radius: 10px;
+    width: max-content;
+    max-width: 40%;
+    height: max-content;
+    margin-bottom: 10px;
+}
+
+.messageLeft {
+    align-self: flex-start;
+    text-align: left;
+    text-wrap: nowrap;
+}
+
+.messageRight {
+    text-align: left;
+    word-wrap: break-word;
+    white-space: normal;
+}
+
+.lastMessageGroup{
+    margin-top: 20px;
 }
 
 @media screen and (max-width: 1500px) {
@@ -378,12 +392,7 @@
         font-size: 12px;
     }
 
-    .messageContainer {
-        align-self: flex-start;
-        background-color:#bbbbbb;
-        color: #000;
-        padding: 15px;
-    }
+
     
     .myMessageContainer {
         align-self: flex-end;
@@ -422,78 +431,78 @@
     }
     
 }
-/*@media screen and (max-width: 800px ){*/
+@media ((width > 500px) and (width <= 1000px )){
     /*MOBILE DESIGN*/
     /* Ocultar sidebar en modo móvil cuando se hace clic en un chat */
-    body.mobile .chat-sidebar:not(.active) {
+    .chat-sidebar:not(.active) {
         display: none;
     }
 
     /* Mostrar el chat principal en modo móvil cuando se hace clic en un chat */
-    body.mobile .chat-main {
+    .chat-main {
         display: none;
     }
 
-    body.mobile .chat-header {
+    .chat-header {
         display: flex;
         align-items: center;
         justify-content: center;
         position: relative;
     }
 
-    body.mobile .chat-header #chats_mobile {
+    .chat-header #chats_mobile {
         position: absolute;
         left: 0%;
     }
 
-    body.mobile #iconChatMobile {
+    #iconChatMobile {
         visibility: visible;
         display: block;
     }
 
-    body.mobile #contactNameText {
+    #contactNameText {
         letter-spacing: 2px;
         font-size: 20px;
         margin-left: 10px;
         font-weight: bold;
     }
 
-    body.mobile #chat-messages .messageContainer p, body.mobile #chat-messages .myMessageContainer p{
+    #chat-messages .messageContainer p, #chat-messages .myMessageContainer p{
         font-size: 12px;
         max-width: 90%;
         margin-right: 5px;
     }
 
-    body.mobile .timeMessage{
+    .timeMessage{
         margin: 0;
         display: block;
         align-self: flex-end;
     }
 
-    body.mobile .chat-main.active {
+    .chat-main.active {
         width: 100%;
         display: flex;
     }
 
-    body.mobile .chat-sidebar.active {
+    .chat-sidebar.active {
         width: 100vw;
         display: flex;
     }
 
-    body.mobile .chat-item .contactName {
+    .chat-item .contactName {
         font-size: 18px;
         font-weight: bold;
         letter-spacing: 2px;
         margin-bottom: 3px;
     }
 
-    body.mobile .chat-container .chat-main .chat-messages {
+    .chat-container .chat-main .chat-messages {
         max-width: 100vw;
         padding: 15px;
     }
 
     
-    body.mobile #friendRequestsWrapper{
+    #friendRequestsWrapper{
         display: flex;
         position: absolute;
         background-color: #ffffffef;
@@ -508,31 +517,28 @@
         flex-direction: column;
     }
 
-    body.mobile #friendRequestsWrapper .friendRequestContainer {
+    #friendRequestsWrapper .friendRequestContainer {
         display: flex;
         justify-content: space-between;
         min-width: 0vw;
         max-width: 100%;
     }
 
-    body.mobile #friendRequestsWrapper .timeRequestContainer{
+    #friendRequestsWrapper .timeRequestContainer{
         display: none;
     }
-
-    @media screen and (max-width: 490px) { 
-        body.mobile #friendRequestsWrapper .friendRequestContainer {
-            display: flex;
-            justify-content: space-between;
-            max-width: 79vw;
-        }
-    }
-
-@media screen and (max-width: 400px) { 
+}
+@media screen and (width <= 500px) { 
     body .messageContainer, #chat-messages .myMessageContainer{
         max-width: 65%!important;
     }
     body #chat-messages .messageContainer p, body #chat-messages .myMessageContainer p{
         max-width: 85%!important;
+    }
+    #friendRequestsWrapper .friendRequestContainer {
+        display: flex;
+        justify-content: space-between;
+        max-width: 79vw;
     }
 }
 

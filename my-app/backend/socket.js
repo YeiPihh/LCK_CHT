@@ -3,7 +3,8 @@ const pool = require('./config/dbConfig.js');
 
 async function saveMessage(senderId, contactId, content) {
     try {
-      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW())', [senderId, contactId, content]);
+      await pool.query('UPDATE messages SET isLast = 0 WHERE id IN (SELECT id FROM (SELECT id FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp DESC LIMIT 1) AS subquery);', [senderId, contactId, contactId, senderId]);
+      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp, isLast) VALUES (?, ?, ?, NOW(), 1)', [senderId, contactId, content]);
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
     }
@@ -95,16 +96,14 @@ module.exports = function(socketio) {
         });
         
         socket.on('sendMessage', async (data) => {
-            
-            const { senderId, receiverId, content } = data;
-            console.log('socket',receiverId);
-            await saveMessage(senderId, receiverId, content);
-
-            const receiverSocket = userSockets[receiverId];
-            if (receiverSocket) {
-              receiverSocket.emit('receiveMessage', data);
+          const { senderId, receiverId, content } = data;
+          console.log('socket',receiverId);
+          await saveMessage(senderId, receiverId, content);
+          
+            const receiverSocketId = userSockets[receiverId];
+            if (receiverSocketId) {
+              receiverSocketId.emit('receiveMessage', data);
             }
-
           });
     });
 };

@@ -6,7 +6,6 @@
     width: auto;
     position: relative;
     height: 3.5em;
-    /* border: 3px ridge var(--textColor); */
     outline: none;
     background-color: transparent;
     color: var(--textColor);
@@ -21,38 +20,6 @@
     align-items: center;
     cursor: pointer;
 }
-
-/* .profileImagenContainer::after {
-  content: "";
-  position: absolute;
-  top: -6px;
-  left: 3%;
-  width: 95%;
-  height: 20%;
-  background-color: var(--main-bg-color);;
-  transition: 0.5s;
-  transform-origin: center;
-}
-
-.profileImagenContainer::before {
-  content: "";
-  transform-origin: center;
-  position: absolute;
-  top: 90%;
-  left: 3%;
-  width: 95%;
-  height: 20%;
-  background-color: var(--main-bg-color);
-  transition: 0.5s;
-}
-
-.profileImagenContainer:hover::before, .profileImagenContainer:hover::after {
-  transform: scale(0)
-}
-
-.profileImagenContainer:hover {
-  box-shadow: inset 0px 0px 10px var(--textColor);
-} */
 
 .usernameSide{
     font-size: 25px;

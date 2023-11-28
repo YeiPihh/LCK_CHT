@@ -1,22 +1,47 @@
 // ChatComponent.jsx
-import React, { useState, useEffect, useRef } from 'react';
+
+//dependencias
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { io } from "socket.io-client";
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { createUseStyles } from 'react-jss';
+
+//components
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
 import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
 import MenuChat from './MenuChat/MenuChatComponent.jsx';
-// import MessageComponent from './Message/MessageComponent';
-// import FriendRequest from './FriendRequests/FriendRequests.jsx';
+import ChatMain from './Chatmain/ChatMain.jsx';
 
+
+//styles
 import './Chat.css';
 import './MenuButton/MenuButton.css';
 
-
 const socket = io('http://localhost:4567');
 
+const useStyles = createUseStyles({
+    userProfileContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+    }
+});
+
+export const MessagesContext = React.createContext({
+  messages: [],
+  setMessages: () => {},
+  userId: '',
+  setUserId: () => {},
+  isWaitingClick: '', 
+  setIsWaitingClick: () => {}
+})
+
 const ChatComponent = () => {
+
+  const classes = useStyles();
+
   const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -30,7 +55,30 @@ const ChatComponent = () => {
   const formRef = useRef(null);
   const [newContactUsername, setNewContactUsername] = useState('');
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
+  const [messages, setMessages] = useState({});
+  const [isWaitingClick, setIsWaitingClick] = useState(true);
+  
    // const [messages, setMessages] = useState([]);
+
+   // hook para extraer informacion de la base de datos
+   useEffect(() => {
+ 
+     fetch('http://localhost:4567/chat', {
+       credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
+     })
+     .then(response => response.json())
+     .then(data => {
+       
+       if (data.success) {
+         // seteamos todas las variables que nos ha proporcionado el servidor mediante la api /chat
+         setContacts(data.contacts);
+         setUsername(data.user.username.toUpperCase());
+         setUserId(data.user.id);
+         socket.emit('informationUser', { username: data.user.username, userId: data.user.id }) // mandamos al servidor la informacion del usuario mediante informationUser
+       }
+     })
+     .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
+   }, []);
 
   // autenticacion para entrar a la pagina /chat
   useEffect(() => {
@@ -66,30 +114,29 @@ const ChatComponent = () => {
       .catch(error=>{
         console.error('Error during authentication:', error);
       });
-  }, []); 
+  }, []);
 
-  // hook para extraer informacion de la base de datos
-  
-  useEffect(() => {
-
-    fetch('http://localhost:4567/chat', {
-      credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
+  const handleContactClick = (contact) => {
+    setSelectedContact(contact.contact_id);
+    fetch(`http://localhost:4567/chat-history/${contact.contact_id}`, {
+      credentials: 'include',
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      },
     })
-    .then(response => response.json())
+    .then(response=> response.json())
     .then(data => {
-      
       if (data.success) {
-        setContacts(data.contacts);
-        setUsername(data.user.username.toUpperCase());
-        setUserId(data.user.id);
-        socket.emit('informationUser', { username: data.user.username, userId: data.user.id })
+        setMessages(data.messages);
+        setIsWaitingClick(false);
+        
       }
     })
-    .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
-  }, []);
-  
-  // visibilidad del menu
+    .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
+  };
 
+  // visibilidad del menu
   // oculta el menu si se pulsa fuera de este
   const handleClickOutside = (e) => {
     if (formRef.current && !formRef.current.contains(e.target)) {
@@ -168,7 +215,6 @@ const ChatComponent = () => {
         confirmButtonText: 'Aceptar'
       });
     });
-
   };
 
   const handleIgnoreRequest = (requestId) => {
@@ -206,9 +252,8 @@ const ChatComponent = () => {
     socket.emit('sendFriendRequest', newContactUsername)
     // Escuchar el evento de éxito al enviar una solicitud de amistad
     setAddFormVisibility(false);
+    window.location.reload();
   };
-
-
 
   //buttonHome
   const handleRedirectHome = () => {
@@ -227,17 +272,16 @@ const ChatComponent = () => {
   //     ]);
   //   }
   // }, [selectedContact]);
-   const handleContactClick = (contact) => {
-     setSelectedContact(contact.contact_id);
-   };
+
 
   return (
+    <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, setIsWaitingClick}}>
+
     <div className="chat-container" onClick={handleClickOutside}>
-      <div className="chat-sidebar">
+      
+      <aside className={`chat-sidebar ${selectedContact ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
-          {//<button id="menuButton" className="material-symbols-outlined" onClick={handleMenuVisibility} ref={formRef}>menu</button>
-          }
           <MenuButtonComponent  id="menuButton" onClick={handleMenuVisibility} ref={formRef} iconClass={menuClicked ? "clicked" : ""} textClass={menuClicked ? "clicked" : ""}/>
           <MenuChat
             menuVisibility={menuVisibility}
@@ -256,27 +300,22 @@ const ChatComponent = () => {
             handleFriendRequestVisibility={handleFriendRequestVisibility}
             handleLogout={handleLogout}
           />
-          <ProfilePictureComponent imageUrl='https://i.postimg.cc/fTDtfZZ7/usuario.png' username={username} />
+          <div className={`${classes.userProfileContainer} no-select`}>
+            <ProfilePictureComponent />
+            <div className='usernameSide'>{username}</div>
+          </div>
         </div>
         
       </div>
-      
         <ChatListComponent contacts={contacts} onContactClick={handleContactClick} />
+      </aside>
       
-      </div>
-      
-      <div className="chat-main containerAll">
-        {selectedContact && (
-          <div>
-            <div className="chat-messages">
-             {/*  {messages.map((message, index) => (
-                <MessageComponent key={index} content={message.content} isOwnMessage={message.isOwnMessage} />
-              ))} */}
-            </div>
-          </div>
-        )}
+      <div className={`chat-main containerAll ${selectedContact ? 'active' : ''}`}>
+        <ChatMain selectedContact= {selectedContact} />
       </div>
     </div>
+
+    </MessagesContext.Provider>
   );
 };
 

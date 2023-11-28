@@ -48,21 +48,56 @@ async function getLastMessage(userId, contactId) {
 
 async function getContactsForUser(userId) {
   try {
-    const [results] = await pool.query('SELECT c.contact_id, u.username FROM contacts c JOIN users u ON c.contact_id = u.id WHERE c.user_id = ?', [userId]);
 
-    // mapeamos el array result con los contactos y por cada contacto ejecutamos la funcion getLastMessage
-    const lastMessagePromises = results.map(contact => 
-      getLastMessage(userId, contact.contact_id)
-    );
+    const queryconIDs= `SELECT DISTINCT
+    u.username,
+    CASE 
+        WHEN c.user_id = ? THEN c.contact_id 
+        ELSE c.user_id 
+    END as contact_id,
+    m.content as lastMessage,
+    m.timestamp,
+    m.isLast
+FROM
+    contacts c
+JOIN
+    users u ON (c.contact_id = u.id AND c.user_id = ? ) OR (c.user_id = u.id AND c.contact_id = ?)
+LEFT JOIN
+    (SELECT sender_id, receiver_id, isLast
+     FROM messages
+     WHERE isLast = 1
+     GROUP BY sender_id, receiver_id) AS lastMsg ON (lastMsg.sender_id = c.contact_id AND lastMsg.receiver_id = c.user_id) OR (lastMsg.sender_id = c.user_id AND lastMsg.receiver_id = c.contact_id)
+LEFT JOIN
+    messages m ON m.sender_id = lastMsg.sender_id AND m.receiver_id = lastMsg.receiver_id AND m.isLast = lastMsg.isLast
+WHERE 
+    (c.contact_id = ? OR c.user_id = ?)
+AND 
+    NOT (c.contact_id = ? AND c.user_id = ?);`;
 
-    const lastMessages = await Promise.all(lastMessagePromises);
+    const queryGetContacts = `
+      SELECT DISTINCT 
+      u.username, 
+      m.content as lastMessage, 
+      m.timestamp, 
+      m.isLast 
+      FROM 
+          contacts c 
+      JOIN 
+          users u ON (c.contact_id = u.id AND c.user_id = ? ) OR (c.user_id = u.id AND c.contact_id = ?)
+      LEFT JOIN 
+          (SELECT sender_id, receiver_id, isLast
+           FROM messages 
+           WHERE isLast = 1
+           GROUP BY sender_id, receiver_id) AS lastMsg ON (lastMsg.sender_id = c.contact_id AND lastMsg.receiver_id = c.user_id) OR (lastMsg.sender_id = c.user_id AND lastMsg.receiver_id = c.contact_id)
+      LEFT JOIN 
+          messages m ON m.sender_id = lastMsg.sender_id AND m.receiver_id = lastMsg.receiver_id AND m.isLast = lastMsg.isLast
+      WHERE 
+          (c.contact_id = ? OR c.user_id = ?) ORDER BY m.timestamp DESC;
+    `;
 
-    const contacts = results.map((contact, index) =>({
-      ...contact,
-      lastMessage: lastMessages[index][0] ? lastMessages[index][0].content : null
-    }));
+    const [results] = await pool.query(queryconIDs, [userId, userId, userId, userId, userId, userId, userId]);
 
-    return contacts;
+    return results;
   } catch (error) {
     console.error('Error al obtener contactos:', error);
     return [];
@@ -75,6 +110,20 @@ async function getChatHistory(userId, contactId) {
     const [results] = await pool.query(
       'SELECT m.* FROM messages m WHERE (m.sender_id = ? AND m.receiver_id = ?) OR (m.sender_id = ? AND m.receiver_id = ?) ORDER BY m.timestamp',
       [userId, contactId, contactId, userId]
+    );
+    return results;
+  } catch (error) {
+    console.error('Error al obtener el historial del chat:', error);
+    return [];
+  }
+}
+
+async function getUnreadMessages(userId, contactId) {
+  try {
+    // Ajusta esta consulta según tus necesidades
+    const [results] = await pool.query(
+      'SELECT nrm.* FROM unread_messages nrm WHERE (m.sender_id = ? AND m.receiver_id = ?) ORDER BY m.timestamp',
+      [contactId, userId]
     );
     return results;
   } catch (error) {
