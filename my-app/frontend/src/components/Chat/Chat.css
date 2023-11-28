@@ -327,7 +327,7 @@
 .messagesContainer {
     display: flex;
     height:calc(100vh - 130px);
-    padding: 20px 10px;
+    padding: 1% 3%;
     align-items: flex-end;
     flex-direction: column;
     justify-content: flex-end;
@@ -362,7 +362,7 @@
     margin-top: 20px;
 }
 
-@media screen and (max-width: 1500px) {
+@media ((width > 1000px) and (width <= 1600px )) {
     body .chat-item .contactName {
         font-size: 18px;
         font-weight: bold;
@@ -371,7 +371,15 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
-    } 
+    }
+
+    .messagesContainer{
+        font-size: 17px;
+    }
+
+    .messageLeft, .messageRight {
+        padding: 10px 15px;
+    }
 
     .chat-container .chat-sidebar {
         width: 35vw;
@@ -391,30 +399,6 @@
     #menuChat .text {
         font-size: 12px;
     }
-
-
-    
-    .myMessageContainer {
-        align-self: flex-end;
-        background-color:#007bff;
-        color: #fff;
-        padding: 15px;
-    }
-    
-    #chat-messages .myMessageContainer, .messageContainer{
-        display: flex;
-        font-size: 16px;
-        margin-bottom: 2%;
-        border-radius: 10px;
-        max-width: 60%;
-    }
-    
-    .messageContainer p, .myMessageContainer p {
-        max-width: 93%;
-        overflow-wrap: break-word;
-        display: inline;
-        margin: 0;
-    }
     
     .timeMessage{
         font-size: 10px;
@@ -431,9 +415,10 @@
     }
     
 }
-@media ((width > 500px) and (width <= 1000px )){
+@media ((width > 0) and (width <= 1000px )){
     /*MOBILE DESIGN*/
     /* Ocultar sidebar en modo móvil cuando se hace clic en un chat */
+
     .chat-sidebar:not(.active) {
         display: none;
     }
@@ -448,6 +433,14 @@
         align-items: center;
         justify-content: center;
         position: relative;
+    }
+
+    .messagesContainer{
+        font-size: 17px;
+    }
+
+    .messageLeft, .messageRight {
+        padding: 10px 15px;
     }
 
     .chat-header #chats_mobile {
@@ -467,7 +460,7 @@
         font-weight: bold;
     }
 
-    #chat-messages .messageContainer p, #chat-messages .myMessageContainer p{
+    #chat-messages .messageContainer, .myMessageContainer{
         font-size: 12px;
         max-width: 90%;
         margin-right: 5px;
@@ -482,6 +475,7 @@
     .chat-main.active {
         width: 100%;
         display: flex;
+        
     }
 
     .chat-sidebar.active {
@@ -528,7 +522,16 @@
         display: none;
     }
 }
-@media screen and (width <= 500px) { 
+@media screen and (width <= 500px) {
+    .messagesContainer{
+        font-size: 15px;
+        padding: 20px;
+    }
+
+    .messageLeft, .messageRight {
+        padding: 9px 13px;
+    }
+
     body .messageContainer, #chat-messages .myMessageContainer{
         max-width: 65%!important;
     }
