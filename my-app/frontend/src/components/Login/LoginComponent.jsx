@@ -20,15 +20,14 @@ const Login = () => {
   const handleLogin = (event) => {
     event.preventDefault();
 
-    fetch('http://localhost:4567/logout', {
+    fetch('http://192.168.1.54:4567/logout', {
         credentials: 'include',
         method: 'GET',
       })
       .then(response => response.json())
       .then(data =>{
         if (data.status === 'success') {
-          console.log('Logout before to login success');
-          fetch('http://localhost:4567/login', {
+          fetch('http://192.168.1.54:4567/login', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

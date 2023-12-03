@@ -1,10 +1,11 @@
 // socket.js
 const pool = require('./config/dbConfig.js');
 
-async function saveMessage(senderId, contactId, content) {
+async function saveMessage(senderId, receiverId, content) {
+
     try {
-      await pool.query('UPDATE messages SET isLast = 0 WHERE id IN (SELECT id FROM (SELECT id FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?) ORDER BY timestamp DESC LIMIT 1) AS subquery);', [senderId, contactId, contactId, senderId]);
-      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp, isLast) VALUES (?, ?, ?, NOW(), 1)', [senderId, contactId, content]);
+      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW(6))', [senderId, receiverId, content]);
+      
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
     }
@@ -16,7 +17,6 @@ const userIds = {};
 
 module.exports = function(socketio) {
     socketio.on('connection', (socket) => {
-        console.log('Un usuario se ha conectado');
         socket.on('informationUser', (data) => {
           userSockets[data.userId] = socket;
           userIds[socket.id] = data.userId;
@@ -33,15 +33,13 @@ module.exports = function(socketio) {
 
         socket.on('sendFriendRequest', async (receiverUsername) => {
           const senderId = parseInt(userIds[socket.id]);
-          console.log(userIds[socket.id])
 
           try {
             const [results] = await pool.query('SELECT id FROM users WHERE username = ?', [receiverUsername]);
             const receiverId = results[0].id;
             const [existingRequests] = await pool.query('SELECT * FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId,receiverId, receiverId, senderId]);
             const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId,receiverId, senderId]);
-            console.log('line 43 socket.js: ',existingRequests)
-            // console.log('line 44 socket.js: ',existingRequests[0].status)
+
             
             if (results.length === 0) {
               socket.emit('friendRequestError', 'Usuario no encontrado');
@@ -87,23 +85,102 @@ module.exports = function(socketio) {
               } else {
                 await pool.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
                 await pool.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
+                const [newContact] = await pool.query('SELECT u.username, c.contact_id, m.content as lastMessage, m.timestamp FROM contacts c JOIN users u ON u.id=c.contact_id LEFT JOIN messages m ON m.sender_id=c.user_id WHERE user_id=? and contact_id=?', [receiverId, senderId]);
                 socket.emit('acceptFriendRequestSuccess', 'Solicitud aceptada exitosamente');
+                socket.emit('getNewContacts', newContact);
               }
             } catch (error) {
               console.error('Error al aceptar la solicitud de amistad:', error);
               socket.emit('acceptFriendRequestError', 'Error al aceptar la solicitud');
             }
         });
+
+        socket.on('ignoreFriendRequest', async (senderId) => {
+            const receiverId = userIds[socket.id];
+            
+            try {
+              const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId, receiverId, senderId]);
+
+              if (existingContacts.length > 0) {  
+                socket.emit('ignoreFriendRequestError', 'This person is alredy your friend');
+              } else {
+                await pool.query('UPDATE friend_requests SET status = "ignorado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
+                socket.emit('ignoreFriendRequestSuccess', 'Solicitud denegada exitosamente');
+              }
+            } catch (error) {
+              console.error('Error al denegar la solicitud de amistad:', error);
+              socket.emit('ignoreFriendRequestError', 'Error al denegar la solicitud');
+            }
+        });
         
         socket.on('sendMessage', async (data) => {
-          const { senderId, receiverId, content } = data;
-          console.log('socket',receiverId);
-          await saveMessage(senderId, receiverId, content);
+          const { sender_id, receiver_id, content } = data;
+
+          try {
+            await saveMessage(sender_id, receiver_id, content);
           
-            const receiverSocketId = userSockets[receiverId];
+            const receiverSocketId = userSockets[receiver_id];
             if (receiverSocketId) {
               receiverSocketId.emit('receiveMessage', data);
             }
-          });
+
+            const senderSocket = userSockets[sender_id];
+            if (senderSocket) {
+              senderSocket.emit('receiveMessage', data)
+            }
+          } catch (error) {
+            socket.emit('sendMessageError', error)
+          }
+        });
+
+        socket.on('clearChat', async(receiverId)=> {
+          const userId = userIds[socket.id];
+          try{
+            await pool.query('UPDATE messages SET showSender = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE 1 END, showReceiver = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE 1 END', [userId, receiverId, receiverId, userId]);
+            socket.emit('clearChatSuccess', 'Chat cleared successfully');
+          } catch (error) {
+            socket.emit('clearChatError', error);
+          }
+        });
+
+        socket.on('newContacts', async() => {
+          const userId = userIds[socket.id];
+          try{
+            const queryMaxTime=`
+              SELECT DISTINCT
+              u.username,
+              CASE
+                WHEN c.user_id = ? THEN c.contact_id
+                ELSE c.user_id
+              END as contact_id,
+              m.content as lastMessage,
+              m.timestamp,
+              m.showSender,
+              m.showReceiver
+              FROM contacts c
+              JOIN users u 
+              ON (c.contact_id = u.id AND c.user_id = ?) 
+              OR (c.user_id = u.id AND c.contact_id = ?)
+              LEFT JOIN (
+              SELECT sender_id, receiver_id, MAX(timestamp) AS max_timestamp, MAX(id) AS max_id
+              FROM messages
+              WHERE (sender_id = ? AND showSender = 1)
+                 OR (receiver_id = ? AND showReceiver = 1)
+              GROUP BY sender_id, receiver_id
+              ) lastMsg 
+              ON (lastMsg.sender_id = c.contact_id AND lastMsg.receiver_id = c.user_id) 
+              OR (lastMsg.sender_id = c.user_id AND lastMsg.receiver_id = c.contact_id)
+              LEFT JOIN messages m 
+              ON m.id = lastMsg.max_id
+              WHERE (c.contact_id = ? OR c.user_id = ?)
+              AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
+            `;
+            const [results] = await pool.query(queryMaxTime, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
+
+            socket.emit('newContactsSuccess', results);
+          } catch (error) {
+            socket.emit('newContactsError', error);
+          }
+        });
     });
 };

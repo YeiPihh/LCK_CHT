@@ -37,8 +37,6 @@ router.post('/', [
         res.status(500).send('Server error');
     }
 
-    console.log(`Un nuevo usuario se ha registrado: ${req.body.username}`);
-
 });
 
 module.exports = router;

@@ -1,31 +1,60 @@
+//chatMain
 import React, { useState, useContext } from "react";
 import Message from './Message/Message.jsx';
 import { MessagesContext } from '../ChatComponent.jsx';
+import InputChat from './InputChat/InputChat.jsx';
+
 import '../Chat.css';
+import HeaderChatMain from "./HeaderChatMain/HeaderChatMain.jsx";
 
 
-const ChatMain = () => {
-    const { messages, userId, isWaitingClick, setIsWaitingClick } = useContext(MessagesContext);
+const ChatMain = ({ sendMessage }) => {
+    const { messages, userId, isWaitingClick, selectedContact} = useContext(MessagesContext);
     
+    const handleSubmit = (messageContent) => {
+            if (messageContent){
+                const messageData = {
+                    sender_id: userId,
+                    receiver_id: selectedContact,
+                    content: messageContent
+                };
+                sendMessage(messageData);
+            }
+        
+    }
+
     const handleOwnMessage = (senderId) => {
         return parseInt(senderId) === parseInt(userId);
     }
+
     
     if (isWaitingClick) {
         return
     } else {
             return (
-            <main style={{width:'100%', height:'100vh'}}>
-                
-                <div className="messagesContainer">
-                    {messages.map((message, index)=> {
-                        const lastMessageGroup = index > 0 && messages[index-1].sender_id !== message.sender_id;
-                        return (
-                        <Message key={message.id} message={message.content} isOwnMessage={handleOwnMessage(message.sender_id)} isLastMessageGroup={lastMessageGroup} />)
-                    })}
-                </div>
+                <>
+                    <HeaderChatMain />
+                    <main className="" style={{width:'100%', display:'flex', flexDirection:'column'}}>
 
-            </main>
+                        <div className="messagesContainer">
+                            {
+                                messages.map((message, index)=> {
+                                    const lastMessageGroup = index > 0 && messages[index-1].sender_id !==   message.sender_id;
+                                
+                                    return (
+                                        <Message 
+                                            key={index}
+                                            message={message.content} 
+                                            isOwnMessage={handleOwnMessage(message.sender_id)}
+                                            isLastMessageGroup={lastMessageGroup} 
+                                        />
+                                    )
+                                })
+                            }
+                        </div>
+                        <InputChat onSubmitMessage={handleSubmit} />
+                    </main>
+                </>
         
         )
     }

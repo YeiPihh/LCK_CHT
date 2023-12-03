@@ -15,7 +15,7 @@ import React from "react";
       setFriendRequestVisibility(!friendRequestVisibility);
       setAddFormVisibility(false);
 
-      fetch ('http://localhost:4567/friend-requests', {
+      fetch ('http://192.168.1.54:4567/friend-requests', {
         credentials: 'include'
       })
       .then(response => response.json())
@@ -44,12 +44,11 @@ import React from "react";
 
     const handleIgnoreRequest = (requestId) => {
       setIsProcessingRequest(true);
-      console.log('pendiente por hacer en socket.js. con el request id eliminamos la peticion de la base de datos y hay que hacer algo para que se elimine de la interfaz del usuario')
     }
 
     //Logout handler
     const handleLogout = () => {
-      fetch('http://localhost:4567/logout', {
+      fetch('http://192.168.1.54:4567/logout', {
         credentials: 'include',
         method: 'GET',
       })

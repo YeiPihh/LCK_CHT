@@ -28,7 +28,7 @@ const MenuChat = ({menuVisibility, formRef, handleRedirectHome, addFormVisibilit
                   <FriendRequest 
                             classFriendRequest={isProcessingRequest ? 'hidden' : ''}
                             acceptRequest={() => handleAcceptRequest(request.sender_id)}
-                            ignoreRequest= {() => handleIgnoreRequest(request.id)} 
+                            ignoreRequest= {() => handleIgnoreRequest(request.sender_id)} 
                             key={request.id} 
                             request={request}
                           />

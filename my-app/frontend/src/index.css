@@ -28,8 +28,8 @@ body {
   /* background-image: url(https://wallpaperaccess.com/full/1567665.png); */
   height: 100vh;
   background-position: center;
-  background-size: cover;
-  overflow: hidden;
+
+  overflow: scroll;
 }
 
 .no-select, img {
@@ -118,7 +118,7 @@ padding: 1em;
 /* Estilos para el menú de navegación */
 .nav {
 background-color: var(--nav-bg-color);
-overflow: hidden;
+
 }
 
 .nav a {

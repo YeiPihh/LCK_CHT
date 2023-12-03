@@ -9,7 +9,7 @@
     font-weight: 600;
     display: flex;
     align-items: center;
-    background: #2b9292;
+    background-color: transparent;
     color: var(--textColor);
     padding: 0px;
     margin: 0px;
@@ -20,6 +20,10 @@
   .btn:hover {
     background-color: #33333385;
   } 
+
+  .btn.clicked {
+    background-color: var(--bgTransparent);
+  }
   
   .btn .icon {
     position: absolute;

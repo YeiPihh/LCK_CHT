@@ -4,6 +4,8 @@
     align-items: center;    
     background-color: var(--bgTransparent);
     z-index: 3;
+    width: 100%;
+    justify-content: space-between;
 }
 
 .buttonsContainer {

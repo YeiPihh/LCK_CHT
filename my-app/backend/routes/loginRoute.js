@@ -17,7 +17,6 @@ router.post('/', function(req, res, next) {
             if (err) {
                 return res.status(500).json({ error: 'Ocurrió un error en el servidor.' });
             }
-            console.log(`Un nuevo usuario se ha logeado: ${req.body.username}`);
             return res.json({ succes: true, message: 'Logged in successfully' });
         });
     })(req, res, next);

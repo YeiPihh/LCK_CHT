@@ -13,14 +13,16 @@ import ProfilePictureComponent from './ProfilePicture/ProfilePictureComponent';
 import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
 import MenuChat from './MenuChat/MenuChatComponent.jsx';
 import ChatMain from './Chatmain/ChatMain.jsx';
+import ContextMenu from './ContextMenu/ContextMenu.jsx';
 
 
 //styles
 import './Chat.css';
 import './MenuButton/MenuButton.css';
 
-const socket = io('http://localhost:4567');
+const socket = io('http://192.168.1.54:4567');
 
+// creacion de estilos dentro de js con JSS
 const useStyles = createUseStyles({
     userProfileContainer: {
         display: 'flex',
@@ -29,22 +31,30 @@ const useStyles = createUseStyles({
     }
 });
 
+// creacion de contexto para pasar informacion de los mensajes
 export const MessagesContext = React.createContext({
   messages: [],
   setMessages: () => {},
   userId: '',
   setUserId: () => {},
   isWaitingClick: '', 
-  setIsWaitingClick: () => {}
+  setIsWaitingClick: () => {},
+  selectedContact: '',
+  setSelectedContact: () => {},
+  selectedContactName: ''
 })
 
 const ChatComponent = () => {
 
   const classes = useStyles();
+  
+  const formRef = useRef(null);
+  const contextMenuRef = useRef(null);
 
   const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
+  const [selectedContactName, setSelectedContactName] = useState(null);
   const [menuVisibility, setMenuVisibility] = useState(false);
   const [menuClicked, setMenuClicked] = useState(false);
   const [addFormVisibility, setAddFormVisibility] = useState(false);
@@ -52,37 +62,36 @@ const ChatComponent = () => {
   const [friendRequests, setFriendRequests] = useState([]);
   const [username, setUsername ] = useState('');
   const [userId, setUserId ] = useState('');
-  const formRef = useRef(null);
   const [newContactUsername, setNewContactUsername] = useState('');
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
   const [messages, setMessages] = useState({});
   const [isWaitingClick, setIsWaitingClick] = useState(true);
-  
-   // const [messages, setMessages] = useState([]);
+  const [showContextMenu, setShowContextMenu] = useState(false);
+  const [coordenades, setCoordenades] = useState({ x:0, y:0 })
 
    // hook para extraer informacion de la base de datos
-   useEffect(() => {
- 
-     fetch('http://localhost:4567/chat', {
-       credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
-     })
-     .then(response => response.json())
-     .then(data => {
-       
-       if (data.success) {
-         // seteamos todas las variables que nos ha proporcionado el servidor mediante la api /chat
-         setContacts(data.contacts);
-         setUsername(data.user.username.toUpperCase());
-         setUserId(data.user.id);
-         socket.emit('informationUser', { username: data.user.username, userId: data.user.id }) // mandamos al servidor la informacion del usuario mediante informationUser
-       }
-     })
-     .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
-   }, []);
+  useEffect(() => {
+
+    fetch('http://192.168.1.54:4567/chat', {
+      credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
+    })
+    .then(response => response.json())
+    .then(data => {
+
+      if (data.success) {
+        // seteamos todas las variables que nos ha proporcionado el servidor mediante la api /chat
+        setContacts(data.contacts);
+        setUsername(data.user.username.toUpperCase());
+        setUserId(data.user.id);
+        socket.emit('informationUser', { username: data.user.username, userId: data.user.id }) // mandamos al servidor la informacion del usuario mediante informationUser
+      }
+    })
+    .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
+  }, []);
 
   // autenticacion para entrar a la pagina /chat
   useEffect(() => {
-    fetch('http://localhost:4567/check-authentication',{
+    fetch('http://192.168.1.54:4567/check-authentication',{
       credentials: 'include',
       method: 'GET',
       headers: {
@@ -100,7 +109,6 @@ const ChatComponent = () => {
         
         if (data.isAuthenticated === false){
           navigate('/Login')
-          console.log(data.isAuthenticated)
           Swal.fire({
             title: 'Error ',
             text: 'Authenticator error! You need to log in first',
@@ -115,67 +123,10 @@ const ChatComponent = () => {
         console.error('Error during authentication:', error);
       });
   }, []);
-
-  const handleContactClick = (contact) => {
-    setSelectedContact(contact.contact_id);
-    fetch(`http://localhost:4567/chat-history/${contact.contact_id}`, {
-      credentials: 'include',
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
-    .then(response=> response.json())
-    .then(data => {
-      if (data.success) {
-        setMessages(data.messages);
-        setIsWaitingClick(false);
-        
-      }
-    })
-    .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
-  };
-
-  // visibilidad del menu
-  // oculta el menu si se pulsa fuera de este
-  const handleClickOutside = (e) => {
-    if (formRef.current && !formRef.current.contains(e.target)) {
-      setMenuVisibility(false);
-      setFriendRequestVisibility(false);
-      setAddFormVisibility(false);
-      setMenuClicked(false);
-    }
-  };
-  //muestra/oculta el menu si se pulsa el menuButton
-  const handleMenuVisibility = (e) => {
-    e.stopPropagation(); // Detiene la propagación del evento
-    setMenuVisibility(!menuVisibility); // Cambia la visibilidad del menú
-    setMenuClicked(!menuClicked);
-    if (menuVisibility === true) {
-      setFriendRequestVisibility(false);
-      setAddFormVisibility(false);
-    }
-  };
-
-  const handleFriendRequestVisibility = () => {
-    setFriendRequestVisibility(!friendRequestVisibility);
-    setAddFormVisibility(false);
-
-    fetch ('http://localhost:4567/friend-requests', {
-      credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        setFriendRequests(data.friendRequests);
-        
-      }
-    })
-  };
-
+  
+  // precargar el success y error de socketFriendRequest
   useEffect(()=>{
     socket.on('friendRequestSuccess', (message) => {
-      
       console.log("Éxito: ", message);
       Swal.fire({
         title: 'Success',
@@ -200,11 +151,139 @@ const ChatComponent = () => {
       socket.off('friendRequestSuccess');
       socket.off('friendRequestError');
     };
-  }, [])
+  }, []);
 
+  // recibir mensajes tiempo real
+  useEffect(()=> {
+    
+    socket.on('receiveMessage', (message)=> {
+      setMessages(prevMessages => [...prevMessages, message]);
+      socket.emit('newContacts');
+    });
+    
+    return () => {
+      socket.off('receiveMessage')
+    };
+    
+  }, []);
+
+  useEffect(() => {
+    const handleNewContacts = (newContacts) => {
+      setContacts(newContacts);
+      console.log(newContacts);
+    };
+  
+    socket.on('newContactsSuccess', handleNewContacts);
+  
+    // La función de limpieza debe desactivar el mismo evento que se activó.
+    return () => {
+      socket.off('newContactsSuccess', handleNewContacts);
+    };
+
+  }, []);
+
+  useEffect(() => {
+    setTimeout(() => {
+      const messagesContainer = document.querySelector('.messagesContainer');
+      if (messagesContainer) {
+        messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      }
+    }, 0);
+  }, [messages]);
+
+  // useEffect (()=> {
+  //   socket.on('getNewContacts', (contact) => {
+  //     debugger
+  //     console.log(contacts)
+  //     setContacts(prevContacts => [...prevContacts, contact[0]]);
+  //   });
+
+  //   return () => {
+  //     socket.off('getNewContacts')
+  //   }
+  // }, []);
+
+  const sendMessage = (messageData) => {
+    socket.emit('sendMessage', messageData);
+   
+  };
+  
+  const handleContactClick = (e, contact) => {
+    e.preventDefault();
+    
+    if (e.button === 0) {
+      setSelectedContact(contact.contact_id);
+      setSelectedContactName(contact.username);
+      fetch(`http://192.168.1.54:4567/chat-history/${contact.contact_id}`, {
+        credentials: 'include',
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      .then(response=> response.json())
+      .then(data => {
+        
+        if (data.success) {
+          setMessages(data.messages);
+          setIsWaitingClick(false);
+          
+        }
+      })
+      .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
+    }
+    else if (e.button === 2) {
+      setSelectedContact(contact.contact_id);
+      setShowContextMenu(!showContextMenu);
+      setCoordenades({ x: e.pageX, y:e.pageY });
+      setMenuVisibility(false);
+    }
+  };
+  
+  // visibilidad del menu
+  const handleClickOutside = (e) => {
+    if (formRef.current && !formRef.current.contains(e.target)) {
+      setMenuVisibility(false);
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+      setMenuClicked(false);
+    }
+    if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
+      setShowContextMenu(false);
+    }
+  };
+  const handleMenuVisibility = (e) => {
+    e.stopPropagation(); // Detiene la propagación del evento
+    setMenuVisibility(!menuVisibility);
+    setShowContextMenu(false) // Cambia la visibilidad del menú
+    setMenuClicked(!menuClicked);
+    if (menuVisibility === true) {
+      setFriendRequestVisibility(false);
+      setAddFormVisibility(false);
+    }
+  };
+  const handleFriendRequestVisibility = () => {
+    setFriendRequestVisibility(!friendRequestVisibility);
+    setAddFormVisibility(false);
+
+    fetch ('http://192.168.1.54:4567/friend-requests', {
+      credentials: 'include'
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        setFriendRequests(data.friendRequests);
+        
+      }
+    })
+  };
   const handleAcceptRequest = (senderId) => {
+    
     setIsProcessingRequest(true);
     socket.emit('acceptFriendRequest', senderId);
+    socket.on('getNewContacts', (contact) => {
+      setContacts(prevContacts => [...prevContacts, contact[0]]);
+    });
 
     socket.on('acceptFriendRequestError', (message) => {
       console.log("Error: ", message);
@@ -216,15 +295,22 @@ const ChatComponent = () => {
       });
     });
   };
-
-  const handleIgnoreRequest = (requestId) => {
+  const handleIgnoreRequest = (senderId) => {
     setIsProcessingRequest(true);
-    console.log('pendiente por hacer en socket.js. con el request id eliminamos la peticion de la base de datos y hay que hacer algo para que se elimine de la interfaz del usuario')
-  }
+    socket.emit('ignoreFriendRequest', senderId);
 
-  //Logout handler
+    socket.on('ignoreFriendRequestError', (message) => {
+      console.log("Error: ", message);
+      Swal.fire({
+        title: 'Error ',
+        text: message,
+        icon: 'error',
+        confirmButtonText: 'Aceptar'
+      });
+    });
+  };
   const handleLogout = () => {
-    fetch('http://localhost:4567/logout', {
+    fetch('http://192.168.1.54:4567/logout', {
       credentials: 'include',
       method: 'GET',
     })
@@ -241,8 +327,6 @@ const ChatComponent = () => {
       console.error('An error occurred:', error);
     });
   };
-
-  //Addcontact handlers
   const handleAddFormVisibility = () => {
     setAddFormVisibility(!addFormVisibility);
     setFriendRequestVisibility(false);    
@@ -252,37 +336,50 @@ const ChatComponent = () => {
     socket.emit('sendFriendRequest', newContactUsername)
     // Escuchar el evento de éxito al enviar una solicitud de amistad
     setAddFormVisibility(false);
-    window.location.reload();
   };
-
-  //buttonHome
   const handleRedirectHome = () => {
     navigate('/');
-  }
+  };
 
-  // no usados
-  // useEffect(() => {
-  //   // Aquí se hara la petición al servidor para obtener los mensajes del contacto seleccionado
-  //   // Por ejemplo: fetch(`/api/messages/${selectedContact}`).then(/* actualizar el estado con los nuevos mensajes */)
-  //   // Por ahora solo se usanran datos de muestra:
-  //   if (selectedContact) {
-  //     setMessages([1
-  //       { content: 'Hola', isOwnMessage: true },
-  //       { content: '¿Qué tal?', isOwnMessage: false }
-  //     ]);
-  //   }
-  // }, [selectedContact]);
+      
+  const handleClearChat = () => {
+    socket.emit('clearChat', selectedContact);
+    socket.on('clearChatSuccess', (message) => {
+      setMessages([]);
+      console.log(contacts)
+      let newContactVisual = contacts.map((item) => ( item.contact_id === 6 ? {...item, lastMessage: null} : item ));
+      setContacts(newContactVisual);
+      console.log(message)
+    })
+    socket.on('clearChatError', (message) => {
+      console.log(message)
+    })
+  };
+  
+  const handleDeleteContact = () => {
+      socket.emit('deleteContact', selectedContact);
+      socket.on('deleteContactSuccess', (message) => {
+        
+        console.log(message)
+      })
+      socket.on('deleteContactError', (message) => {
+        console.log(message)
+      })
+  };
+
+
+
 
 
   return (
-    <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, setIsWaitingClick}}>
+    <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName}}>
 
     <div className="chat-container" onClick={handleClickOutside}>
       
       <aside className={`chat-sidebar ${selectedContact ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
-          <MenuButtonComponent  id="menuButton" onClick={handleMenuVisibility} ref={formRef} iconClass={menuClicked ? "clicked" : ""} textClass={menuClicked ? "clicked" : ""}/>
+          <MenuButtonComponent  id="menuButton" onClick={handleMenuVisibility} ref={formRef} iconClass={menuClicked ? "clicked" : ""} textClass={menuClicked ? "clicked" : ""} btnClicked={menuClicked ? "clicked" : ""} />
           <MenuChat
             menuVisibility={menuVisibility}
             formRef={formRef}
@@ -301,17 +398,18 @@ const ChatComponent = () => {
             handleLogout={handleLogout}
           />
           <div className={`${classes.userProfileContainer} no-select`}>
-            <ProfilePictureComponent />
-            <div className='usernameSide'>{username}</div>
+            <ProfilePictureComponent username={username} />
+            {/* <div className='usernameSide'>{username}</div> */}
           </div>
         </div>
         
       </div>
         <ChatListComponent contacts={contacts} onContactClick={handleContactClick} />
+        <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
       </aside>
       
-      <div className={`chat-main containerAll ${selectedContact ? 'active' : ''}`}>
-        <ChatMain selectedContact= {selectedContact} />
+      <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
+        <ChatMain sendMessage={sendMessage} />
       </div>
     </div>
 

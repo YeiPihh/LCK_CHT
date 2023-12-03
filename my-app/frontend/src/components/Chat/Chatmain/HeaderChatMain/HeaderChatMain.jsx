@@ -1,23 +1,29 @@
-import React from "react";
-import ProfilePictureComponent from "../../ProfilePicture/ProfilePictureComponent";
+import React, {useContext} from "react";
+import ProfilePictureComponent from "../../ProfilePicture/ProfilePictureComponent.jsx";
 import { createUseStyles } from 'react-jss';
+import { MessagesContext } from "../../ChatComponent.jsx";
 
 const useStyles = createUseStyles({
-    headerChatMain: {
+    headerChatMains: {
         display: 'flex',
-        backgroundColor:'#444',
+        backgroundColor:'var(--main-bg-color)',
         width: '100%',
-        height: 'max-content'
+        height: 'max-content',
+        padding: '20px 20px'
     }
 });
 
-const HeaderChatMain = (imageUrl, profileUsername) => {
+const HeaderChatMain = () => {
+
+    const {selectedContactName} = useContext(MessagesContext);
 
     const classes = useStyles();
 
-    <header className={`${classes.headerChatMain}`} >
-        <ProfilePictureComponent imageUrl={imageUrl} username={profileUsername} />
-    </header>
+    return (
+        <header className={`${classes.headerChatMains}`} >
+            <ProfilePictureComponent username={selectedContactName} />
+        </header>
+    );
 };
 
 export default HeaderChatMain;
