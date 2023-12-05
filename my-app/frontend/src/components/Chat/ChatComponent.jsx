@@ -6,6 +6,7 @@ import { io } from "socket.io-client";
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
+import { Link } from 'react-router-dom';
 
 //components
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
@@ -51,6 +52,9 @@ const ChatComponent = () => {
   const formRef = useRef(null);
   const contextMenuRef = useRef(null);
 
+  const [loading, setLoading] = useState(true);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
+
   const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
@@ -67,64 +71,105 @@ const ChatComponent = () => {
   const [messages, setMessages] = useState({});
   const [isWaitingClick, setIsWaitingClick] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
-  const [coordenades, setCoordenades] = useState({ x:0, y:0 })
+  const [coordenades, setCoordenades] = useState({ x:0, y:0 });
 
    // hook para extraer informacion de la base de datos
-  useEffect(() => {
-
-    fetch('http://192.168.1.54:4567/chat', {
-      credentials: 'include' // Esto asegura que las cookies se envían con la solicitud
-    })
-    .then(response => response.json())
-    .then(data => {
-
-      if (data.success) {
-        // seteamos todas las variables que nos ha proporcionado el servidor mediante la api /chat
-        setContacts(data.contacts);
-        setUsername(data.user.username.toUpperCase());
-        setUserId(data.user.id);
-        socket.emit('informationUser', { username: data.user.username, userId: data.user.id }) // mandamos al servidor la informacion del usuario mediante informationUser
-      }
-    })
-    .catch(error => console.error('Hubo un problema con la petición Fetch:', error));
-  }, []);
-
-  // autenticacion para entrar a la pagina /chat
-  useEffect(() => {
-    fetch('http://192.168.1.54:4567/check-authentication',{
-      credentials: 'include',
-      method: 'GET',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+   useEffect(() => {
+    Promise.all([
+      fetch('http://192.168.1.54:4567/chat', {
+        credentials: 'include',
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
       })
-      .then(response=> {
-        if(response.ok){
-            return response.json();
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
+          setIsAuthenticated(false);
         } else {
-          throw new Error('Failed to authenticate')
+          throw new Error('Failed to get your data chat');
         }
       })
-      .then(data=>{
-        
-        if (data.isAuthenticated === false){
-          navigate('/Login')
-          Swal.fire({
-            title: 'Error ',
-            text: 'Authenticator error! You need to log in first',
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-          })
-        } else {
-          console.log('Autenticacion exitosa')
+      .then(data => {
+        if (data && data.success) {
+
+          setContacts(data.contacts);
+          setUsername(data.user.username.toUpperCase());
+          setUserId(data.user.id);
+          socket.emit('informationUser', { username: data.user.username, userId: data.user.id });
         }
       })
-      .catch(error=>{
-        console.error('Error during authentication:', error);
-      });
+      .catch(error => {
+        console.error('Hubo un problema con la petición Fetch:', error);
+      }),
+  
+      fetch('http://192.168.1.54:4567/friend-requests', {
+        credentials: 'include',
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' }
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.json();
+        } else if (response.status === 401) {
+          setIsAuthenticated(false);
+        } else {
+          throw new Error('Failed to get your friends requests');
+        }
+      })
+      .then(data => {
+        if (data && data.success) {
+          setFriendRequests(data.friendRequests);
+        }
+      })
+      .catch(error => {
+        console.error('Hubo un problema con la petición Fetch:', error);
+      })
+    ])
+    .finally(() => {
+      setTimeout(()=>{
+        setLoading(false);
+      }, 100)
+    });
   }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate('/Login');
+      Swal.fire({
+        title: 'warning',
+        text: 'You have to be authenticated before to access here!!',
+        icon: 'warning',
+        confirmButtonText: 'Aceptar'
+      })
+    }
+  },[isAuthenticated])
+
+  // useEffect(() => {
+  //   fetch('http://192.168.1.54:4567/check-authentication',{
+  //     credentials: 'include',
+  //     method: 'GET',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     })
+  //     .then(response=> {
+  //       if(response.ok){
+  //         ;
+  //         return response.json();
+  //       } else {
+  //         
+  //         throw new Error('Failed to authenticate');
+  //       }
+  //     })
+  //     .catch(error=>{
+  //       
+  //       console.error('Error during authentication:', error);
+  //     });    
+  // }, [])
   
   // precargar el success y error de socketFriendRequest
+  
   useEffect(()=>{
     socket.on('friendRequestSuccess', (message) => {
       console.log("Éxito: ", message);
@@ -158,6 +203,7 @@ const ChatComponent = () => {
     
     socket.on('receiveMessage', (message)=> {
       setMessages(prevMessages => [...prevMessages, message]);
+      
       socket.emit('newContacts');
     });
     
@@ -169,8 +215,9 @@ const ChatComponent = () => {
 
   useEffect(() => {
     const handleNewContacts = (newContacts) => {
+      
       setContacts(newContacts);
-      console.log(newContacts);
+      
     };
   
     socket.on('newContactsSuccess', handleNewContacts);
@@ -193,7 +240,7 @@ const ChatComponent = () => {
 
   // useEffect (()=> {
   //   socket.on('getNewContacts', (contact) => {
-  //     debugger
+  //     
   //     console.log(contacts)
   //     setContacts(prevContacts => [...prevContacts, contact[0]]);
   //   });
@@ -204,16 +251,18 @@ const ChatComponent = () => {
   // }, []);
 
   const sendMessage = (messageData) => {
+    
     socket.emit('sendMessage', messageData);
-   
+    
   };
   
   const handleContactClick = (e, contact) => {
+    
     e.preventDefault();
     
     if (e.button === 0) {
       setSelectedContact(contact.contact_id);
-      setSelectedContactName(contact.username);
+      setSelectedContactName(contact.username.toUpperCase());
       fetch(`http://192.168.1.54:4567/chat-history/${contact.contact_id}`, {
         credentials: 'include',
         method: 'GET',
@@ -225,6 +274,7 @@ const ChatComponent = () => {
       .then(data => {
         
         if (data.success) {
+         
           setMessages(data.messages);
           setIsWaitingClick(false);
           
@@ -265,17 +315,6 @@ const ChatComponent = () => {
   const handleFriendRequestVisibility = () => {
     setFriendRequestVisibility(!friendRequestVisibility);
     setAddFormVisibility(false);
-
-    fetch ('http://192.168.1.54:4567/friend-requests', {
-      credentials: 'include'
-    })
-    .then(response => response.json())
-    .then(data => {
-      if (data.success) {
-        setFriendRequests(data.friendRequests);
-        
-      }
-    })
   };
   const handleAcceptRequest = (senderId) => {
     
@@ -346,36 +385,44 @@ const ChatComponent = () => {
     socket.emit('clearChat', selectedContact);
     socket.on('clearChatSuccess', (message) => {
       setMessages([]);
-      console.log(contacts)
-      let newContactVisual = contacts.map((item) => ( item.contact_id === 6 ? {...item, lastMessage: null} : item ));
+      console.log(contacts);
+      let newContactVisual = contacts.map((item) => ( item.contact_id === selectedContact ? {...item, lastMessage: null} : item ));
       setContacts(newContactVisual);
-      console.log(message)
+      console.log(message);
     })
     socket.on('clearChatError', (message) => {
-      console.log(message)
+      console.log(message);
     })
   };
   
   const handleDeleteContact = () => {
       socket.emit('deleteContact', selectedContact);
       socket.on('deleteContactSuccess', (message) => {
+        let indexContactDelete = contacts.findIndex(obj => obj.contact_id === selectedContact); // <-- Encontramos el index del contacto que hemos seleccionado
+        if (indexContactDelete !== -1) {
+          let updateContacts = [...contacts];
+          updateContacts.splice(indexContactDelete, 1);
+          setContacts(updateContacts);
+          setShowContextMenu(false);
+        }
         
-        console.log(message)
+        console.log(message);
       })
       socket.on('deleteContactError', (message) => {
-        console.log(message)
+        console.log(message);
       })
   };
 
-
-
+   if (loading) {
+     return <svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>
+   }
 
 
   return (
     <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName}}>
 
     <div className="chat-container" onClick={handleClickOutside}>
-      
+      <div className= {`containerSide ${selectedContact ? '' : 'active'}`} >
       <aside className={`chat-sidebar ${selectedContact ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
@@ -404,12 +451,16 @@ const ChatComponent = () => {
         </div>
         
       </div>
+      <div className='contactsContainer'>
         <ChatListComponent contacts={contacts} onContactClick={handleContactClick} />
         <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
+      </div>
       </aside>
-      
+      </div>
+      <div className='containerChat'>
       <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
         <ChatMain sendMessage={sendMessage} />
+      </div>
       </div>
     </div>
 

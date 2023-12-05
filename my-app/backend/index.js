@@ -83,10 +83,10 @@ LEFT JOIN
      `;
 
      const queryMaxTime=`
-     SELECT DISTINCT
-     u.username,
-     CASE
-            WHEN c.user_id = ? THEN c.contact_id
+      SELECT DISTINCT
+        u.username,
+        CASE
+            WHEN c.user_id = 1 THEN c.contact_id
             ELSE c.user_id
         END as contact_id,
         m.content as lastMessage,
@@ -94,28 +94,30 @@ LEFT JOIN
         m.showSender,
         m.showReceiver
       FROM contacts c
-      JOIN users u 
-        ON (c.contact_id = u.id AND c.user_id = ?) 
-        OR (c.user_id = u.id AND c.contact_id = ?)
+      JOIN users u ON u.id = CASE
+                                WHEN c.user_id = 1 THEN c.contact_id
+                                ELSE c.user_id
+                              END
       LEFT JOIN (
-        SELECT sender_id, receiver_id, MAX(timestamp) AS max_timestamp, MAX(id) AS max_id
-        FROM messages
-        WHERE (sender_id = ? AND showSender = 1)
-           OR (receiver_id = ? AND showReceiver = 1)
-        GROUP BY sender_id, receiver_id
-      ) lastMsg 
-        ON (lastMsg.sender_id = c.contact_id AND lastMsg.receiver_id = c.user_id) 
-        OR (lastMsg.sender_id = c.user_id AND lastMsg.receiver_id = c.contact_id)
-      LEFT JOIN messages m 
-        ON m.id = lastMsg.max_id
-      WHERE (c.contact_id = ? OR c.user_id = ?)
-      AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
+          SELECT 
+              LEAST(sender_id, receiver_id) AS user1,
+              GREATEST(sender_id, receiver_id) AS user2,
+              MAX(id) AS max_id
+          FROM messages
+          WHERE (sender_id = 1 OR receiver_id = 1)
+          GROUP BY user1, user2
+      ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
+                    GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
+      LEFT JOIN messages m ON m.id = lastMsg.max_id
+      WHERE (c.contact_id = 1 OR c.user_id = 1)
+      AND NOT (c.contact_id = 1 AND c.user_id = 1) ORDER BY m.timestamp DESC;
+      ;
   `;
 
     const [results] = await pool.query(queryMaxTime, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
 
     return results;
-  } catch (error) {
+} catch (error) {
     console.error('Error al obtener contactos:', error);
     return [];
   }
@@ -201,11 +203,11 @@ app.use('/register', registerRoute);
 app.use('/login', loginRoute);
 
 // Endpoint para verificar el estado de autenticación
-app.get('/check-authentication', (req, res) => {
-  if (req.isAuthenticated()) {
-    res.json({ isAuthenticated: true });
+app.get('/check-authentication', async (req, res, next) => {
+  if (req.session && req.session.userId) {
+    next(); // El usuario está autenticado, continúa con la siguiente función en la cadena
   } else {
-    res.json({ isAuthenticated: false });
+    res.status(401).send('No autorizado'); // El usuario no está autenticado
   }
 });
 

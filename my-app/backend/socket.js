@@ -146,41 +146,64 @@ module.exports = function(socketio) {
         socket.on('newContacts', async() => {
           const userId = userIds[socket.id];
           try{
-            const queryMaxTime=`
-              SELECT DISTINCT
-              u.username,
-              CASE
-                WHEN c.user_id = ? THEN c.contact_id
+            const queryGetContactsLastMessage=`
+            SELECT DISTINCT
+            u.username,
+            CASE
+                WHEN c.user_id = 1 THEN c.contact_id
                 ELSE c.user_id
-              END as contact_id,
-              m.content as lastMessage,
-              m.timestamp,
-              m.showSender,
-              m.showReceiver
-              FROM contacts c
-              JOIN users u 
-              ON (c.contact_id = u.id AND c.user_id = ?) 
-              OR (c.user_id = u.id AND c.contact_id = ?)
-              LEFT JOIN (
-              SELECT sender_id, receiver_id, MAX(timestamp) AS max_timestamp, MAX(id) AS max_id
+            END as contact_id,
+            m.content as lastMessage,
+            m.timestamp,
+            m.showSender,
+            m.showReceiver
+          FROM contacts c
+          JOIN users u ON u.id = CASE
+                                    WHEN c.user_id = 1 THEN c.contact_id
+                                    ELSE c.user_id
+                                  END
+          LEFT JOIN (
+              SELECT 
+                  LEAST(sender_id, receiver_id) AS user1,
+                  GREATEST(sender_id, receiver_id) AS user2,
+                  MAX(id) AS max_id
               FROM messages
-              WHERE (sender_id = ? AND showSender = 1)
-                 OR (receiver_id = ? AND showReceiver = 1)
-              GROUP BY sender_id, receiver_id
-              ) lastMsg 
-              ON (lastMsg.sender_id = c.contact_id AND lastMsg.receiver_id = c.user_id) 
-              OR (lastMsg.sender_id = c.user_id AND lastMsg.receiver_id = c.contact_id)
-              LEFT JOIN messages m 
-              ON m.id = lastMsg.max_id
-              WHERE (c.contact_id = ? OR c.user_id = ?)
-              AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
+              WHERE (sender_id = 1 OR receiver_id = 1)
+              GROUP BY user1, user2
+          ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
+                        GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
+          LEFT JOIN messages m ON m.id = lastMsg.max_id
+          WHERE (c.contact_id = 1 OR c.user_id = 1)
+          AND NOT (c.contact_id = 1 AND c.user_id = 1) ORDER BY m.timestamp DESC;
+          ;
             `;
-            const [results] = await pool.query(queryMaxTime, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
+            const [results] = await pool.query(queryGetContactsLastMessage, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
 
             socket.emit('newContactsSuccess', results);
           } catch (error) {
             socket.emit('newContactsError', error);
           }
+        });
+
+        socket.on('deleteContact', async (contactId)=> {
+          let connection;
+          try {
+            const userId = userIds[socket.id];
+            connection = await pool.getConnection();
+            await connection.beginTransaction();
+
+            await connection.query('DELETE FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [userId, contactId, contactId, userId]);
+            await connection.query('DELETE FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [userId, contactId, contactId, userId]);
+            await connection.query('DELETE FROM messages WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [userId, contactId, contactId, userId]);
+
+            await connection.commit();
+            socket.emit('deleteContactSuccess', 'Contacto eliminado correctamente');
+
+          } catch (error) {
+            socket.emit('deleteContactError', error)
+          } finally {
+            if (connection) connection.release();
+          };
         });
     });
 };

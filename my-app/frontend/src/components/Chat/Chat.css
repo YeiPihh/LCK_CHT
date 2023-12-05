@@ -11,6 +11,12 @@
     box-sizing: border-box;
 }
 
+.loading {
+    height: 99vh;
+    width: 99vw;
+    
+}
+
 .myMessageContainer {
     align-self: flex-end;
     background-color:#007bff;
@@ -42,14 +48,6 @@
 #iconChatMobile {
     visibility: hidden;
     display: none;
-}
-
-
-.chat-container {
-    display: flex;
-    height: 100vh;
-    margin: 0;
- 
 }
 
 
@@ -113,20 +111,25 @@
 .chat-container {
     display: flex;
     height: 100vh;
+    background-color: #000000;
+    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 1500'%3E%3Cdefs%3E%3Ccircle stroke='%23BBBBBB' vector-effect='non-scaling-stroke' id='a' fill='none' stroke-width='3.1' r='315'/%3E%3Cuse id='f' href='%23a' stroke-dasharray='100 100 100 9999'/%3E%3Cuse id='b' href='%23a' stroke-dasharray='250 250 250 250 250 9999'/%3E%3Cuse id='e' href='%23a' stroke-dasharray='1000 500 1000 500 9999'/%3E%3Cuse id='g' href='%23a' stroke-dasharray='1500 9999'/%3E%3Cuse id='h' href='%23a' stroke-dasharray='2000 500 500 9999'/%3E%3Cuse id='j' href='%23a' stroke-dasharray='800 800 800 800 800 9999'/%3E%3Cuse id='k' href='%23a' stroke-dasharray='1200 1200 1200 1200 1200 9999'/%3E%3Cuse id='l' href='%23a' stroke-dasharray='1600 1600 1600 1600 1600 9999'/%3E%3C/defs%3E%3Cg transform='translate(1000 750)' %3E%3Cg %3E%3Ccircle fill='%23BBBBBB' r='10'/%3E%3Cg transform='rotate(-57 0 0)'%3E%3Cuse href='%23f' transform='scale(.1) rotate(50 0 0)' /%3E%3Cuse href='%23f' transform='scale(.2) rotate(100 0 0)' /%3E%3Cuse href='%23f' transform='scale(.3) rotate(150 0 0)' /%3E%3C/g%3E%3Cg transform='rotate(-38.4 0 0)'%3E%3Cuse href='%23b' transform='scale(.4) rotate(200 0 0)' /%3E%3Cuse href='%23z' transform='scale(.5) rotate(250 0 0)' /%3E%3C/g%3E%3Cg id='z' transform='rotate(25.65 0 0)'%3E%3Cg transform=''%3E%3Cuse href='%23b'/%3E%3Cuse href='%23b' transform='scale(1.2) rotate(90 0 0)' /%3E%3Cuse href='%23b' transform='scale(1.4) rotate(60 0 0)' /%3E%3Cuse href='%23e' transform='scale(1.6) rotate(120 0 0)' /%3E%3Cuse href='%23e' transform='scale(1.8) rotate(30 0 0)' /%3E%3C/g%3E%3C/g%3E%3Cg id='y' transform='rotate(172.8 0 0)'%3E%3Cg transform=''%3E%3Cuse href='%23e' transform='scale(1.1) rotate(20 0 0)' /%3E%3Cuse href='%23g' transform='scale(1.3) rotate(-40 0 0)' /%3E%3Cuse href='%23g' transform='scale(1.5) rotate(60 0 0)' /%3E%3Cuse href='%23h' transform='scale(1.7) rotate(-80 0 0)' /%3E%3Cuse href='%23j' transform='scale(1.9) rotate(100 0 0)' /%3E%3C/g%3E%3C/g%3E%3Cg transform=''%3E%3Cg transform='rotate(-25.65 0 0)'%3E%3Cg transform='rotate(-230.4 0 0)'%3E%3Cuse href='%23h' transform='scale(2) rotate(60 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.1) rotate(120 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.3) rotate(180 0 0)'/%3E%3Cuse href='%23h' transform='scale(2.4) rotate(240 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.5) rotate(300 0 0)'/%3E%3C/g%3E%3Cuse href='%23y' transform='scale(2) rotate(180 0 0)' /%3E%3Cuse href='%23j' transform='scale(2.7)'/%3E%3Cuse href='%23j' transform='scale(2.8) rotate(45 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.9) rotate(90 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.1) rotate(135 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.2) rotate(180 0 0)'/%3E%3C/g%3E%3Cuse href='%23k' transform='scale(3.3) rotate(225 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.5) rotate(270 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.6) rotate(315 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.7)'/%3E%3Cuse href='%23k' transform='scale(3.9) rotate(75 0 0)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); */
+    background-image: url("https://i.postimg.cc/YSqz9s48/hollowed-boxes.png");
+    background-attachment: fixed;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    margin: 0;
 }
 
 .chat-sidebar {
     position: relative;
     display: flex;
     flex-direction: column;
-    width: 30vw;
-    background-color: var(--main-bg-color); /* Oscuro igual que el footer de index.html */
-    color: #ecf0f1;
-    border-right: 1px solid #20caca;
-}
 
-.nav-list-chat-heads {
-    border-bottom: 1px solid var(--main-color);
+    background-color: #008cff88;
+    backdrop-filter: blur(25px);
+    color: #ecf0f1;
+    border-radius: 25px;
 }
 
 #contactButton {
@@ -138,10 +141,11 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    background-image: url("https://i.postimg.cc/YSqz9s48/hollowed-boxes.png");
-    /* background-image: url(https://wallpaperaccess.com/full/1567665.png); */
-    height: 100vh;
     overflow: hidden;
+    height: 100vh;
+    border-radius: 25px;
+    justify-content: flex-end;
+    gap: 20px;
 }
 
 .chat-header {
@@ -153,14 +157,6 @@
     font-weight: bold;
     text-align: center;
     align-items: center;
-}
-
-.input-container {
-    display: flex;
-    align-items: center;
-    padding: 15px;
-    background-color: #f9f9f9;
-    border-bottom-right-radius: 20px;
 }
 
 .login-button,
@@ -253,18 +249,18 @@
 
 #menuChat {
     position: absolute;
-    top: 100px;
+    top: 80px;
     left: 10%;
     z-index: 0;
     padding: 0 30px;
-    background-color: var(--bgTransparent);
+    background-color: #111111e1;
     /* background-color: transparent; */
-    border-radius: 5px;
+    border-radius: 25px;
     color: white;
     opacity: 0;
     flex-direction: column;
     box-sizing:content-box;
-    border: 1px solid var(--textColor);
+    /* border: 1px solid var(--textColor); */
     transition: opacity .3s ease-in-out, visibility .3s ease-in-out, box-shadow .1s ease-in-out;
     transform-origin: center;
     visibility: hidden;
@@ -331,19 +327,39 @@
 
 
 /* MessageComponent */
+.containerChat {
+    flex: 1 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    height: 100vh;
+    padding: 30px;
+    box-sizing: border-box;
+    z-index: 1;
+}
+
+.containerSide {
+    width: 30vw;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    padding: 30px;
+    z-index: 2;
+    box-sizing: border-box;
+}
+
 main{
     height: 100%;
     overflow: scroll!important;
 }
 
 .messagesContainer {
-
     height: 95%;
-    padding: 1% 3%;
+    padding: 10px 20px;
     font-size: 20px;
     letter-spacing: 0px;
     overflow: scroll!important;
-    
+    box-sizing: border-box;
 }
 
 .messageLeft, .messageRight{
@@ -375,6 +391,10 @@ main{
     margin-top: 20px;
 }
 
+.contactsContainer {
+    overflow: scroll;
+}
+
 @media ((width > 1000px) and (width <= 1600px )) {
     body .chat-item .contactName {
         font-size: 18px;
@@ -391,10 +411,6 @@ main{
 
     .messageLeft, .messageRight {
         padding: 10px 15px;
-    }
-
-    .chat-container .chat-sidebar {
-        width: 35vw;
     }
 
     .chat-main .chat-messages {
@@ -431,13 +447,35 @@ main{
     /*MOBILE DESIGN*/
     /* Ocultar sidebar en modo móvil cuando se hace clic en un chat */
 
-    .chat-sidebar:not(.active) {
+    .chat-sidebar:not(.active), .containerSide:not(.active) {
         display: none;
+    }
+
+    body .input, body .buttonSubmit {
+        height: 40px!important;
     }
 
     /* Mostrar el chat principal en modo móvil cuando se hace clic en un chat */
     .chat-main {
         display: none;
+    }
+
+    body .headerChatMain {
+        display: flex;
+        background-color:#008cff88;
+        backdrop-filter: blur(25px);
+        width: 100%;
+        height: 5%;
+        padding: 5px
+    }
+    
+    body .profileImagenContainer {
+        height: max-content;
+    }
+    
+    body .profileImagenContainer img {
+        height: 25px;
+        width: 25px;
     }
 
     .chat-header {
@@ -490,9 +528,10 @@ main{
         
     }
 
-    .chat-sidebar.active {
-        width: 100vw;
+    .chat-sidebar.active, .containerSide.active {
+        min-width: 100%;
         display: flex;
+        height: 100%;
     }
 
     .chat-item .contactName {
@@ -501,9 +540,13 @@ main{
         letter-spacing: 2px;
         margin-bottom: 3px;
     }
+    
+    .chat-container {
+        overflow: hidden;
+    }
 
     .chat-container .chat-main .chat-messages {
-        max-width: 100vw;
+        width: 100vw;
         padding: 15px;
     }
 

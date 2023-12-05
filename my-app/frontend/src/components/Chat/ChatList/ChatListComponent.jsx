@@ -13,7 +13,7 @@ const useStyles = createUseStyles({
   
 
 const ChatListComponent = ({ contacts, onContactClick }) => {
-  console.log(contacts)
+  
   const classes = useStyles();
   return (
     <> 

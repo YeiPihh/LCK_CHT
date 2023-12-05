@@ -34,7 +34,7 @@ const ChatMain = ({ sendMessage }) => {
             return (
                 <>
                     <HeaderChatMain />
-                    <main className="" style={{width:'100%', display:'flex', flexDirection:'column'}}>
+                    
 
                         <div className="messagesContainer">
                             {
@@ -53,7 +53,7 @@ const ChatMain = ({ sendMessage }) => {
                             }
                         </div>
                         <InputChat onSubmitMessage={handleSubmit} />
-                    </main>
+                 
                 </>
         
         )

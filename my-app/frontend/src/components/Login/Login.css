@@ -8,10 +8,10 @@
     width: 350px;
     height: 550px;
     padding: 25px;
-    background-color: transparent;
+    background-color: var(--main-colorTransparent);
     box-shadow: 0px 0px 0px var(--main-color-dark);
     border-radius: 0px;
-    border: 1px solid #fff;
+    /* border: 1px solid #fff; */
     backdrop-filter: blur(10px);
   }
   
@@ -89,7 +89,6 @@
   }
   
   .form-inp {
-    padding: 11px 25px;
     background: transparent;
     border: 1px solid #e3e3e3;
     line-height: 1;
@@ -111,7 +110,7 @@
     font-weight: 600;
     color: var(--textColor);
     border: none;
-    padding: 0;
+    padding: 11px 25px;
     margin: 0
   }
   
