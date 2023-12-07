@@ -8,9 +8,10 @@ import '../Chat.css';
 import HeaderChatMain from "./HeaderChatMain/HeaderChatMain.jsx";
 
 
-const ChatMain = ({ sendMessage }) => {
-    const { messages, userId, isWaitingClick, selectedContact} = useContext(MessagesContext);
-    
+const ChatMain = ({ sendMessage, handleClickMessage }) => {
+
+    const { messages, userId, isWaitingClick, selectedContact } = useContext(MessagesContext);
+
     const handleSubmit = (messageContent) => {
             if (messageContent){
                 const messageData = {
@@ -27,15 +28,13 @@ const ChatMain = ({ sendMessage }) => {
         return parseInt(senderId) === parseInt(userId);
     }
 
-    
     if (isWaitingClick) {
         return
+
     } else {
             return (
                 <>
                     <HeaderChatMain />
-                    
-
                         <div className="messagesContainer">
                             {
                                 messages.map((message, index)=> {
@@ -46,14 +45,14 @@ const ChatMain = ({ sendMessage }) => {
                                             key={index}
                                             message={message.content} 
                                             isOwnMessage={handleOwnMessage(message.sender_id)}
-                                            isLastMessageGroup={lastMessageGroup} 
+                                            isLastMessageGroup={lastMessageGroup}
+                                            onContextMenu={(e) => handleClickMessage(message, e)}
                                         />
                                     )
                                 })
                             }
                         </div>
                         <InputChat onSubmitMessage={handleSubmit} />
-                 
                 </>
         
         )

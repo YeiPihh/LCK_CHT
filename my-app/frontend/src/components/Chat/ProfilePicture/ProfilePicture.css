@@ -38,7 +38,7 @@
 
 @media (max-width: 900px){
     .usernameSide {
-        display: none;
+        font-size: 18px;
     }
     .profileImagenContainer {
         padding: 0px 10px;

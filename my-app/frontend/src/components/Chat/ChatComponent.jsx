@@ -15,6 +15,7 @@ import MenuButtonComponent from './MenuButton/MenuButtonComponent.jsx';
 import MenuChat from './MenuChat/MenuChatComponent.jsx';
 import ChatMain from './Chatmain/ChatMain.jsx';
 import ContextMenu from './ContextMenu/ContextMenu.jsx';
+import ContextMenuMessage from './ContextMenu/ContextMenuMessage.jsx';
 
 
 //styles
@@ -51,6 +52,7 @@ const ChatComponent = () => {
   
   const formRef = useRef(null);
   const contextMenuRef = useRef(null);
+  const contextMenuMessageRef = useRef(null);
 
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
@@ -72,6 +74,10 @@ const ChatComponent = () => {
   const [isWaitingClick, setIsWaitingClick] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [coordenades, setCoordenades] = useState({ x:0, y:0 });
+  const [showContextMenuMessage, setShowContextMenuMessage] = useState(false);
+  const [messageSelected, setMessageSelected] = useState('');
+  const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+
 
    // hook para extraer informacion de la base de datos
    useEffect(() => {
@@ -144,31 +150,6 @@ const ChatComponent = () => {
       })
     }
   },[isAuthenticated])
-
-  // useEffect(() => {
-  //   fetch('http://192.168.1.54:4567/check-authentication',{
-  //     credentials: 'include',
-  //     method: 'GET',
-  //     headers: {
-  //       'Content-Type': 'application/json',
-  //     },
-  //     })
-  //     .then(response=> {
-  //       if(response.ok){
-  //         ;
-  //         return response.json();
-  //       } else {
-  //         
-  //         throw new Error('Failed to authenticate');
-  //       }
-  //     })
-  //     .catch(error=>{
-  //       
-  //       console.error('Error during authentication:', error);
-  //     });    
-  // }, [])
-  
-  // precargar el success y error de socketFriendRequest
   
   useEffect(()=>{
     socket.on('friendRequestSuccess', (message) => {
@@ -257,7 +238,7 @@ const ChatComponent = () => {
   };
   
   const handleContactClick = (e, contact) => {
-    
+    setShowContextMenuMessage(false);
     e.preventDefault();
     
     if (e.button === 0) {
@@ -284,9 +265,10 @@ const ChatComponent = () => {
     }
     else if (e.button === 2) {
       setSelectedContact(contact.contact_id);
-      setShowContextMenu(!showContextMenu);
-      setCoordenades({ x: e.pageX, y:e.pageY });
+      setShowContextMenu(true);
       setMenuVisibility(false);
+      setCoordenades({ x: e.clientX, y: e.clientY });
+      
     }
   };
   
@@ -301,12 +283,16 @@ const ChatComponent = () => {
     if (contextMenuRef.current && !contextMenuRef.current.contains(e.target)) {
       setShowContextMenu(false);
     }
+    if (contextMenuMessageRef.current && !contextMenuMessageRef.current.contains(e.target)) {
+      setShowContextMenuMessage(false);
+    }
   };
   const handleMenuVisibility = (e) => {
     e.stopPropagation(); // Detiene la propagación del evento
     setMenuVisibility(!menuVisibility);
     setShowContextMenu(false) // Cambia la visibilidad del menú
     setMenuClicked(!menuClicked);
+    setShowContextMenuMessage(false);
     if (menuVisibility === true) {
       setFriendRequestVisibility(false);
       setAddFormVisibility(false);
@@ -413,6 +399,35 @@ const ChatComponent = () => {
       })
   };
 
+  const handleClickMessage = (message, e) => {
+    setShowContextMenu(false);
+    e.stopPropagation();
+    e.preventDefault();
+    if (e.button === 2) {
+      e.preventDefault();
+      setShowContextMenuMessage(true);
+      setMessageSelected(message.id);
+      console.log(message.id);
+      
+      const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
+      const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
+      const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
+
+      setCoordenades({ x: newX, y: newY });
+      
+    }
+  }
+
+  useEffect(() => {
+    if (showContextMenuMessage && contextMenuMessageRef.current) {
+        const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
+        setMenuSize({ width: offsetWidth, height: offsetHeight });
+    }
+}, [showContextMenuMessage]);
+
+  useEffect(() => {console.log(showContextMenuMessage,coordenades)}, [showContextMenuMessage, coordenades])
+
+
    if (loading) {
      return <svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>
    }
@@ -459,7 +474,8 @@ const ChatComponent = () => {
       </div>
       <div className='containerChat'>
       <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
-        <ChatMain sendMessage={sendMessage} />
+        <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} />
+        <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleClearChat} handle2={handleDeleteContact} content1={'Eliminar para mi'} content2={'Eliminar para todos'} />
       </div>
       </div>
     </div>

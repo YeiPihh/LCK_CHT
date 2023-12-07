@@ -86,7 +86,7 @@ LEFT JOIN
       SELECT DISTINCT
         u.username,
         CASE
-            WHEN c.user_id = 1 THEN c.contact_id
+            WHEN c.user_id = ? THEN c.contact_id
             ELSE c.user_id
         END as contact_id,
         m.content as lastMessage,
@@ -95,7 +95,7 @@ LEFT JOIN
         m.showReceiver
       FROM contacts c
       JOIN users u ON u.id = CASE
-                                WHEN c.user_id = 1 THEN c.contact_id
+                                WHEN c.user_id = ? THEN c.contact_id
                                 ELSE c.user_id
                               END
       LEFT JOIN (
@@ -104,13 +104,13 @@ LEFT JOIN
               GREATEST(sender_id, receiver_id) AS user2,
               MAX(id) AS max_id
           FROM messages
-          WHERE (sender_id = 1 OR receiver_id = 1)
+          WHERE (sender_id = ? OR receiver_id = ?)
           GROUP BY user1, user2
       ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
                     GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
       LEFT JOIN messages m ON m.id = lastMsg.max_id
-      WHERE (c.contact_id = 1 OR c.user_id = 1)
-      AND NOT (c.contact_id = 1 AND c.user_id = 1) ORDER BY m.timestamp DESC;
+      WHERE (c.contact_id = ? OR c.user_id = ?)
+      AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
       ;
   `;
 
