@@ -4,11 +4,15 @@ const pool = require('./config/dbConfig.js');
 async function saveMessage(senderId, receiverId, content) {
 
     try {
-      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW(6))', [senderId, receiverId, content]);
+      await pool.query('INSERT INTO messages (sender_id, receiver_id, content, timestamp) VALUES (?, ?, ?, NOW())', [senderId, receiverId, content]);
       
     } catch (error) {
       console.error('Error al guardar el mensaje:', error);
     }
+}
+
+const parseDate = (date) => { 
+  date = date.substring(0, 19);
 }
 
 
@@ -118,19 +122,38 @@ module.exports = function(socketio) {
 
           try {
             await saveMessage(sender_id, receiver_id, content);
-          
+          } catch (error) {
+            socket.emit('sendMessageError', error)
+          }
+
+          try {
+            const [results] = await pool.query('select * from messages where id = (select max(id) from messages)');
+            
+            const newData = {
+              id: results[0].id,
+              sender_id: results[0].sender_id,
+              receiver_id: results[0].receiver_id,
+              content: results[0].content,
+              timestamp: results[0].timestamp,
+              showSender: results[0].showSender,
+              showReceiver: results[0].showReceiver
+            }
+
             const receiverSocketId = userSockets[receiver_id];
             if (receiverSocketId) {
-              receiverSocketId.emit('receiveMessage', data);
+              receiverSocketId.emit('receiveMessage', newData);
             }
 
             const senderSocket = userSockets[sender_id];
             if (senderSocket) {
-              senderSocket.emit('receiveMessage', data)
+              senderSocket.emit('receiveMessage', newData)
             }
+
           } catch (error) {
-            socket.emit('sendMessageError', error)
+
+            console.log(error, 'error al recuperar el ultimo mensaje')
           }
+
         });
 
         socket.on('clearChat', async(receiverId)=> {
@@ -144,44 +167,48 @@ module.exports = function(socketio) {
         });
 
         socket.on('newContacts', async() => {
+          console.log('ejecucion socket newcontacts')
           const userId = userIds[socket.id];
           try{
             const queryGetContactsLastMessage=`
             SELECT DISTINCT
-        u.username,
-        CASE
+            u.username,
+            CASE
+                WHEN c.user_id = ? THEN c.contact_id
+                ELSE c.user_id
+            END as contact_id,
+            m.id as messageId,
+            m.content as lastMessage,
+            m.timestamp,
+            m.showSender,
+            m.showReceiver,
+            m.sender_id,
+            m.receiver_id
+          FROM contacts c
+          JOIN users u ON u.id = CASE
             WHEN c.user_id = ? THEN c.contact_id
             ELSE c.user_id
-        END as contact_id,
-        m.content as lastMessage,
-        m.timestamp,
-        m.showSender,
-        m.showReceiver
-      FROM contacts c
-      JOIN users u ON u.id = CASE
-                                WHEN c.user_id = ? THEN c.contact_id
-                                ELSE c.user_id
-                              END
-      LEFT JOIN (
-          SELECT 
-              LEAST(sender_id, receiver_id) AS user1,
-              GREATEST(sender_id, receiver_id) AS user2,
-              MAX(id) AS max_id
-          FROM messages
-          WHERE (sender_id = ? OR receiver_id = ?)
-          GROUP BY user1, user2
-      ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
-                    GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
-      LEFT JOIN messages m ON m.id = lastMsg.max_id
-      WHERE (c.contact_id = ? OR c.user_id = ?)
-      AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
+          END
+          LEFT JOIN (
+              SELECT 
+                  LEAST(sender_id, receiver_id) AS user1,
+                  GREATEST(sender_id, receiver_id) AS user2,
+                  MAX(id) AS max_id
+              FROM messages
+              WHERE (sender_id = ? OR receiver_id = ?) AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END 
+              GROUP BY user1, user2
+          ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
+                        GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
+          LEFT JOIN messages m ON m.id = lastMsg.max_id
+          WHERE (c.contact_id = ? OR c.user_id = ?)
+          AND NOT (c.contact_id = ? AND c.user_id = ?) ORDER BY m.timestamp DESC;
           ;
             `;
-            const [results] = await pool.query(queryGetContactsLastMessage, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
-
+            const [results] = await pool.query(queryGetContactsLastMessage, [userId, userId, userId, userId, userId, userId, userId, userId, userId, userId, userId]);
             socket.emit('newContactsSuccess', results);
           } catch (error) {
             socket.emit('newContactsError', error);
+            console.log('error en newContacts', error)
           }
         });
 
@@ -204,6 +231,64 @@ module.exports = function(socketio) {
           } finally {
             if (connection) connection.release();
           };
+        });
+
+        socket.on('deleteMessageForAll', async (messageInfo) => {
+          const {id, sender_id, receiver_id, content, timestamp, showSender, showReceiver } = messageInfo;
+          const timestampParsed = parseDate(timestamp);      
+
+          const queryDeleteMessageForAll = `
+            DELETE FROM messages WHERE id = ?
+          `;
+
+          const queryInsertMessage = `
+            INSERT INTO deleted_messages (sender_id, receiver_id, content, timestamp, showSender, showReceiver) VALUES (?, ?, ?, ?, ?, ?)
+          `;
+
+          try {
+            await pool.query(queryDeleteMessageForAll,[id]);
+            socket.emit('deleteMessageForAllSuccess', 'Mensaje eliminado para todos correctamente');
+          } catch (error) {
+            socket.emit('deleteMessageForAllError', error)
+          }
+
+          try {
+            pool.query(queryInsertMessage, [sender_id, receiver_id, content, timestampParsed, showSender, showReceiver]);
+          } catch (error) {
+            console.log('error insertando el mensaje en deleted_messages', error)
+          }
+        });
+
+        socket.on('deleteMessageForMe', async (messageInfo) => {
+
+          const userId = userIds[socket.id];
+          const {id, sender_id, receiver_id, content, timestamp, showSender, showReceiver } = messageInfo;
+
+          const contactId = userId === sender_id ? receiver_id : sender_id;
+
+          const queryDeleteMessageForMe = `
+            UPDATE messages SET showSender = CASE WHEN sender_id=? THEN 0 ELSE 1 END, showReceiver = CASE WHEN receiver_id=? THEN 0 ELSE 1 END WHERE id = ?
+          `;
+
+          const queryGetNewLastMessage = `
+            SELECT * FROM messages WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END ORDER BY timestamp DESC LIMIT 1 
+          `;
+
+          try {
+            await pool.query(queryDeleteMessageForMe,[userId, userId, id]);
+            const newLastMessage = await pool.query(queryGetNewLastMessage,[userId, contactId, contactId, userId, userId, userId]);
+
+            console.log('newLastMessage', newLastMessage)
+  
+            const results = newLastMessage[0].id === id ? newLastMessage[0] : null;
+
+            socket.emit('deleteMessageForMeSuccess', results);
+
+          } catch (error) {
+            socket.emit('deleteMessageForMeError', error);
+            console.log('error en deleteMessageForMe', error)
+          }
+        
         });
     });
 };

@@ -1,12 +1,13 @@
 // ChatComponent.jsx
 
 //dependencias
-import React, { useState, useEffect, useRef, useContext } from 'react';
-import { io } from "socket.io-client";
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { Socket, io } from "socket.io-client";
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
-import { Link } from 'react-router-dom';
+import { fetchData } from '../../fetch.js';
+
 
 //components
 import ChatListComponent from './ChatList/ChatListComponent.jsx';
@@ -22,7 +23,10 @@ import ContextMenuMessage from './ContextMenu/ContextMenuMessage.jsx';
 import './Chat.css';
 import './MenuButton/MenuButton.css';
 
-const socket = io('http://192.168.1.54:4567');
+
+const REACT_APP_SERVER_URL = process.env.REACT_APP_SERVER_URL;
+
+const socket = io(REACT_APP_SERVER_URL);
 
 // creacion de estilos dentro de js con JSS
 const useStyles = createUseStyles({
@@ -48,12 +52,16 @@ export const MessagesContext = React.createContext({
 
 const ChatComponent = () => {
 
+  
+  const  SECONDARY_CLICK = 2;
+  const  PRINCIPAL_CLICK = 0;
+
   const classes = useStyles();
   
   const formRef = useRef(null);
   const contextMenuRef = useRef(null);
   const contextMenuMessageRef = useRef(null);
-
+  
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
@@ -78,48 +86,50 @@ const ChatComponent = () => {
   const [messageSelected, setMessageSelected] = useState('');
   const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
 
+  const redirectLogin = (tittle, message, icon) => { 
+    navigate('/Login');
+    Swal.fire({
+      title: tittle,
+      text: message,
+      icon: icon,
+      confirmButtonText: 'Aceptar'
+    })
+  }
 
    // hook para extraer informacion de la base de datos
    useEffect(() => {
-    Promise.all([
-      fetch('http://192.168.1.54:4567/chat', {
-        credentials: 'include',
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      })
-      .then(response => {
-        if (response.ok) {
-          return response.json();
-        } else if (response.status === 401) {
-          setIsAuthenticated(false);
-        } else {
-          throw new Error('Failed to get your data chat');
-        }
-      })
-      .then(data => {
-        if (data && data.success) {
 
-          setContacts(data.contacts);
-          setUsername(data.user.username.toUpperCase());
-          setUserId(data.user.id);
-          socket.emit('informationUser', { username: data.user.username, userId: data.user.id });
-        }
-      })
-      .catch(error => {
-        console.error('Hubo un problema con la petición Fetch:', error);
-      }),
-  
-      fetch('http://192.168.1.54:4567/friend-requests', {
-        credentials: 'include',
-        method: 'GET',
-        headers: { 'Content-Type': 'application/json' }
-      })
+    Promise.all([
+      fetchData(REACT_APP_SERVER_URL, 'chat', 'GET', '').then(response => {
+      if (response.ok) {
+        return response.json();
+      } else if (response.status === 401) {
+        setIsAuthenticated(false);
+      } else {
+        redirectLogin('Error', 'Your request failed', 'error')
+        throw new Error('Failed to get your chat');
+      }
+    }).then(data => {
+      if (data && data.success) {
+        setContacts(data.contacts);
+        setUsername(data.user.username.toUpperCase());
+        setUserId(data.user.id);
+        socket.emit('informationUser', { username: data.user.username, userId: data.user.id });
+      }
+    }).catch(error => {
+      console.error('Hubo un problema con la petición Fetch:', error);
+      redirectLogin('Error', 'Your request failed', 'error')
+    }),
+      
+      
+      fetchData(REACT_APP_SERVER_URL, 'friend-requests', 'GET', '')
       .then(response => {
         if (response.ok) {
           return response.json();
         } else if (response.status === 401) {
           setIsAuthenticated(false);
         } else {
+          redirectLogin('Error', 'Your request failed', 'error')
           throw new Error('Failed to get your friends requests');
         }
       })
@@ -129,6 +139,7 @@ const ChatComponent = () => {
         }
       })
       .catch(error => {
+        redirectLogin('Error', 'Your request failed', 'error')
         console.error('Hubo un problema con la petición Fetch:', error);
       })
     ])
@@ -141,13 +152,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate('/Login');
-      Swal.fire({
-        title: 'warning',
-        text: 'You have to be authenticated before to access here!!',
-        icon: 'warning',
-        confirmButtonText: 'Aceptar'
-      })
+      redirectLogin('Warning', 'You have to be authenticated before to access here!!', 'warning')
     }
   },[isAuthenticated])
   
@@ -183,6 +188,7 @@ const ChatComponent = () => {
   useEffect(()=> {
     
     socket.on('receiveMessage', (message)=> {
+      console.log('messageaaaa', message)
       setMessages(prevMessages => [...prevMessages, message]);
       
       socket.emit('newContacts');
@@ -196,7 +202,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     const handleNewContacts = (newContacts) => {
-      
+      console.log('newContacts', newContacts);
       setContacts(newContacts);
       
     };
@@ -219,32 +225,19 @@ const ChatComponent = () => {
     }, 0);
   }, [messages]);
 
-  // useEffect (()=> {
-  //   socket.on('getNewContacts', (contact) => {
-  //     
-  //     console.log(contacts)
-  //     setContacts(prevContacts => [...prevContacts, contact[0]]);
-  //   });
-
-  //   return () => {
-  //     socket.off('getNewContacts')
-  //   }
-  // }, []);
-
   const sendMessage = (messageData) => {
-    
+    if (messageData.content.trim() === '' ) return;
     socket.emit('sendMessage', messageData);
-    
   };
   
-  const handleContactClick = (e, contact) => {
+  const handleContactClick = useCallback((e, { contact_id, username }) => {
     setShowContextMenuMessage(false);
     e.preventDefault();
-    
-    if (e.button === 0) {
-      setSelectedContact(contact.contact_id);
-      setSelectedContactName(contact.username.toUpperCase());
-      fetch(`http://192.168.1.54:4567/chat-history/${contact.contact_id}`, {
+
+    if (e.button === PRINCIPAL_CLICK ) {
+      setSelectedContact(contact_id);
+      setSelectedContactName(username.toUpperCase());
+      fetch(`http://192.168.1.54:4567/chat-history/${contact_id}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -253,24 +246,20 @@ const ChatComponent = () => {
       })
       .then(response=> response.json())
       .then(data => {
-        
         if (data.success) {
-         
           setMessages(data.messages);
           setIsWaitingClick(false);
-          
         }
       })
       .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
     }
-    else if (e.button === 2) {
-      setSelectedContact(contact.contact_id);
+    else if (e.button === SECONDARY_CLICK ) {
+      setSelectedContact(contact_id);
       setShowContextMenu(true);
       setMenuVisibility(false);
       setCoordenades({ x: e.clientX, y: e.clientY });
-      
     }
-  };
+  }, []);
   
   // visibilidad del menu
   const handleClickOutside = (e) => {
@@ -406,27 +395,87 @@ const ChatComponent = () => {
     if (e.button === 2) {
       e.preventDefault();
       setShowContextMenuMessage(true);
-      setMessageSelected(message.id);
-      console.log(message.id);
+      setMessageSelected(message);
+      console.log(message);
       
       const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
       const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
       const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
 
       setCoordenades({ x: newX, y: newY });
-      
     }
   }
+
+  const handleDeleteMessageForAll = () => {
+    socket.emit('deleteMessageForAll', messageSelected);
+    socket.on('deleteMessageForAllSuccess', (message) => {
+      
+      let indexMessageAllDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
+      if (indexMessageAllDelete !== -1) {
+        let updateMessages = [...messages];
+        updateMessages.splice(indexMessageAllDelete, 1);
+        setMessages(updateMessages);
+      }
+      console.log(message);
+    });
+
+    socket.on('deleteMessageForAllError', (message) => {
+      console.log(message);
+    });
+
+    return () => {
+      socket.off('deleteMessageForAllSuccess');
+      socket.off('deleteMessageForAllError');
+    };
+  }
+
+  const handleDeleteMessageForMe = () => {
+    socket.emit('deleteMessageForMe', messageSelected);
+  }
+
+  useEffect(() => {
+   
+    socket.on('deleteMessageForMeSuccess', (newLastMessage) => {
+      let indexMessageMeDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
+      if (indexMessageMeDelete !== -1) {
+        let updateMessages = [...messages];
+        updateMessages.splice(indexMessageMeDelete, 1);
+        setMessages(updateMessages);
+      }
+
+      
+      
+      if (newLastMessage) {
+        let newLastMessage = newLastMessage;
+        let newContacts = [...contacts];
+        let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
+        console.log('AAAA', indexContact);
+        if (indexContact !== -1) {
+          newContacts[indexContact].lastMessage = newLastMessage;
+          setContacts(newContacts);
+          console.log('AAAAEE',newContacts);
+        }
+}
+      
+
+      setShowContextMenuMessage(false);
+
+    }); 
+    socket.on('deleteMessageForMeError', (message) => {
+      console.log(message);
+    });
+    return () => {
+      socket.off('deleteMessageForMeSuccess');
+      socket.off('deleteMessageForMeError');
+    };
+  }, [messages, messageSelected]);
 
   useEffect(() => {
     if (showContextMenuMessage && contextMenuMessageRef.current) {
         const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
         setMenuSize({ width: offsetWidth, height: offsetHeight });
     }
-}, [showContextMenuMessage]);
-
-  useEffect(() => {console.log(showContextMenuMessage,coordenades)}, [showContextMenuMessage, coordenades])
-
+  }, [showContextMenuMessage]);
 
    if (loading) {
      return <svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>
@@ -467,7 +516,7 @@ const ChatComponent = () => {
         
       </div>
       <div className='contactsContainer'>
-        <ChatListComponent contacts={contacts} onContactClick={handleContactClick} />
+        <ChatListComponent contacts={contacts} onContactClick={handleContactClick} userId={userId} />
         <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
       </div>
       </aside>
@@ -475,7 +524,7 @@ const ChatComponent = () => {
       <div className='containerChat'>
       <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
         <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} />
-        <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleClearChat} handle2={handleDeleteContact} content1={'Eliminar para mi'} content2={'Eliminar para todos'} />
+        {messageSelected.sender_id !== userId ? <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe}  content1={'Delete message for me'} /> : <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={handleDeleteMessageForAll} content2={'Delete message for all'} /> }
       </div>
       </div>
     </div>
@@ -485,3 +534,44 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
+
+
+
+
+
+
+  
+// const handleContactClick = (e, contact) => {
+//   setShowContextMenuMessage(false);
+//   e.preventDefault();
+  
+//   if (e.button === 0) {
+//     setSelectedContact(contact.contact_id);
+//     setSelectedContactName(contact.username.toUpperCase());
+//     fetch(`http://192.168.1.54:4567/chat-history/${contact.contact_id}`, {
+//       credentials: 'include',
+//       method: 'GET',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//     })
+//     .then(response=> response.json())
+//     .then(data => {
+      
+//       if (data.success) {
+       
+//         setMessages(data.messages);
+//         setIsWaitingClick(false);
+        
+//       }
+//     })
+//     .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
+//   }
+//   else if (e.button === 2) {
+//     setSelectedContact(contact.contact_id);
+//     setShowContextMenu(true);
+//     setMenuVisibility(false);
+//     setCoordenades({ x: e.clientX, y: e.clientY });
+    
+//   }
+// };

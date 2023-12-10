@@ -7,7 +7,7 @@ const cors = require('cors');
 const server = require('http').Server(app);
 const socketio = require('socket.io')(server, {
   cors: {
-    origin: "http://192.168.1.54:3001" || "http://localhost:3001",
+    origin: ["http://192.168.1.54:3001", "http://localhost:3001"],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -89,10 +89,13 @@ LEFT JOIN
             WHEN c.user_id = ? THEN c.contact_id
             ELSE c.user_id
         END as contact_id,
+        m.id as messageId,
         m.content as lastMessage,
         m.timestamp,
         m.showSender,
-        m.showReceiver
+        m.showReceiver,
+        m.sender_id,
+        m.receiver_id
       FROM contacts c
       JOIN users u ON u.id = CASE
                                 WHEN c.user_id = ? THEN c.contact_id
@@ -104,7 +107,7 @@ LEFT JOIN
               GREATEST(sender_id, receiver_id) AS user2,
               MAX(id) AS max_id
           FROM messages
-          WHERE (sender_id = ? OR receiver_id = ?)
+          WHERE (sender_id = ? OR receiver_id = ?) AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END 
           GROUP BY user1, user2
       ) lastMsg ON (LEAST(c.user_id, c.contact_id) = lastMsg.user1 AND
                     GREATEST(c.user_id, c.contact_id) = lastMsg.user2)
@@ -114,7 +117,7 @@ LEFT JOIN
       ;
   `;
 
-    const [results] = await pool.query(queryMaxTime, [userId, userId, userId, userId, userId, userId, userId, userId, userId]);
+    const [results] = await pool.query(queryMaxTime, [userId, userId, userId, userId, userId, userId, userId, userId, userId, userId, userId]);
 
     return results;
 } catch (error) {
@@ -187,7 +190,7 @@ app.use(session({
 }));
 
 app.use(cors({
-  origin: "http://192.168.1.54:3001" || "http://localhost:3001",
+  origin: ["http://192.168.1.54:3001", "http://localhost:3001"],
   credentials: true
 }));
 

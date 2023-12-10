@@ -1,5 +1,5 @@
 //chatMain
-import React, { useState, useContext } from "react";
+import React, { useContext } from "react";
 import Message from './Message/Message.jsx';
 import { MessagesContext } from '../ChatComponent.jsx';
 import InputChat from './InputChat/InputChat.jsx';
