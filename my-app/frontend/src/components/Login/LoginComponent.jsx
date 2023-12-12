@@ -3,6 +3,7 @@ import './Login.css';
 import { useNavigate, Link  } from 'react-router-dom';
 import Swal from 'sweetalert2';
 
+const REACT_APP_SERVER_URL = process.env.REACT_APP_SERVER_URL;
 
 const Login = () => {
   const [username, setUsername] = useState('');

@@ -8,6 +8,8 @@
     "start-backend": "cd backend && yarn start"
   },
   "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^6.5.1",
+    "@fortawesome/free-solid-svg-icons": "6.5.1",
     "cors": "^2.8.5",
     "google-auth-library": "^9.0.0",
     "googleapis": "^126.0.1",

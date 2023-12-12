@@ -4,6 +4,8 @@ import '../Login/Login.css';
 import './Register.css';
 import Swal from 'sweetalert2';
 
+const REACT_APP_SERVER_URL = process.env.REACT_APP_SERVER_URL;
+
 const Register = () => {
   const [formData, setFormData] = useState({
     username: '',

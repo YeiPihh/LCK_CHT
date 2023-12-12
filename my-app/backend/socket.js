@@ -235,7 +235,14 @@ module.exports = function(socketio) {
 
         socket.on('deleteMessageForAll', async (messageInfo) => {
           const {id, sender_id, receiver_id, content, timestamp, showSender, showReceiver } = messageInfo;
-          const timestampParsed = parseDate(timestamp);      
+          const timestampParsed = parseDate(timestamp);
+         
+          const userId = userIds[socket.id];
+          const contactId = userId === sender_id ? receiver_id : sender_id;
+
+          const queryGetLastMessage = `
+            SELECT * FROM messages WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END ORDER BY timestamp DESC LIMIT 1 
+          `;
 
           const queryDeleteMessageForAll = `
             DELETE FROM messages WHERE id = ?
@@ -246,10 +253,20 @@ module.exports = function(socketio) {
           `;
 
           try {
+            
+            const lastMessage = await pool.query(queryGetLastMessage,[userId, contactId, contactId, userId, userId, userId]);
+            
             await pool.query(queryDeleteMessageForAll,[id]);
-            socket.emit('deleteMessageForAllSuccess', 'Mensaje eliminado para todos correctamente');
+  
+            const newLastMessage = lastMessage[0][0].id === id ? await pool.query(queryGetLastMessage,[userId, contactId, contactId, userId, userId, userId]) : null;
+
+            const resultNewLastMessage = newLastMessage ? newLastMessage[0][0] : null;
+
+            socket.emit('deleteMessageForAllSuccess', resultNewLastMessage);
+
           } catch (error) {
-            socket.emit('deleteMessageForAllError', error)
+            socket.emit('deleteMessageForAllError', error);
+            console.log('error en deleteMessageForAll', error);
           }
 
           try {
@@ -270,23 +287,24 @@ module.exports = function(socketio) {
             UPDATE messages SET showSender = CASE WHEN sender_id=? THEN 0 ELSE 1 END, showReceiver = CASE WHEN receiver_id=? THEN 0 ELSE 1 END WHERE id = ?
           `;
 
-          const queryGetNewLastMessage = `
+          const queryGetLastMessage = `
             SELECT * FROM messages WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END ORDER BY timestamp DESC LIMIT 1 
           `;
 
           try {
+            const lastMessage = await pool.query(queryGetLastMessage,[userId, contactId, contactId, userId, userId, userId]);
             await pool.query(queryDeleteMessageForMe,[userId, userId, id]);
-            const newLastMessage = await pool.query(queryGetNewLastMessage,[userId, contactId, contactId, userId, userId, userId]);
-
-            console.log('newLastMessage', newLastMessage)
+            
   
-            const results = newLastMessage[0].id === id ? newLastMessage[0] : null;
+            const newLastMessage = lastMessage[0][0].id === id ? await pool.query(queryGetLastMessage,[userId, contactId, contactId, userId, userId, userId]) : null;
 
-            socket.emit('deleteMessageForMeSuccess', results);
+            const resultNewLastMessage = newLastMessage ? newLastMessage[0][0] : null;
+            
+            socket.emit('deleteMessageForMeSuccess', resultNewLastMessage);
 
           } catch (error) {
+            console.log('error en deleteMessageForMe', error);
             socket.emit('deleteMessageForMeError', error);
-            console.log('error en deleteMessageForMe', error)
           }
         
         });

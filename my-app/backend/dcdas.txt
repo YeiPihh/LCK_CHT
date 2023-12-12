@@ -1,3 +1,7 @@
+recuerdas que estamos haciendo la memoria de mi proyecto de chart de texto a tiempo real con node react y mysql. ahora estoy en el apartado de desarrollo del proyecto:
+
+vale vamos poco a poco:
+vamos a hacer el punto de diseño poco a poco empezamos en el backend con el archivo mas importatne : index.js, cuando terminemos conel diseño de todos los archivos del backend empezaremos con el diseño de los archivos de frontend. y despues iremos con el desarrollo de los archivos backend y frontend:
 //index.js
 const express = require('express');
 const session = require('express-session');

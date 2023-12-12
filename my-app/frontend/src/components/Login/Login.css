@@ -8,20 +8,25 @@
     width: 350px;
     height: 550px;
     padding: 25px;
-    background-color: var(--main-colorTransparent);
+    background-color: transparent;
     box-shadow: 0px 0px 0px var(--main-color-dark);
     border-radius: 0px;
-    /* border: 1px solid #fff; */
-    backdrop-filter: blur(10px);
-    border-radius: 25px;
+    border: 1px solid #fff; 
+    backdrop-filter: blur(20px);
+    /* border-radius: 25px; */
   }
   
   #formBodyLogin {
     width: 300px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    justify-content: space-around;
   }
   
   #welcome-lines {
     text-align: center;
+    margin-bottom: 40px;
   }
   
   #welcome-line-1 {
@@ -35,74 +40,42 @@
     padding: 13px 10px;
     transition: transform 0.9s ease-in-out;
     transition: box-shadow 0.4s ease-in-out;
-    margin-bottom: 23px
   }
 
   #welcome-line-1 a {
     color: var(--textColor);
   }
   
-  /* #welcome-line-1::after {
-    content: "";
-    position: absolute;
-    top: -10%;
-    left: 3%;
-    width: 95%;
-    height: 20%;
-    background-color: var(--main-bg-color);;
-    transition: 0.5s;
-    transform-origin: center;
-  } */
-  
-  /* #welcome-line-1::before {
-    content: "";
-    transform-origin: left;
-    position: absolute;
-    top: -1%;
-    left: -1%;
-    width: 101%;
-    height: 101%;
-    background-color: transparent;
-    transition: .8s;
-    border: 2px solid #fff;
-    transform: scale(0)
-  } */
-
-  /* #welcome-line-1:hover::before, #welcome-line-1:hover::after {
-    transform: scale(1)
-  }
-
-  #welcome-line-1:hover {
-    cursor: pointer;
-    transform: scale(1.0);
-    color: var(--main-color-dark);
-    
-  } */
-  
   #welcome-line-2 {
     color: #ffffff;
     font-size: 18px;
-    margin-top: 17px;
+
   }
   
   #input-area {
-    margin-top: 40px;
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  #formBodyRegister {
+    gap: 20px;
+    display: flex;
+    flex-direction: column;
   }
   
   .form-inp {
     background: transparent;
     border: 1px solid #e3e3e3;
     line-height: 1;
-    border-radius: 0px;
+    border-radius: 20px;
+    backdrop-filter: blur(10px);
   }
   
   .form-inp:focus {
     border: 1px solid var(--main-color);
   }
-  
-  .form-inp:first-child {
-    margin-bottom: 15px;
-  }
+
   
   .form-inp input {
     width: 100%;
@@ -142,10 +115,10 @@
     padding: 14px 13px 12px 13px;
     border: 0;
     outline: 1px solid var(--textColor);
-    border-radius: 0px;
     line-height: 1;
     cursor: pointer;
     transition: all ease-in-out 0s;
+    border-radius: 20px;
   }
   
   #submit-button:hover {
@@ -156,19 +129,21 @@
   
   #forgot-pass {
     text-align: center;
-    margin-top: 30px;
     color: var(--text-color);
     font-size: 15px;
+    
   }
   
   #forgot-pass a {
     text-decoration: none;
     font-size: 15px;
+    color: white;
     cursor: pointer;
   }
 
   #forgot-pass a:hover {
     filter: brightness(2);
-
-    font-size: 15px!important;
+    transform: scale(1.01);
+    font-size: bolder;
+    
   }

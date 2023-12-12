@@ -12,7 +12,7 @@ const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRe
         backgroundColor: 'var(--bgTransparent)',
         border: '1px solid #ccc',
         borderRadius: '7px',
-        padding: '20px 100px 20px 10px',
+        padding: '20px 20px 20px 20px',
         width: 'max-content',
         backdropFilter: 'blur(5px)',
         gap: '20px',
@@ -22,7 +22,6 @@ const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRe
         display: 'flex',
         backgroundColor: 'transparent',
         minWidth: 'max-content',
-        width: '100%',
         fontSize: '16px',
         padding: '8px',
         border: 'none',
@@ -31,12 +30,13 @@ const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRe
         cursor: 'pointer',
         fontWeight: '600',
         fontFamily: 'Poppins',
-        letterSpacing: '0.5px'
+        letterSpacing: '0.5px',
+        width: 'max-content',
     }
     
     if (!showContextMenuMessage) return null;
 
-    console.log(showContextMenuMessage)
+    
     
     return (
         <div style={contextMenuStyles} className="contextMenuContainer" ref={contextMenuMessageRef}>

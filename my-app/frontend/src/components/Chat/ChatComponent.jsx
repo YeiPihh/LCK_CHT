@@ -188,7 +188,6 @@ const ChatComponent = () => {
   useEffect(()=> {
     
     socket.on('receiveMessage', (message)=> {
-      console.log('messageaaaa', message)
       setMessages(prevMessages => [...prevMessages, message]);
       
       socket.emit('newContacts');
@@ -226,8 +225,8 @@ const ChatComponent = () => {
   }, [messages]);
 
   const sendMessage = (messageData) => {
-    if (messageData.content.trim() === '' ) return;
     socket.emit('sendMessage', messageData);
+
   };
   
   const handleContactClick = useCallback((e, { contact_id, username }) => {
@@ -396,7 +395,6 @@ const ChatComponent = () => {
       e.preventDefault();
       setShowContextMenuMessage(true);
       setMessageSelected(message);
-      console.log(message);
       
       const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
       const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
@@ -408,25 +406,6 @@ const ChatComponent = () => {
 
   const handleDeleteMessageForAll = () => {
     socket.emit('deleteMessageForAll', messageSelected);
-    socket.on('deleteMessageForAllSuccess', (message) => {
-      
-      let indexMessageAllDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
-      if (indexMessageAllDelete !== -1) {
-        let updateMessages = [...messages];
-        updateMessages.splice(indexMessageAllDelete, 1);
-        setMessages(updateMessages);
-      }
-      console.log(message);
-    });
-
-    socket.on('deleteMessageForAllError', (message) => {
-      console.log(message);
-    });
-
-    return () => {
-      socket.off('deleteMessageForAllSuccess');
-      socket.off('deleteMessageForAllError');
-    };
   }
 
   const handleDeleteMessageForMe = () => {
@@ -434,40 +413,67 @@ const ChatComponent = () => {
   }
 
   useEffect(() => {
+
+    socket.on('deleteMessageForAllSuccess', (newLastMessage) => {
+      setShowContextMenuMessage(false);
+      
+      let indexMessageAllDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
+      if (indexMessageAllDelete !== -1) {
+        let updateMessages = [...messages];
+        updateMessages.splice(indexMessageAllDelete, 1);
+        setMessages(updateMessages);
+      }
+
+      if (newLastMessage) {
+        let newContacts = [...contacts];
+        let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
+        
+        if (indexContact !== -1) {
+          newContacts[indexContact].lastMessage = newLastMessage.content;
+          setContacts(newContacts);
+        }
+      }
+      
+      
+    });
+
+    socket.on('deleteMessageForAllError', (error) => {
+      console.log(error);
+    });
    
     socket.on('deleteMessageForMeSuccess', (newLastMessage) => {
+      setShowContextMenuMessage(false);
+      
       let indexMessageMeDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
+      
       if (indexMessageMeDelete !== -1) {
         let updateMessages = [...messages];
         updateMessages.splice(indexMessageMeDelete, 1);
         setMessages(updateMessages);
       }
 
-      
-      
-      if (newLastMessage) {
-        let newLastMessage = newLastMessage;
-        let newContacts = [...contacts];
-        let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
-        console.log('AAAA', indexContact);
-        if (indexContact !== -1) {
-          newContacts[indexContact].lastMessage = newLastMessage;
-          setContacts(newContacts);
-          console.log('AAAAEE',newContacts);
-        }
-}
-      
-
-      setShowContextMenuMessage(false);
+       if (newLastMessage) {
+         let newContacts = [...contacts];
+         let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
+         
+         if (indexContact !== -1) {
+           newContacts[indexContact].lastMessage = newLastMessage.content;
+           setContacts(newContacts);
+         }
+       }
 
     }); 
     socket.on('deleteMessageForMeError', (message) => {
       console.log(message);
     });
+
     return () => {
       socket.off('deleteMessageForMeSuccess');
       socket.off('deleteMessageForMeError');
+      socket.off('deleteMessageForAllSuccess');
+      socket.off('deleteMessageForAllError');
     };
+
   }, [messages, messageSelected]);
 
   useEffect(() => {
@@ -477,8 +483,13 @@ const ChatComponent = () => {
     }
   }, [showContextMenuMessage]);
 
+  const handleClickBack = () => {
+    setSelectedContact(null);
+    setSelectedContactName(null);
+  }
+
    if (loading) {
-     return <svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg>
+     return <div className='loaderContainer'><svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg></div>
    }
 
 
@@ -523,7 +534,7 @@ const ChatComponent = () => {
       </div>
       <div className='containerChat'>
       <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
-        <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} />
+        <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} handleClickBack={handleClickBack} />
         {messageSelected.sender_id !== userId ? <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe}  content1={'Delete message for me'} /> : <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={handleDeleteMessageForAll} content2={'Delete message for all'} /> }
       </div>
       </div>
@@ -534,44 +545,3 @@ const ChatComponent = () => {
 };
 
 export default ChatComponent;
-
-
-
-
-
-
-  
-// const handleContactClick = (e, contact) => {
-//   setShowContextMenuMessage(false);
-//   e.preventDefault();
-  
-//   if (e.button === 0) {
-//     setSelectedContact(contact.contact_id);
-//     setSelectedContactName(contact.username.toUpperCase());
-//     fetch(`http://192.168.1.54:4567/chat-history/${contact.contact_id}`, {
-//       credentials: 'include',
-//       method: 'GET',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//     })
-//     .then(response=> response.json())
-//     .then(data => {
-      
-//       if (data.success) {
-       
-//         setMessages(data.messages);
-//         setIsWaitingClick(false);
-        
-//       }
-//     })
-//     .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
-//   }
-//   else if (e.button === 2) {
-//     setSelectedContact(contact.contact_id);
-//     setShowContextMenu(true);
-//     setMenuVisibility(false);
-//     setCoordenades({ x: e.clientX, y: e.clientY });
-    
-//   }
-// };

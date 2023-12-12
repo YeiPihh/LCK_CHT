@@ -20,10 +20,6 @@
     display: flex;
     justify-content: center;
   }
-
-  #confirm-password-container {
-    margin-top: 15px;
-  }
   
   .error{
     border: 1px solid red !important;
@@ -36,7 +32,6 @@
   
   #forgot-pass {
     text-align: center;
-    margin-top: 30px;
     color: var(--text-color);
     font-size: 15px;
   }

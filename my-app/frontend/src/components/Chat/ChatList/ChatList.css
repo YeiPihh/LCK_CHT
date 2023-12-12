@@ -32,6 +32,7 @@
     white-space: nowrap;
     text-overflow: ellipsis;
     height: max-content;
+    overflow: hidden;
 }
 
 .chat-item .contactName {
@@ -48,4 +49,5 @@
     color: #fff;
     white-space: nowrap;
     text-overflow: ellipsis;
+    overflow: hidden;
 }

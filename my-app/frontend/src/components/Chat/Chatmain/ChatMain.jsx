@@ -8,7 +8,7 @@ import '../Chat.css';
 import HeaderChatMain from "./HeaderChatMain/HeaderChatMain.jsx";
 
 
-const ChatMain = ({ sendMessage, handleClickMessage }) => {
+const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack }) => {
 
     const { messages, userId, isWaitingClick, selectedContact } = useContext(MessagesContext);
 
@@ -34,7 +34,7 @@ const ChatMain = ({ sendMessage, handleClickMessage }) => {
     } else {
             return (
                 <>
-                    <HeaderChatMain />
+                    <HeaderChatMain handleClickBack={handleClickBack} />
                         <div className="messagesContainer">
                             {
                                 messages.map((message, index)=> {
