@@ -11,6 +11,8 @@
     box-sizing: border-box;
 }
 
+
+
 .loading {
     height: 99vh;
     width: 99vw;
@@ -112,13 +114,6 @@
     display: flex;
     height: 100vh;
     background-color: transparent;
-    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2000 1500'%3E%3Cdefs%3E%3Ccircle stroke='%23BBBBBB' vector-effect='non-scaling-stroke' id='a' fill='none' stroke-width='3.1' r='315'/%3E%3Cuse id='f' href='%23a' stroke-dasharray='100 100 100 9999'/%3E%3Cuse id='b' href='%23a' stroke-dasharray='250 250 250 250 250 9999'/%3E%3Cuse id='e' href='%23a' stroke-dasharray='1000 500 1000 500 9999'/%3E%3Cuse id='g' href='%23a' stroke-dasharray='1500 9999'/%3E%3Cuse id='h' href='%23a' stroke-dasharray='2000 500 500 9999'/%3E%3Cuse id='j' href='%23a' stroke-dasharray='800 800 800 800 800 9999'/%3E%3Cuse id='k' href='%23a' stroke-dasharray='1200 1200 1200 1200 1200 9999'/%3E%3Cuse id='l' href='%23a' stroke-dasharray='1600 1600 1600 1600 1600 9999'/%3E%3C/defs%3E%3Cg transform='translate(1000 750)' %3E%3Cg %3E%3Ccircle fill='%23BBBBBB' r='10'/%3E%3Cg transform='rotate(-57 0 0)'%3E%3Cuse href='%23f' transform='scale(.1) rotate(50 0 0)' /%3E%3Cuse href='%23f' transform='scale(.2) rotate(100 0 0)' /%3E%3Cuse href='%23f' transform='scale(.3) rotate(150 0 0)' /%3E%3C/g%3E%3Cg transform='rotate(-38.4 0 0)'%3E%3Cuse href='%23b' transform='scale(.4) rotate(200 0 0)' /%3E%3Cuse href='%23z' transform='scale(.5) rotate(250 0 0)' /%3E%3C/g%3E%3Cg id='z' transform='rotate(25.65 0 0)'%3E%3Cg transform=''%3E%3Cuse href='%23b'/%3E%3Cuse href='%23b' transform='scale(1.2) rotate(90 0 0)' /%3E%3Cuse href='%23b' transform='scale(1.4) rotate(60 0 0)' /%3E%3Cuse href='%23e' transform='scale(1.6) rotate(120 0 0)' /%3E%3Cuse href='%23e' transform='scale(1.8) rotate(30 0 0)' /%3E%3C/g%3E%3C/g%3E%3Cg id='y' transform='rotate(172.8 0 0)'%3E%3Cg transform=''%3E%3Cuse href='%23e' transform='scale(1.1) rotate(20 0 0)' /%3E%3Cuse href='%23g' transform='scale(1.3) rotate(-40 0 0)' /%3E%3Cuse href='%23g' transform='scale(1.5) rotate(60 0 0)' /%3E%3Cuse href='%23h' transform='scale(1.7) rotate(-80 0 0)' /%3E%3Cuse href='%23j' transform='scale(1.9) rotate(100 0 0)' /%3E%3C/g%3E%3C/g%3E%3Cg transform=''%3E%3Cg transform='rotate(-25.65 0 0)'%3E%3Cg transform='rotate(-230.4 0 0)'%3E%3Cuse href='%23h' transform='scale(2) rotate(60 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.1) rotate(120 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.3) rotate(180 0 0)'/%3E%3Cuse href='%23h' transform='scale(2.4) rotate(240 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.5) rotate(300 0 0)'/%3E%3C/g%3E%3Cuse href='%23y' transform='scale(2) rotate(180 0 0)' /%3E%3Cuse href='%23j' transform='scale(2.7)'/%3E%3Cuse href='%23j' transform='scale(2.8) rotate(45 0 0)'/%3E%3Cuse href='%23j' transform='scale(2.9) rotate(90 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.1) rotate(135 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.2) rotate(180 0 0)'/%3E%3C/g%3E%3Cuse href='%23k' transform='scale(3.3) rotate(225 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.5) rotate(270 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.6) rotate(315 0 0)'/%3E%3Cuse href='%23k' transform='scale(3.7)'/%3E%3Cuse href='%23k' transform='scale(3.9) rotate(75 0 0)'/%3E%3C/g%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); */
-    /* background-image: url("https://i.postimg.cc/YSqz9s48/hollowed-boxes.png"); */
-    /* background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1600 900'%3E%3Cpolygon fill='%23cc0000' points='957 450 539 900 1396 900'/%3E%3Cpolygon fill='%23aa0000' points='957 450 872.9 900 1396 900'/%3E%3Cpolygon fill='%23d6002b' points='-60 900 398 662 816 900'/%3E%3Cpolygon fill='%23b10022' points='337 900 398 662 816 900'/%3E%3Cpolygon fill='%23d9004b' points='1203 546 1552 900 876 900'/%3E%3Cpolygon fill='%23b2003d' points='1203 546 1552 900 1162 900'/%3E%3Cpolygon fill='%23d3006c' points='641 695 886 900 367 900'/%3E%3Cpolygon fill='%23ac0057' points='587 900 641 695 886 900'/%3E%3Cpolygon fill='%23c4008c' points='1710 900 1401 632 1096 900'/%3E%3Cpolygon fill='%239e0071' points='1710 900 1401 632 1365 900'/%3E%3Cpolygon fill='%23aa00aa' points='1210 900 971 687 725 900'/%3E%3Cpolygon fill='%23880088' points='943 900 1210 900 971 687'/%3E%3C/svg%3E");
-    background-attachment: fixed;
-    background-repeat: no-repeat;
-    background-size: cover;
-    background-position: center; */
     margin: 0;
 }
 
@@ -135,11 +130,11 @@
     position: relative;
     display: flex;
     flex-direction: column;
-
     background-color: #008cff88;
     backdrop-filter: blur(25px);
     color: #ecf0f1;
     border-radius: 25px;
+    padding: 10px;
 }
 
 #contactButton {
@@ -175,25 +170,18 @@
     border-radius: 20px;
 }
 
-.contact-icon {
-    display: flex;
-    margin: 0;
-    padding: 0;
-    bottom: 20px; /* Espaciado desde la parte inferior */
-    left: 430px; /* Espaciado desde la izquierda */
-}
 
 #addContactForm{
     display: flex;
     flex-direction: column;
     position: absolute;
-    background-color: var(--bgTransparent);
-    padding: 15px 20px;
-    border-radius: 10px;
+    background-color:#111111e1;
+    padding: 25px 30px;
+    border-radius: 25px;
     top: 105%;
     left: 0%;
-    width: 85%;
-    border: 2px solid var(--textColor);
+    width: max-content;
+    backdrop-filter: blur(10px);
 }
 
 #addContactForm input {
@@ -206,17 +194,9 @@
     outline: 0px solid var(--main-color);
 }
 
-#addContactForm input:focus {
-    transform: scale(1.00);
-    background-color: var(--main-color);
-    color: #000;
-    border: 0px solid var(--main-color);
-    outline: 0px solid var(--main-color);
-}
-
 #addContactForm button {
     font-size: 14px;
-    font-weight: 600;
+    letter-spacing: 1px;
     color: #fff;
     background-color: var(--main-color);
     padding: 8px 8px;
@@ -228,60 +208,73 @@
     width: fit-content;
 }
 
-#addContactForm button:hover {
-    transform: scale(1.03);
-}
-
 #friendRequestsWrapper{
     display: flex;
     position: absolute;
-    padding: 13px 30px;
-    border-radius: 3px;
-    border: 1px solid #fff;
-    top: 0%;
+    padding: 25px 35px;
+    border-radius: 25px;
+    border: none;
+    top: 2%;
     left: 105%;
     width: max-content;
     height: max-content;
     min-height: 40px;
     min-width: 270px;
-    background-color: var(--bgTransparent);
-    gap: 10px;
+    background-color: #111111e1;
+    gap: 23px;
     align-items: center;
     justify-content: center;
     flex-direction: column;
+    backdrop-filter: blur(10px);
 }
 
 .noRequests {
-    position: absolute;
     width: max-content;
-    top: 30%;
 }
 
 #menuChat {
+    display: flex;
+    gap: 10px;
     position: absolute;
     top: 80px;
-    left: 10%;
-    z-index: 0;
-    padding: 0 30px;
+    left: 30px;
+    padding: 20px 20px;
     background-color: #111111e1;
-    /* background-color: transparent; */
     border-radius: 25px;
     color: white;
     opacity: 0;
     flex-direction: column;
-    box-sizing:content-box;
-    /* border: 1px solid var(--textColor); */
     transition: opacity .3s ease-in-out, visibility .3s ease-in-out, box-shadow .1s ease-in-out;
     transform-origin: center;
     visibility: hidden;
     z-index: 5;
     backdrop-filter: blur(10px);
+    width: max-content;
 }
 
-.material-symbols-outlined:hover {
-    font-weight: bolder;
-    filter: brightness(1.5);
-    transform: scale(1);
+#homeButton,
+.contact-icon ,
+.solicitud,
+.nav-list-logout {
+
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    cursor: pointer;
+    transition: all .3s ease-in-out;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+#homeButton:hover,
+.contact-icon:hover,
+.solicitud:hover,
+.nav-list-logout:hover {
+    background-color: #4242425d;
+}
+
+#menuChat > div.selected{
+    background-color: #4242425d;
 }
 
 #menuChat.visible {
@@ -294,26 +287,15 @@
     opacity: 0;
 }
 
-#menuChat  > div {
-    margin-bottom: 20%;
-    align-items: center;
-}
 
-#menuChat #homeButton {
-    display: flex;
-    margin-top: 20%;
-    align-items: center;
-    
-}
-
-#menuChat div .text {
+/* #menuChat div .text {
     margin-left: 10px;
     white-space: nowrap;
     font-size: 13px;
     letter-spacing: 1px;
     font-weight:600;
     user-select: none;
-}
+} */
 
 .solicitud {
     display: flex;
@@ -353,9 +335,9 @@
     display: flex;
     flex-direction: column;
     height: 100vh;
-    padding: 30px;
     z-index: 2;
-    box-sizing: border-box;
+    box-sizing: content-box;
+   
 }
 
 main{
@@ -368,7 +350,7 @@ main{
     padding: 0px 20px;
     font-size: 20px;
     letter-spacing: 0px;
-    overflow: scroll!important;
+    overflow-y: scroll!important;
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -377,12 +359,14 @@ main{
 
 .message  {
     display: flex;
-    height: max-content;
+    height: fit-content;
     flex-direction: column;
+    transition: all .3s ease-in-out;
+    border-radius: 25px;
 }
 
 .message.selected {
-    background-color: #136ecfa9;
+    background-color: #007bff6c;
 }
 
 .messageLeft, .messageRight{
@@ -414,17 +398,28 @@ main{
 }
 
 .contactsContainer {
-    overflow: scroll;
+    overflow-y: scroll;
+    display: flex;
+    flex-direction: column;
+    gap: 0px;
+}
+
+.chat-item {
+    align-items: center;
 }
 
 @media ((width > 1000px) and (width <= 1600px )) {
     body .chat-item .contactName {
-        font-size: 18px;
+        font-size: 22px;
         font-weight: bold;
         letter-spacing: 4px;
         margin-bottom: 5px;
         white-space: nowrap;
         text-overflow: ellipsis;
+    }
+
+    body .usernameSide {
+        font-size: 22px;
     }
 
     .messagesContainer{
@@ -441,27 +436,13 @@ main{
         box-sizing: border-box;
     }
 
-    .nav-list-logout,
-    .contact-icon {
-        left: 10px; 
-    }
-
-    #menuChat .text {
-        font-size: 12px;
-    }
-    
     .timeMessage{
         font-size: 10px;
         align-self: flex-end;
         margin-left: 7px;
-    } 
-
-    #friendRequestsWrapper{
-        min-width: 50vw;
     }
-
-    #friendRequestsWrapper .friendRequestContainer {
-        min-width: 30vw;
+    #menuChat{
+        width: max-content;
     }
     
 }
@@ -495,7 +476,7 @@ main{
         backdrop-filter: blur(25px);
         width: 100%;
         height: max-content;
-        padding: 10px;
+        padding: 17px 10px;
         align-items: center;
     }
     
@@ -504,8 +485,8 @@ main{
     }
     
     body .profileImagenContainer img {
-        height: 25px;
-        width: 25px;
+        height: 40px;
+        width: 40px;
     }
 
     .chat-header {
@@ -558,48 +539,43 @@ main{
         gap: 10px;
     }
 
-    .chat-sidebar.active, .containerSide.active {
+    .containerSide.active {
         min-width: 100%;
         display: flex;
         height: 100%;
+        padding-top: 30px;
+    }
+
+    .chat-sidebar.active {
+        min-width: 50%;
+        display: flex;
+        max-height: 90vh;
+        margin: auto;
+        margin-top: 0;
     }
 
     .chat-item .contactName {
-        font-size: 18px;
+        font-size: 25px;
         font-weight: bold;
         letter-spacing: 2px;
         margin-bottom: 3px;
-    }
-    
-    .chat-container {
-        overflow: hidden;
     }
 
     .chat-container .chat-main .chat-messages {
         width: 100vw;
         padding: 15px;
+      
     }
 
     
-    #friendRequestsWrapper{
-        display: flex;
-        position: absolute;
-        background-color: #ffffffef;
-        padding: 10px;
-        padding-left: 10px;
-        padding-right: 10px;
-        border-radius: 10px;
-        border: 1px solid #000;
-        top: 140%;
+    #friendRequestsWrapper {
+        top: 105%;
         left: 0%;
-        min-width: 80vw;
-        flex-direction: column;
     }
 
     #friendRequestsWrapper .friendRequestContainer {
         display: flex;
         justify-content: space-between;
-        min-width: 0vw;
         max-width: 100%;
     }
 

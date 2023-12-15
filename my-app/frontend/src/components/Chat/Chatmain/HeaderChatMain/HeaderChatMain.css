@@ -2,10 +2,10 @@
     display: flex;
     background-color:#008cff88;
     backdrop-filter: blur(25px);
-    width: 100%;
+    width: auto;
     height: 5%;
     padding: 25px 20px;
-    border-bottom-left-radius: 25px;
+    border-radius: 25px;
     align-items: center;
     justify-content: left;
     gap: 0px;

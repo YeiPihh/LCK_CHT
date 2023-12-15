@@ -2,11 +2,12 @@
 
 //dependencias
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { Socket, io } from "socket.io-client";
+import { io } from "socket.io-client";
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { createUseStyles } from 'react-jss';
 import { fetchData } from '../../fetch.js';
+import { SVG_LOADING} from './svg.js';
 
 
 //components
@@ -24,7 +25,9 @@ import './Chat.css';
 import './MenuButton/MenuButton.css';
 
 
-const REACT_APP_SERVER_URL = process.env.REACT_APP_SERVER_URL;
+const {REACT_APP_SERVER_URL} = process.env;
+
+
 
 const socket = io(REACT_APP_SERVER_URL);
 
@@ -47,7 +50,9 @@ export const MessagesContext = React.createContext({
   setIsWaitingClick: () => {},
   selectedContact: '',
   setSelectedContact: () => {},
-  selectedContactName: ''
+  selectedContactName: '',
+  messageSelected:'', 
+  setMessageSelected:() => {}
 })
 
 const ChatComponent = () => {
@@ -85,6 +90,7 @@ const ChatComponent = () => {
   const [showContextMenuMessage, setShowContextMenuMessage] = useState(false);
   const [messageSelected, setMessageSelected] = useState('');
   const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
+  const [temporizador, setTemporizador] = useState(null);
 
   const redirectLogin = (tittle, message, icon) => { 
     navigate('/Login');
@@ -228,15 +234,44 @@ const ChatComponent = () => {
     socket.emit('sendMessage', messageData);
 
   };
+
+  const onTouchStart = (e, handler) => {
+    e.preventDefault();
+    // Establecer un nuevo temporizador
+    const id = setTimeout(handler, 1000);
+    setTemporizador(id);
+  };
+
+  const onTouchEnd = () => {
+    // Cancelar el temporizador si el usuario suelta antes de tiempo
+    clearTimeout(temporizador);
+  };
+
+  const handleHoldTouchContact = () => {
+    setShowContextMenu(true);
+  };
   
+  const handleHoldTouchMessage = () => {
+    setShowContextMenuMessage(true);
+  };
+
   const handleContactClick = useCallback((e, { contact_id, username }) => {
     setShowContextMenuMessage(false);
+    setSelectedContact(contact_id);
+    setCoordenades({ x: e.clientX, y: e.clientY });
+    console.log(e.clientX, e.clientY);
+    setMenuVisibility(false);
     e.preventDefault();
 
-    if (e.button === PRINCIPAL_CLICK ) {
-      setSelectedContact(contact_id);
+    if (e.button === SECONDARY_CLICK || temporizador ) {
+      e.preventDefault();
+      setShowContextMenu(true);
+    }
+
+    if (e.button === PRINCIPAL_CLICK) {
+      e.preventDefault();
       setSelectedContactName(username.toUpperCase());
-      fetch(`http://192.168.1.54:4567/chat-history/${contact_id}`, {
+      fetch(`${REACT_APP_SERVER_URL}/chat-history/${contact_id}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -252,12 +287,8 @@ const ChatComponent = () => {
       })
       .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
     }
-    else if (e.button === SECONDARY_CLICK ) {
-      setSelectedContact(contact_id);
-      setShowContextMenu(true);
-      setMenuVisibility(false);
-      setCoordenades({ x: e.clientX, y: e.clientY });
-    }
+
+
   }, []);
   
   // visibilidad del menu
@@ -290,13 +321,22 @@ const ChatComponent = () => {
     setFriendRequestVisibility(!friendRequestVisibility);
     setAddFormVisibility(false);
   };
+
+  const getIndex = (array, property, reference) => {
+    return array.findIndex(obj => obj[property] === reference);
+  }
+
   const handleAcceptRequest = (senderId) => {
-    
-    setIsProcessingRequest(true);
     socket.emit('acceptFriendRequest', senderId);
-    socket.on('getNewContacts', (contact) => {
-      setContacts(prevContacts => [...prevContacts, contact[0]]);
-    });
+
+    const indexAcceptRequest  = getIndex(friendRequests, 'sender_id', senderId);
+    console.log(indexAcceptRequest);
+
+    if (indexAcceptRequest !== -1) {
+      let updateFriendRequests = [...friendRequests];
+      updateFriendRequests.splice(indexAcceptRequest, 1);
+      setFriendRequests(updateFriendRequests);
+    }
 
     socket.on('acceptFriendRequestError', (message) => {
       console.log("Error: ", message);
@@ -308,8 +348,26 @@ const ChatComponent = () => {
       });
     });
   };
+
+  useEffect(() => {
+    socket.on('acceptFriendRequestSuccess', (contact) => {
+      console.log("Éxito: ", contact);
+      let updateContacts = [...contacts, contact[0]];
+      setContacts(updateContacts);
+    });
+
+     socket.on('newFriendRequest', (friendRequests)=>{
+       setFriendRequests(friendRequests);
+     });
+
+    return () => {
+      socket.off('acceptFriendRequestSuccess');
+      // socket.off('newFriendRequest');
+    };
+  }, []);
+
   const handleIgnoreRequest = (senderId) => {
-    setIsProcessingRequest(true);
+    setIsProcessingRequest(senderId);
     socket.emit('ignoreFriendRequest', senderId);
 
     socket.on('ignoreFriendRequestError', (message) => {
@@ -323,7 +381,7 @@ const ChatComponent = () => {
     });
   };
   const handleLogout = () => {
-    fetch('http://192.168.1.54:4567/logout', {
+    fetch(`${REACT_APP_SERVER_URL}/logout`, {
       credentials: 'include',
       method: 'GET',
     })
@@ -356,6 +414,7 @@ const ChatComponent = () => {
 
       
   const handleClearChat = () => {
+    setShowContextMenu(false);
     socket.emit('clearChat', selectedContact);
     socket.on('clearChatSuccess', (message) => {
       setMessages([]);
@@ -370,38 +429,44 @@ const ChatComponent = () => {
   };
   
   const handleDeleteContact = () => {
-      socket.emit('deleteContact', selectedContact);
-      socket.on('deleteContactSuccess', (message) => {
-        let indexContactDelete = contacts.findIndex(obj => obj.contact_id === selectedContact); // <-- Encontramos el index del contacto que hemos seleccionado
-        if (indexContactDelete !== -1) {
-          let updateContacts = [...contacts];
-          updateContacts.splice(indexContactDelete, 1);
-          setContacts(updateContacts);
-          setShowContextMenu(false);
-        }
-        
-        console.log(message);
-      })
-      socket.on('deleteContactError', (message) => {
-        console.log(message);
-      })
+    setShowContextMenu(false);
+    let indexContactDelete = contacts.findIndex(obj => obj.contact_id === selectedContact); // <-- Encontramos el index del contacto que hemos seleccionado
+    if (indexContactDelete !== -1) {
+      let updateContacts = [...contacts];
+      updateContacts.splice(indexContactDelete, 1);
+      setContacts(updateContacts);
+    }
+    socket.emit('deleteContact', selectedContact);
+    socket.on('deleteContactSuccess', (message) => {
+
+      
+      console.log(message);
+    })
+    socket.on('deleteContactError', (message) => {
+      console.log(message);
+    })
   };
 
   const handleClickMessage = (message, e) => {
     setShowContextMenu(false);
+    setMenuVisibility(false);
+    setMessageSelected(message);
     e.stopPropagation();
     e.preventDefault();
-    if (e.button === 2) {
-      e.preventDefault();
-      setShowContextMenuMessage(true);
-      setMessageSelected(message);
-      
-      const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
-      const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
-      const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
 
-      setCoordenades({ x: newX, y: newY });
+    //coordenades message
+    const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
+    const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
+    const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
+
+    const  newXx = e.clientX > window.innerWidth/2 ? '' : ''; 
+
+    setCoordenades({ x: newX, y: newY });
+
+    if (e.button === SECONDARY_CLICK || temporizador) {
+      setShowContextMenuMessage(true);
     }
+
   }
 
   const handleDeleteMessageForAll = () => {
@@ -433,8 +498,6 @@ const ChatComponent = () => {
           setContacts(newContacts);
         }
       }
-      
-      
     });
 
     socket.on('deleteMessageForAllError', (error) => {
@@ -477,9 +540,17 @@ const ChatComponent = () => {
   }, [messages, messageSelected]);
 
   useEffect(() => {
-    if (showContextMenuMessage && contextMenuMessageRef.current) {
-        const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
-        setMenuSize({ width: offsetWidth, height: offsetHeight });
+
+    // if (contextMenuMessageRef) {
+    //   // const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
+    //   // setMenuSize({ width: offsetWidth, height: offsetHeight });
+    //   console.log(contextMenuMessageRef.current);
+    // }
+    // console.log(contextMenuMessageRef)
+
+
+    if (!showContextMenuMessage) {
+      setMessageSelected('');
     }
   }, [showContextMenuMessage]);
 
@@ -488,17 +559,21 @@ const ChatComponent = () => {
     setSelectedContactName(null);
   }
 
+
+
    if (loading) {
-     return <div className='loaderContainer'><svg className='loading' xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200"><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="40" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.4"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="100" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="-.2"></animate></circle><circle fill="#fff" stroke="#fff" strokeWidth="2" r="15" cx="160" cy="65"><animate attributeName="cy" calcMode="spline" dur="1.7" values="65;135;65;" keySplines=".5 0 .5 1;.5 0 .5 1" repeatCount="indefinite" begin="0"></animate></circle></svg></div>
+     return <div className='loaderContainer'>{SVG_LOADING}</div>
    }
+   
+   
+   return (
+     <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName, messageSelected}}>
 
-
-  return (
-    <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName}}>
-
-    <div className="chat-container" onClick={handleClickOutside}>
-      <div className= {`containerSide ${selectedContact ? '' : 'active'}`} >
-      <aside className={`chat-sidebar ${selectedContact ? '' : 'active'}`}>
+    <div className="chat-container" onClick={handleClickOutside} >
+      <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
+      <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={messageSelected.sender_id === userId ? handleDeleteMessageForAll : ''} content2={messageSelected.sender_id === userId ? 'Delete message for all' : ''} ownMessage={messageSelected.sender_id === userId ? true : false}  />
+      <div className= {`containerSide ${selectedContactName ? '' : 'active'}`} >
+      <aside className={`chat-sidebar ${selectedContactName ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
         <div className="menuContainer">
           <MenuButtonComponent  id="menuButton" onClick={handleMenuVisibility} ref={formRef} iconClass={menuClicked ? "clicked" : ""} textClass={menuClicked ? "clicked" : ""} btnClicked={menuClicked ? "clicked" : ""} />
@@ -521,21 +596,19 @@ const ChatComponent = () => {
           />
           <div className={`${classes.userProfileContainer} no-select`}>
             <ProfilePictureComponent username={username} />
-            {/* <div className='usernameSide'>{username}</div> */}
+            
           </div>
         </div>
         
       </div>
       <div className='contactsContainer'>
-        <ChatListComponent contacts={contacts} onContactClick={handleContactClick} userId={userId} />
-        <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
+        <ChatListComponent contacts={contacts} onContactClick={handleContactClick} userId={userId} onTouchStart={(e) => onTouchStart(e, handleHoldTouchContact)} onTouchEnd={onTouchEnd} />
       </div>
       </aside>
       </div>
       <div className='containerChat'>
-      <div className={`chat-main ${selectedContact ? 'active' : ''}`}>
-        <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} handleClickBack={handleClickBack} />
-        {messageSelected.sender_id !== userId ? <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe}  content1={'Delete message for me'} /> : <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={handleDeleteMessageForAll} content2={'Delete message for all'} /> }
+      <div className={`chat-main ${ selectedContactName!==null ? 'active' : ''}`}>
+        <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} handleClickBack={handleClickBack} handleHoldTouchMessage={handleHoldTouchMessage} onTouchStart={(e) => onTouchStart(e, handleHoldTouchMessage)} onTouchEnd={onTouchEnd} />
       </div>
       </div>
     </div>

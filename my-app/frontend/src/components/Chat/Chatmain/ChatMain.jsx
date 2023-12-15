@@ -1,5 +1,5 @@
 //chatMain
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Message from './Message/Message.jsx';
 import { MessagesContext } from '../ChatComponent.jsx';
 import InputChat from './InputChat/InputChat.jsx';
@@ -8,9 +8,9 @@ import '../Chat.css';
 import HeaderChatMain from "./HeaderChatMain/HeaderChatMain.jsx";
 
 
-const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack }) => {
+const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchStart, onTouchEnd }) => {
 
-    const { messages, userId, isWaitingClick, selectedContact } = useContext(MessagesContext);
+    const { messages, userId, isWaitingClick, selectedContact, messageSelected } = useContext(MessagesContext);
 
     const handleSubmit = (messageContent) => {
             if (messageContent){
@@ -23,6 +23,8 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack }) => {
             }
         
     }
+
+    useEffect(() => {console.log(messageSelected)}, [messageSelected]);
 
     const handleOwnMessage = (senderId) => {
         return parseInt(senderId) === parseInt(userId);
@@ -39,6 +41,7 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack }) => {
                             {
                                 messages.map((message, index)=> {
                                     const lastMessageGroup = index > 0 && messages[index-1].sender_id !==   message.sender_id;
+                                    const isSelected = messageSelected.id === message.id;
                                 
                                     return (
                                         <Message 
@@ -47,6 +50,10 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack }) => {
                                             isOwnMessage={handleOwnMessage(message.sender_id)}
                                             isLastMessageGroup={lastMessageGroup}
                                             onContextMenu={(e) => handleClickMessage(message, e)}
+                                            onTouchStart={onTouchStart}
+                                            onTouchEnd={onTouchEnd}
+                                            messageSelected={messageSelected}
+                                            isSelected={isSelected}
                                         />
                                     )
                                 })

@@ -40,16 +40,18 @@ module.exports = function(socketio) {
 
           try {
             const [results] = await pool.query('SELECT id FROM users WHERE username = ?', [receiverUsername]);
+            if (results.length < 1) {
+              socket.emit('friendRequestError', 'Usuario no encontrado');
+              return;
+            }
+
             const receiverId = results[0].id;
+            
             const [existingRequests] = await pool.query('SELECT * FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId,receiverId, receiverId, senderId]);
             const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId,receiverId, senderId]);
 
             
-            if (results.length === 0) {
-              socket.emit('friendRequestError', 'Usuario no encontrado');
-              return;
-            }
-            else if (senderId === receiverId) {
+            if (senderId === receiverId) {
               socket.emit('friendRequestError', 'No puedes enviarte una solicitud a ti mismo');
               return;
             }
@@ -69,6 +71,7 @@ module.exports = function(socketio) {
               return;
              } 
             } else {
+              const receiverSocketId = userSockets[receiverId];
               await pool.query('INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES (?, ?, "pendiente")', [senderId, receiverId]);
               socket.emit('friendRequestSuccess', 'Solicitud enviada exitosamente');
             }
@@ -90,8 +93,8 @@ module.exports = function(socketio) {
                 await pool.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
                 await pool.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
                 const [newContact] = await pool.query('SELECT u.username, c.contact_id, m.content as lastMessage, m.timestamp FROM contacts c JOIN users u ON u.id=c.contact_id LEFT JOIN messages m ON m.sender_id=c.user_id WHERE user_id=? and contact_id=?', [receiverId, senderId]);
-                socket.emit('acceptFriendRequestSuccess', 'Solicitud aceptada exitosamente');
-                socket.emit('getNewContacts', newContact);
+                socket.emit('acceptFriendRequestSuccess', newContact);
+                
               }
             } catch (error) {
               console.error('Error al aceptar la solicitud de amistad:', error);

@@ -2,3 +2,10 @@
     color: #fff;
     background-color: var(--main-color);
 }
+
+#homeButton,
+#contact-icon,
+#solicitud,
+#nav-list-logout {
+    cursor: pointer;
+}

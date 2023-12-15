@@ -1,21 +1,23 @@
 .btn {
-    width: 130px;
-    height: 45px;
-    border-radius: 5px;
+    width: max-content;
+    height: max-content;
+    border-radius: 25px;
     border: 0px solid var(--textColor);
     transition: all 0.5s ease-in-out background-color 0s ease-in-out;
     font-size: 17px;
-    font-family: Verdana, Geneva, Tahoma, sans-serif;
     font-weight: 600;
     display: flex;
     align-items: center;
     background-color: transparent;
     color: var(--textColor);
-    padding: 0px;
     margin: 0px;
     position: relative;
     cursor: pointer;
+    letter-spacing: 2px;
+    padding: 5px 10px;
   }
+
+  
  
   .btn:hover {
     background-color: #3333335e;
@@ -26,21 +28,19 @@
   }
   
   .btn .icon {
-    position: absolute;
+    
     height: 40px;
-    width: 70px;
+    width: max-content;
     display: flex;
     justify-content: center;
     align-items: center;
     transition: all 0.5s;
   }
   
-  .btn .text {
-    transform: translateX(55px);
-  }
+
   
    .btn .icon.clicked {
-    width: 115%;
+    transform: translateX(100%);
   } 
   
    .btn .text.clicked {
@@ -56,17 +56,15 @@
     transform: scale(0.85);
   }
 
-  @media (max-width: 1050px){
-
-    .btn {
-        width: 50px;
-    }
-
+  @media ((width > 1000px) and (width <= 1600px )){
     .btn .text {
-        display: none;
+      display: none;
     }
+    .btn .icon {
+      transform: translateX(33%);
+    } 
 
-    .btn:hover .icon {
-        width: 70px;
-      }
-}
+    .btn .icon.clicked {
+      transform: translateX(33%);
+    } 
+  }

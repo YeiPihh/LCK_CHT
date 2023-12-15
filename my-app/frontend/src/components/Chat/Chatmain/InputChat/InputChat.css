@@ -1,6 +1,6 @@
 .inputGroup {
     display: flex;
-
+    height: 50px;
   }
 
   .inputGroup {
@@ -8,37 +8,36 @@
   }
   
   .input {
-    height: 50px;
+    min-height: 50px;
     flex-grow: 1;
     padding: 0 2rem;
     color: #000;
     font-size: 15px;
     border: 1px solid #fff;
     background-color: #fff;
-    border-top-left-radius: 25px;
+    border-radius: 25px;
+    outline: none;
   }
   
   .buttonSubmit {
-    height: 50px;
+    max-height: 50px;
+    min-height: 50px;
     padding: .5em 1em;
     border: none;
-    background-color: #007bff;
+    background-color: transparent;
     color: #fff;
     font-size: 15px;
     cursor: pointer;
     transition: background-color .3s ease-in-out;
     font-weight: 500;
-    border-top-right-radius: 25px;
-    min-width: 50px;
+    border-radius: 25px;
+    width: 50px;
+    position: absolute;
+    left: calc(100% - 50px);
   }
   
   .buttonSubmit:hover {
-    background-color: #0056b3;
-  }
-  
-  .input:focus, .input:focus-visible {
-    border-color: #3898EC;
-    outline: none;
+    background-color: var(--main-color);
   }
   
   .errorMessage {

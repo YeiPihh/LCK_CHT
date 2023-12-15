@@ -11,7 +11,7 @@ const useStyles = createUseStyles({
 });
   
 
-const ChatListComponent = ({ contacts, onContactClick, userId }) => {
+const ChatListComponent = ({ contacts, onContactClick, userId,  onTouchStart, onTouchEnd }) => {
   
   const classes = useStyles();
   return (
@@ -19,7 +19,7 @@ const ChatListComponent = ({ contacts, onContactClick, userId }) => {
     {contacts.map((contact, index) => {
       
       return(
-      <div key={index} className="chat-item" onClick={(e) => onContactClick(e, contact)} onContextMenu={(e) => onContactClick(e, contact)}>
+      <div key={index} className="chat-item" onClick={(e) => onContactClick(e, contact)} onContextMenu={(e) => onContactClick(e, contact)}  onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           <ProfilePictureComponent />
           <div className="contactContainer">
             <span className="contactName">{contact.username.toUpperCase()}</span>

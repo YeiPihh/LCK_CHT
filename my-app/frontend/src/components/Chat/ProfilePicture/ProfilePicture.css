@@ -25,23 +25,5 @@
     font-weight: 600;
     letter-spacing: 3px;
 }
-
-@media (max-width: 1150px) {
-.usernameSide {
-  font-size: 16px;
-  font-weight: 600;
-  letter-spacing: 2px;
-}
-
-}
-
-@media (max-width: 900px){
-    .usernameSide {
-        font-size: 18px;
-    }
-    .profileImagenContainer {
-        padding: 0px 10px;
-    }
-}
   
 

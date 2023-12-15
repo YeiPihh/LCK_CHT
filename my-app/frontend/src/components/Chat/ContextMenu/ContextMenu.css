@@ -1,0 +1,15 @@
+.contextMenuContainer > div {
+    border-radius: 15px;
+    padding: 5px 10px;
+}
+
+.buttonContextContainer {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 7px;
+}
+
+.contextMenuContainer > div:hover {
+    background-color: #4242425d;
+}

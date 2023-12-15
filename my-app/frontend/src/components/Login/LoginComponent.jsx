@@ -21,14 +21,14 @@ const Login = () => {
   const handleLogin = (event) => {
     event.preventDefault();
 
-    fetch('http://192.168.1.54:4567/logout', {
+    fetch(`${REACT_APP_SERVER_URL}/logout`, {
         credentials: 'include',
         method: 'GET',
       })
       .then(response => response.json())
       .then(data =>{
         if (data.status === 'success') {
-          fetch('http://192.168.1.54:4567/login', {
+          fetch(`${REACT_APP_SERVER_URL}/login`, {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json',

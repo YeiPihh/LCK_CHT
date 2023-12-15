@@ -1,18 +1,29 @@
-import React from "react";
+import React, {useRef, useEffect} from "react";
+import { SVG_ICON_TRASH, SVG_ICON_X } from './svgContextMenu.js';
 
-const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRef, handle1, handle2, content1, content2 }) => { 
+
+const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRef, handle1, handle2, content1, content2, ownMessage }) => {
+
+
+    useEffect(() => {
+        if (contextMenuMessageRef.current) {
+            const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
+            console.log(`El tamaño de contextMenuContainer es ${offsetWidth}x${offsetHeight}`);
+        }
+    }, []);
+
+    const positionY= ownMessage ? x-275 : x;
     
     const contextMenuStyles = {
         display: 'flex',
         flexDirection: 'column',
         position: 'absolute',
         top: y,
-        left: x,
-        zIndex: 10000,
-        backgroundColor: 'var(--bgTransparent)',
-        border: '1px solid #ccc',
-        borderRadius: '7px',
-        padding: '20px 20px 20px 20px',
+        left: positionY,
+        zIndex: 4,
+        backgroundColor: '#111111e1',
+        borderRadius: '15px',
+        padding: '20px 25px',
         width: 'max-content',
         backdropFilter: 'blur(5px)',
         gap: '20px',
@@ -22,7 +33,7 @@ const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRe
         display: 'flex',
         backgroundColor: 'transparent',
         minWidth: 'max-content',
-        fontSize: '16px',
+        fontSize: '13px',
         padding: '8px',
         border: 'none',
         outline: 'none',
@@ -40,8 +51,12 @@ const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRe
     
     return (
         <div style={contextMenuStyles} className="contextMenuContainer" ref={contextMenuMessageRef}>
+            <div className="buttonContextContainer">{SVG_ICON_X}
                 <button style={buttonContextMenu} onClick={handle1}>{content1}</button>
-                <button className={handle2 || content2 ? '' : 'hidden'} style={buttonContextMenu} onClick={handle2}>{content2}</button>
+            </div>
+            <div className={`buttonContextContainer ${handle2 || content2 ? '' : 'hidden'}`}>{SVG_ICON_TRASH}
+                <button style={buttonContextMenu} onClick={handle2}>{content2}</button>
+            </div>
         </div>
     )
 };

@@ -1,4 +1,6 @@
 import React from "react";
+import './ContextMenu.css';
+import { SVG_ICON_TRASH, SVG_ICON_EMPTY } from './svgContextMenu.js';
 
 const ContextMenu = ({ x, y, showContextMenu, contextMenuRef, handleClearChat, handleDeleteContact }) => {
     if (!showContextMenu) return null;
@@ -10,10 +12,9 @@ const ContextMenu = ({ x, y, showContextMenu, contextMenuRef, handleClearChat, h
         top: y,
         left: x,
         zIndex: 4,
-        backgroundColor: 'var(--bgTransparent)',
-        border: '1px solid #ccc',
-        borderRadius: '7px',
-        padding: '20px 20px 20px 20px',
+        backgroundColor: '#111111e1',
+        borderRadius: '15px',
+        padding: '20px 25px',
         width: 'max-content',
         backdropFilter: 'blur(5px)',
         gap: '20px',
@@ -37,8 +38,11 @@ const ContextMenu = ({ x, y, showContextMenu, contextMenuRef, handleClearChat, h
 
     return (
         <div style={contextMenuStyles} className="contextMenuContainer" ref={contextMenuRef}>
-                <button style={buttonContextMenu} onClick={handleClearChat}>Vaciar chat</button>
-                <button style={buttonContextMenu} onClick={handleDeleteContact}>Eliminar contacto</button>
+                <div className="buttonContextContainer">{SVG_ICON_EMPTY}
+                    <button style={buttonContextMenu} onClick={handleClearChat}>Vaciar chat</button></div>
+                <div className="buttonContextContainer">{SVG_ICON_TRASH}
+                    <button style={buttonContextMenu} onClick={handleDeleteContact}>Eliminar contacto</button>
+                </div>
         </div>
     )
 };
