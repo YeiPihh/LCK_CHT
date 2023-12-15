@@ -44,18 +44,19 @@ module.exports = function(socketio) {
               socket.emit('friendRequestError', 'Usuario no encontrado');
               return;
             }
-
-            const receiverId = results[0].id;
             
-            const [existingRequests] = await pool.query('SELECT * FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId,receiverId, receiverId, senderId]);
-            const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId,receiverId, senderId]);
-
+            const receiverId = results[0].id;
             
             if (senderId === receiverId) {
               socket.emit('friendRequestError', 'No puedes enviarte una solicitud a ti mismo');
               return;
             }
-            else if (existingRequests.length > 0) {
+            
+            const [existingRequests] = await pool.query('SELECT * FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId,receiverId, receiverId, senderId]);
+            const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [senderId, receiverId,receiverId, senderId]);
+
+            
+            if (existingRequests.length > 0) {
              if (existingRequests[0].status === 'pendiente') {
                if (existingRequests[0].sender_id === senderId) {
                  socket.emit('friendRequestError', 'You alredy sent a friend request to this person');
@@ -72,8 +73,11 @@ module.exports = function(socketio) {
              } 
             } else {
               const receiverSocketId = userSockets[receiverId];
+              await pool.query('DELETE FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId, receiverId, receiverId, senderId]);
               await pool.query('INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES (?, ?, "pendiente")', [senderId, receiverId]);
               socket.emit('friendRequestSuccess', 'Solicitud enviada exitosamente');
+              const [newFriendRequest] = await pool.query('SELECT f.*, u.username AS senderUsername FROM friend_requests f JOIN users u ON f.sender_id = u.id WHERE f.sender_id = ? AND f.receiver_id = ?', [senderId, receiverId]);
+              receiverSocketId.emit('newFriendRequest', newFriendRequest[0]);
             }
           } catch (error) {
             console.error('Error al enviar la solicitud de amistad:', error);
@@ -92,7 +96,7 @@ module.exports = function(socketio) {
               } else {
                 await pool.query('UPDATE friend_requests SET status = "aceptado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
                 await pool.query('INSERT INTO contacts (user_id, contact_id) VALUES (?, ?), (?, ?)', [senderId, receiverId, receiverId, senderId]);
-                const [newContact] = await pool.query('SELECT u.username, c.contact_id, m.content as lastMessage, m.timestamp FROM contacts c JOIN users u ON u.id=c.contact_id LEFT JOIN messages m ON m.sender_id=c.user_id WHERE user_id=? and contact_id=?', [receiverId, senderId]);
+                const [newContact] = await pool.query('SELECT u.username, c.contact_id FROM contacts c JOIN users u ON u.id=c.contact_id WHERE c.user_id=? and c.contact_id=?', [receiverId, senderId]);
                 socket.emit('acceptFriendRequestSuccess', newContact);
                 
               }
@@ -111,7 +115,7 @@ module.exports = function(socketio) {
               if (existingContacts.length > 0) {  
                 socket.emit('ignoreFriendRequestError', 'This person is alredy your friend');
               } else {
-                await pool.query('UPDATE friend_requests SET status = "ignorado" WHERE sender_id = ? AND receiver_id = ?', [senderId, receiverId]);
+                await pool.query('UPDATE friend_requests SET status = ? WHERE sender_id = ? AND receiver_id = ?', ['rechazado', senderId, receiverId]);
                 socket.emit('ignoreFriendRequestSuccess', 'Solicitud denegada exitosamente');
               }
             } catch (error) {
@@ -122,6 +126,13 @@ module.exports = function(socketio) {
         
         socket.on('sendMessage', async (data) => {
           const { sender_id, receiver_id, content } = data;
+
+          const [existingContacts] = await pool.query('SELECT * FROM contacts WHERE (user_id = ? AND contact_id = ?) OR (user_id = ? AND contact_id = ?)', [sender_id, receiver_id, receiver_id, sender_id]);
+
+          if (existingContacts.length < 1) {
+            socket.emit('sendMessageError', 'No puedes enviar mensajes a personas que no son tus amigos');
+            return;
+          }
 
           try {
             await saveMessage(sender_id, receiver_id, content);
@@ -170,7 +181,6 @@ module.exports = function(socketio) {
         });
 
         socket.on('newContacts', async() => {
-          console.log('ejecucion socket newcontacts')
           const userId = userIds[socket.id];
           try{
             const queryGetContactsLastMessage=`
@@ -219,6 +229,8 @@ module.exports = function(socketio) {
           let connection;
           try {
             const userId = userIds[socket.id];
+            const receiverSocketId = userSockets[contactId];
+
             connection = await pool.getConnection();
             await connection.beginTransaction();
 
@@ -228,6 +240,7 @@ module.exports = function(socketio) {
 
             await connection.commit();
             socket.emit('deleteContactSuccess', 'Contacto eliminado correctamente');
+            receiverSocketId.emit('removeContact', userId);
 
           } catch (error) {
             socket.emit('deleteContactError', error)

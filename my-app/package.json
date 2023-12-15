@@ -8,15 +8,13 @@
     "start-backend": "cd backend && yarn start"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "^6.5.1",
-    "@fortawesome/free-solid-svg-icons": "6.5.1",
     "cors": "^2.8.5",
-    "google-auth-library": "^9.0.0",
-    "googleapis": "^126.0.1",
     "mysql2": "^3.6.1",
     "nodemon": "^3.0.1",
     "react-jss": "^10.10.0",
+    "react-scripts": "^5.0.1",
     "socket.io-client": "^4.7.2",
-    "sweetalert2": "^11.7.28"
+    "sweetalert2": "^11.7.28",
+    "webpack": "^5.89.0"
   }
 }

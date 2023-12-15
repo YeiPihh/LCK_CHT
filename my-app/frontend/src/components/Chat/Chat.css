@@ -337,7 +337,7 @@
     height: 100vh;
     z-index: 2;
     box-sizing: content-box;
-   
+    padding: 30px;
 }
 
 main{
@@ -457,7 +457,7 @@ main{
         display: flex!important;
     }
 
-    .chat-sidebar:not(.active), .containerSide:not(.active) {
+    .chat-sidebar:not(.active), .containerSide:not(.active), .containerChat:not(.active) {
         display: none;
     }
 
@@ -482,6 +482,11 @@ main{
     
     body .profileImagenContainer {
         height: max-content;
+    }
+
+    .menuContainer {
+        display: flex;
+        justify-content: space-between;
     }
     
     body .profileImagenContainer img {
@@ -540,18 +545,19 @@ main{
     }
 
     .containerSide.active {
-        min-width: 100%;
+        min-width: max-content;
         display: flex;
-        height: 100%;
-        padding-top: 30px;
+        height: max-content;
+        padding: 0px;
+        width: 70%;
+        max-width: 500px;
+        margin-top: 40px;
     }
 
     .chat-sidebar.active {
-        min-width: 50%;
+        min-width: 80%;
         display: flex;
         max-height: 90vh;
-        margin: auto;
-        margin-top: 0;
     }
 
     .chat-item .contactName {
@@ -564,7 +570,12 @@ main{
     .chat-container .chat-main .chat-messages {
         width: 100vw;
         padding: 15px;
-      
+    }
+
+    .chat-container{
+        display: flex;
+        
+        justify-content: center;
     }
 
     

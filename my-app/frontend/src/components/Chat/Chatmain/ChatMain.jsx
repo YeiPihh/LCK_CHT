@@ -1,5 +1,5 @@
 //chatMain
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import Message from './Message/Message.jsx';
 import { MessagesContext } from '../ChatComponent.jsx';
 import InputChat from './InputChat/InputChat.jsx';
@@ -23,8 +23,6 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchSta
             }
         
     }
-
-    useEffect(() => {console.log(messageSelected)}, [messageSelected]);
 
     const handleOwnMessage = (senderId) => {
         return parseInt(senderId) === parseInt(userId);

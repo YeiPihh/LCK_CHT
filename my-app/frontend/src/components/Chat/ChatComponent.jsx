@@ -89,18 +89,18 @@ const ChatComponent = () => {
   const [coordenades, setCoordenades] = useState({ x:0, y:0 });
   const [showContextMenuMessage, setShowContextMenuMessage] = useState(false);
   const [messageSelected, setMessageSelected] = useState('');
-  const [menuSize, setMenuSize] = useState({ width: 0, height: 0 });
   const [temporizador, setTemporizador] = useState(null);
+  const [menuSize] = useState({ width: 0, height: 0 });
 
-  const redirectLogin = (tittle, message, icon) => { 
+  const redirectLogin = useCallback((tittle, message, icon) => { 
     navigate('/Login');
     Swal.fire({
       title: tittle,
       text: message,
       icon: icon,
       confirmButtonText: 'Aceptar'
-    })
-  }
+    });
+  }, [navigate]);
 
    // hook para extraer informacion de la base de datos
    useEffect(() => {
@@ -154,13 +154,13 @@ const ChatComponent = () => {
         setLoading(false);
       }, 100)
     });
-  }, []);
+  }, [redirectLogin]);
 
   useEffect(() => {
     if (!isAuthenticated) {
       redirectLogin('Warning', 'You have to be authenticated before to access here!!', 'warning')
     }
-  },[isAuthenticated])
+  },[isAuthenticated, redirectLogin])
   
   useEffect(()=>{
     socket.on('friendRequestSuccess', (message) => {
@@ -255,15 +255,39 @@ const ChatComponent = () => {
     setShowContextMenuMessage(true);
   };
 
+
+    // Inicializa el estado con el ancho y alto actuales del navegador
+    const [windowSize, setWindowSize] = useState({
+        width: window.innerWidth,
+        height: window.innerHeight,
+    });
+
+    useEffect(() => {
+        // Función para actualizar el estado con el nuevo tamaño
+        const handleResize = () => {
+            setWindowSize({
+                width: window.innerWidth,
+                height: window.innerHeight,
+            });
+        };
+
+        // Añadir listener para el evento resize
+        window.addEventListener('resize', handleResize);
+
+        // Limpieza del listener cuando el componente se desmonta
+        return () => window.removeEventListener('resize', handleResize);
+    }, []); // El array vacío asegura que el efecto se ejecute solo en la montura y desmontura
+
+
   const handleContactClick = useCallback((e, { contact_id, username }) => {
     setShowContextMenuMessage(false);
     setSelectedContact(contact_id);
-    setCoordenades({ x: e.clientX, y: e.clientY });
-    console.log(e.clientX, e.clientY);
+    e.clientX > windowSize.width/2 ? setCoordenades({ x: e.clientX-275, y: e.clientY }) : setCoordenades({ x: e.clientX, y: e.clientY }) ;
+    
     setMenuVisibility(false);
     e.preventDefault();
 
-    if (e.button === SECONDARY_CLICK || temporizador ) {
+    if (e.button === SECONDARY_CLICK ) {
       e.preventDefault();
       setShowContextMenu(true);
     }
@@ -289,7 +313,7 @@ const ChatComponent = () => {
     }
 
 
-  }, []);
+  }, [windowSize]);
   
   // visibilidad del menu
   const handleClickOutside = (e) => {
@@ -351,20 +375,30 @@ const ChatComponent = () => {
 
   useEffect(() => {
     socket.on('acceptFriendRequestSuccess', (contact) => {
-      console.log("Éxito: ", contact);
+
       let updateContacts = [...contacts, contact[0]];
       setContacts(updateContacts);
     });
 
-     socket.on('newFriendRequest', (friendRequests)=>{
-       setFriendRequests(friendRequests);
-     });
+    socket.on('newFriendRequest', (friendRequest)=>{
+       let newFriendRequests = [...friendRequests, friendRequest];
+       setFriendRequests(newFriendRequests);
+    });
+
+    socket.on('removeContact', (contactId) => {
+      let indexContactDelete = contacts.findIndex(obj => obj.contact_id === contactId); // <-- Encontramos el index del contacto que hemos seleccionado
+      if (indexContactDelete !== -1) {
+        let updateContacts = [...contacts];
+        updateContacts.splice(indexContactDelete, 1);
+        setContacts(updateContacts);
+      }
+    });
 
     return () => {
       socket.off('acceptFriendRequestSuccess');
-      // socket.off('newFriendRequest');
+      socket.off('newFriendRequest');
     };
-  }, []);
+  }, [contacts, friendRequests]);
 
   const handleIgnoreRequest = (senderId) => {
     setIsProcessingRequest(senderId);
@@ -459,8 +493,6 @@ const ChatComponent = () => {
     const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
     const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
 
-    const  newXx = e.clientX > window.innerWidth/2 ? '' : ''; 
-
     setCoordenades({ x: newX, y: newY });
 
     if (e.button === SECONDARY_CLICK || temporizador) {
@@ -537,7 +569,7 @@ const ChatComponent = () => {
       socket.off('deleteMessageForAllError');
     };
 
-  }, [messages, messageSelected]);
+  }, [messages, messageSelected, contacts]);
 
   useEffect(() => {
 
@@ -571,7 +603,7 @@ const ChatComponent = () => {
 
     <div className="chat-container" onClick={handleClickOutside} >
       <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
-      <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={messageSelected.sender_id === userId ? handleDeleteMessageForAll : ''} content2={messageSelected.sender_id === userId ? 'Delete message for all' : ''} ownMessage={messageSelected.sender_id === userId ? true : false}  />
+      <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={messageSelected.sender_id === userId ? handleDeleteMessageForAll : null} content2={messageSelected.sender_id === userId ? 'Delete message for all' : ''} ownMessage={messageSelected.sender_id === userId ? true : false}  />
       <div className= {`containerSide ${selectedContactName ? '' : 'active'}`} >
       <aside className={`chat-sidebar ${selectedContactName ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
@@ -606,7 +638,7 @@ const ChatComponent = () => {
       </div>
       </aside>
       </div>
-      <div className='containerChat'>
+      <div className={`containerChat ${selectedContactName ? 'active' : ''}`}>
       <div className={`chat-main ${ selectedContactName!==null ? 'active' : ''}`}>
         <ChatMain sendMessage={sendMessage} handleClickMessage={handleClickMessage} handleClickBack={handleClickBack} handleHoldTouchMessage={handleHoldTouchMessage} onTouchStart={(e) => onTouchStart(e, handleHoldTouchMessage)} onTouchEnd={onTouchEnd} />
       </div>
