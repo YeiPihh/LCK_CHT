@@ -3,7 +3,7 @@
 
 Before you start, ensure the following are installed on your system:
 
-1. **Node.js (Version 16.20.2):**
+1. **Node.js (Version 20):**
    - Download and install Node.js version 20 from the [Node.js website](https://nodejs.org/).
 
 2. **Yarn Package Manager:**
