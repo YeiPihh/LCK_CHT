@@ -169,11 +169,13 @@ module.exports = function(socketio) {
           }
 
         });
-
+        
         socket.on('clearChat', async(receiverId)=> {
+          
           const userId = userIds[socket.id];
+          console.log('clearChat', userId, receiverId)
           try{
-            await pool.query('UPDATE messages SET showSender = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE 1 END, showReceiver = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE 1 END', [userId, receiverId, receiverId, userId]);
+            await pool.query('UPDATE messages SET showSender = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE showSender END, showReceiver = CASE WHEN sender_id=? AND receiver_id=? THEN 0 ELSE showReceiver END', [userId, receiverId, receiverId, userId]);
             socket.emit('clearChatSuccess', 'Chat cleared successfully');
           } catch (error) {
             socket.emit('clearChatError', error);
@@ -255,6 +257,7 @@ module.exports = function(socketio) {
          
           const userId = userIds[socket.id];
           const contactId = userId === sender_id ? receiver_id : sender_id;
+          const receiverSocketId = userSockets[contactId];
 
           const queryGetLastMessage = `
             SELECT * FROM messages WHERE ((sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)) AND showReceiver = CASE WHEN receiver_id=? THEN 1 ELSE showReceiver END AND showSender = CASE WHEN sender_id=? THEN 1 ELSE showSender END ORDER BY timestamp DESC LIMIT 1 
@@ -269,6 +272,8 @@ module.exports = function(socketio) {
           `;
 
           try {
+
+            const messageDeleteInfo = await pool.query('select * from messages where id = ?', [id]);
             
             const lastMessage = await pool.query(queryGetLastMessage,[userId, contactId, contactId, userId, userId, userId]);
             
@@ -279,6 +284,8 @@ module.exports = function(socketio) {
             const resultNewLastMessage = newLastMessage ? newLastMessage[0][0] : null;
 
             socket.emit('deleteMessageForAllSuccess', resultNewLastMessage);
+            receiverSocketId.emit('updateMessageDelete', messageDeleteInfo[0][0]);
+    
 
           } catch (error) {
             socket.emit('deleteMessageForAllError', error);

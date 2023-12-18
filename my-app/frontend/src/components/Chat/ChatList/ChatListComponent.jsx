@@ -1,5 +1,5 @@
 // ChatListComponent.jsx
-import React from 'react';
+import React, { useEffect } from 'react';
 import ProfilePictureComponent from '../ProfilePicture/ProfilePictureComponent';
 import './ChatList.css';
 import { createUseStyles } from 'react-jss';
@@ -11,15 +11,18 @@ const useStyles = createUseStyles({
 });
   
 
-const ChatListComponent = ({ contacts, onContactClick, userId,  onTouchStart, onTouchEnd }) => {
+const ChatListComponent = ({ contacts, onContactClick, userId,  onTouchStart, onTouchEnd, selectedContact }) => {
   
   const classes = useStyles();
+
+
   return (
     <> 
     {contacts.map((contact, index) => {
+      const isSelected = selectedContact ? selectedContact === contact.contact_id : false;
       
       return(
-      <div key={index} className="chat-item" onClick={(e) => onContactClick(e, contact)} onContextMenu={(e) => onContactClick(e, contact)}  onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
+      <div key={index} className={`chat-item ${isSelected ? 'selected' : ''}`} onClick={(e) => onContactClick(e, contact)} onContextMenu={(e) => onContactClick(e, contact)}  onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
           <ProfilePictureComponent />
           <div className="contactContainer">
             <span className="contactName">{contact.username.toUpperCase()}</span>

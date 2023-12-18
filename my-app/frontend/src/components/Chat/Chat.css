@@ -144,13 +144,17 @@
 
 .chat-main {
     flex: 1;
-    display: flex;
+    display: none;
     flex-direction: column;
     overflow: hidden;
     height: 100vh;
     border-radius: 25px;
     justify-content: flex-end;
     gap: 20px;
+}
+
+.chat-main.active{
+    display: flex;
 }
 
 .chat-header {
@@ -369,6 +373,10 @@ main{
     background-color: #007bff6c;
 }
 
+.message.selected .messageRight, .message.selected .messageLeft {
+    filter: opacity(0.7);
+}
+
 .messageLeft, .messageRight{
     display: flex;
     background-color: #e0e0e0;
@@ -379,6 +387,8 @@ main{
     height: max-content;
     word-wrap: break-word;
     word-break: break-all;
+    flex-direction: column;
+    min-width: 80px;
 }
 
 .messageLeft {
@@ -391,6 +401,32 @@ main{
     word-wrap: break-word;
     white-space: normal;
     align-self: flex-end;
+}
+
+.titleMessageLeft, .titleMessageRight {
+    display: flex;
+    height: fit-content;
+    width: fit-content;
+    font-size: 14px;
+    letter-spacing: 1px;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    color: var(--main-color);
+    align-self: flex-end;
+}
+
+.titleMessageRight {
+    align-self: flex-start;
+}
+
+.contentMessageLeft, .contentMessageRight {
+    display: flex;
+    height: max-content;
+    width: 100%;
+}
+
+.contentMessageRight{
+    justify-content: flex-end;
 }
 
 .lastMessageGroup{

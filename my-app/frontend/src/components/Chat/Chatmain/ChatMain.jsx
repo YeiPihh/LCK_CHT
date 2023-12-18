@@ -1,5 +1,5 @@
 //chatMain
-import React, { useContext } from "react";
+import React, { useContext, useEffect } from "react";
 import Message from './Message/Message.jsx';
 import { MessagesContext } from '../ChatComponent.jsx';
 import InputChat from './InputChat/InputChat.jsx';
@@ -19,9 +19,10 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchSta
                     receiver_id: selectedContact,
                     content: messageContent
                 };
-                sendMessage(messageData);
+                setTimeout(() => {
+                    sendMessage(messageData);
+                }, 500);
             }
-        
     }
 
     const handleOwnMessage = (senderId) => {
@@ -40,10 +41,11 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchSta
                                 messages.map((message, index)=> {
                                     const lastMessageGroup = index > 0 && messages[index-1].sender_id !==   message.sender_id;
                                     const isSelected = messageSelected.id === message.id;
+                                    
                                 
                                     return (
                                         <Message 
-                                            key={index}
+                                            key={message.id}
                                             message={message.content} 
                                             isOwnMessage={handleOwnMessage(message.sender_id)}
                                             isLastMessageGroup={lastMessageGroup}

@@ -1,25 +1,27 @@
-import React, {useRef, useEffect} from "react";
+import React, {useRef, useEffect, useState} from "react";
 import { SVG_ICON_TRASH, SVG_ICON_X } from './svgContextMenu.js';
-
+import useWindowSize from './useWindowSize.jsx';
 
 const ContextMenuMessage = ({ x, y, showContextMenuMessage, contextMenuMessageRef, handle1, handle2, content1, content2, ownMessage }) => {
 
+    const [windowWidth, windowHeight] = useWindowSize();
 
     useEffect(() => {
         if (contextMenuMessageRef.current) {
             const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
             console.log(`El tamaño de contextMenuContainer es ${offsetWidth}x${offsetHeight}`);
         }
-    }, []);
+    }, [contextMenuMessageRef]);
 
-    const positionY= ownMessage ? x-275 : x;
-    
+    const positionX= ownMessage ? x-275 : x;
+    const positionY = y > windowHeight/2 ? y-150 : y;
+
     const contextMenuStyles = {
         display: 'flex',
         flexDirection: 'column',
         position: 'absolute',
-        top: y,
-        left: positionY,
+        top: positionY,
+        left: positionX,
         zIndex: 4,
         backgroundColor: '#111111e1',
         borderRadius: '15px',

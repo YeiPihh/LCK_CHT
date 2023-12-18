@@ -46,27 +46,30 @@ export const MessagesContext = React.createContext({
   setMessages: () => {},
   userId: '',
   setUserId: () => {},
-  isWaitingClick: '', 
+  isWaitingClick: '',
   setIsWaitingClick: () => {},
   selectedContact: '',
   setSelectedContact: () => {},
   selectedContactName: '',
-  messageSelected:'', 
-  setMessageSelected:() => {}
+  messageSelected:'',
+  setMessageSelected:() => {},
+  username: '',
+  selectedContactName: '',
+  secondSelectedContactId: '',
 })
 
 const ChatComponent = () => {
 
-  
+
   const  SECONDARY_CLICK = 2;
   const  PRINCIPAL_CLICK = 0;
 
   const classes = useStyles();
-  
+
   const formRef = useRef(null);
   const contextMenuRef = useRef(null);
   const contextMenuMessageRef = useRef(null);
-  
+
   const [loading, setLoading] = useState(true);
   const [isAuthenticated, setIsAuthenticated] = useState(true);
 
@@ -74,6 +77,7 @@ const ChatComponent = () => {
   const [contacts, setContacts] = useState([]);
   const [selectedContact, setSelectedContact] = useState(null);
   const [selectedContactName, setSelectedContactName] = useState(null);
+  const [secondSelectedContactId, setSecondSelectedContactId] = useState(null);
   const [menuVisibility, setMenuVisibility] = useState(false);
   const [menuClicked, setMenuClicked] = useState(false);
   const [addFormVisibility, setAddFormVisibility] = useState(false);
@@ -83,7 +87,7 @@ const ChatComponent = () => {
   const [userId, setUserId ] = useState('');
   const [newContactUsername, setNewContactUsername] = useState('');
   const [isProcessingRequest, setIsProcessingRequest] = useState(false);
-  const [messages, setMessages] = useState({});
+  const [messages, setMessages] = useState([]);
   const [isWaitingClick, setIsWaitingClick] = useState(true);
   const [showContextMenu, setShowContextMenu] = useState(false);
   const [coordenades, setCoordenades] = useState({ x:0, y:0 });
@@ -92,7 +96,7 @@ const ChatComponent = () => {
   const [temporizador, setTemporizador] = useState(null);
   const [menuSize] = useState({ width: 0, height: 0 });
 
-  const redirectLogin = useCallback((tittle, message, icon) => { 
+  const redirectLogin = useCallback((tittle, message, icon) => {
     navigate('/Login');
     Swal.fire({
       title: tittle,
@@ -126,8 +130,8 @@ const ChatComponent = () => {
       console.error('Hubo un problema con la petición Fetch:', error);
       redirectLogin('Error', 'Your request failed', 'error')
     }),
-      
-      
+
+
       fetchData(REACT_APP_SERVER_URL, 'friend-requests', 'GET', '')
       .then(response => {
         if (response.ok) {
@@ -161,7 +165,7 @@ const ChatComponent = () => {
       redirectLogin('Warning', 'You have to be authenticated before to access here!!', 'warning')
     }
   },[isAuthenticated, redirectLogin])
-  
+
   useEffect(()=>{
     socket.on('friendRequestSuccess', (message) => {
       console.log("Éxito: ", message);
@@ -172,17 +176,17 @@ const ChatComponent = () => {
         confirmButtonText: 'Aceptar'
       });
     });
-    
+
     // Escuchar el evento de error al enviar una solicitud de amistad
     socket.on('friendRequestError', (message) => {
-      
+
       console.log("Error: ", message);
       Swal.fire({
         title: 'Error ',
         text: message,
         icon: 'error',
         confirmButtonText: 'Aceptar'
-      })  
+      })
     });
     return () => {
       socket.off('friendRequestSuccess');
@@ -192,28 +196,28 @@ const ChatComponent = () => {
 
   // recibir mensajes tiempo real
   useEffect(()=> {
-    
+
     socket.on('receiveMessage', (message)=> {
       setMessages(prevMessages => [...prevMessages, message]);
-      
+
       socket.emit('newContacts');
     });
-    
+
     return () => {
       socket.off('receiveMessage')
     };
-    
+
   }, []);
 
   useEffect(() => {
     const handleNewContacts = (newContacts) => {
       console.log('newContacts', newContacts);
       setContacts(newContacts);
-      
+
     };
-  
+
     socket.on('newContactsSuccess', handleNewContacts);
-  
+
     // La función de limpieza debe desactivar el mismo evento que se activó.
     return () => {
       socket.off('newContactsSuccess', handleNewContacts);
@@ -231,7 +235,10 @@ const ChatComponent = () => {
   }, [messages]);
 
   const sendMessage = (messageData) => {
-    socket.emit('sendMessage', messageData);
+    setTimeout(() => {
+      socket.emit('sendMessage', messageData);
+    }, 200);
+    
 
   };
 
@@ -250,7 +257,7 @@ const ChatComponent = () => {
   const handleHoldTouchContact = () => {
     setShowContextMenu(true);
   };
-  
+
   const handleHoldTouchMessage = () => {
     setShowContextMenuMessage(true);
   };
@@ -280,22 +287,32 @@ const ChatComponent = () => {
 
 
   const handleContactClick = useCallback((e, { contact_id, username }) => {
+
     setShowContextMenuMessage(false);
-    setSelectedContact(contact_id);
-    e.clientX > windowSize.width/2 ? setCoordenades({ x: e.clientX-275, y: e.clientY }) : setCoordenades({ x: e.clientX, y: e.clientY }) ;
-    
+
+    setCoordenades({ x: e.clientX, y: e.clientY })
+
     setMenuVisibility(false);
     e.preventDefault();
 
     if (e.button === SECONDARY_CLICK ) {
       e.preventDefault();
+      setSecondSelectedContactId(contact_id);
       setShowContextMenu(true);
     }
 
     if (e.button === PRINCIPAL_CLICK) {
       e.preventDefault();
+      setSelectedContact(contact_id);
       setSelectedContactName(username.toUpperCase());
-      fetch(`${REACT_APP_SERVER_URL}/chat-history/${contact_id}`, {
+    }
+
+  }, [windowSize]);
+
+  // useEffect que carga el chat history de la conversacion que hemos seleccionado
+  useEffect(() => {
+
+      fetch(`${REACT_APP_SERVER_URL}/chat-history/${selectedContact}`, {
         credentials: 'include',
         method: 'GET',
         headers: {
@@ -310,11 +327,9 @@ const ChatComponent = () => {
         }
       })
       .catch(error => console.error('Hubo un problema con la peticion Fetch:', error));
-    }
 
+  }, [selectedContact]);
 
-  }, [windowSize]);
-  
   // visibilidad del menu
   const handleClickOutside = (e) => {
     if (formRef.current && !formRef.current.contains(e.target)) {
@@ -423,7 +438,7 @@ const ChatComponent = () => {
     .then(data =>{
       if (data.status === 'success') {
         navigate('/Login');
-        
+
       } else {
         console.error('Logout failed');
       }
@@ -434,7 +449,7 @@ const ChatComponent = () => {
   };
   const handleAddFormVisibility = () => {
     setAddFormVisibility(!addFormVisibility);
-    setFriendRequestVisibility(false);    
+    setFriendRequestVisibility(false);
   };
   const handleAddContact = async(e) => {
     e.preventDefault();
@@ -446,34 +461,47 @@ const ChatComponent = () => {
     navigate('/');
   };
 
-      
-  const handleClearChat = () => {
+  // useEffect(() => {}, [secondSelectedContactId]);
+
+  const handleClearChat = useCallback(() => {
+    console.log('secondSelectedContactId', secondSelectedContactId)
     setShowContextMenu(false);
-    socket.emit('clearChat', selectedContact);
+    socket.emit('clearChat', secondSelectedContactId);
+    console.log(secondSelectedContactId, typeof secondSelectedContactId);
     socket.on('clearChatSuccess', (message) => {
-      setMessages([]);
+      if (secondSelectedContactId === selectedContact) {
+        setMessages([]);
+      }
       console.log(contacts);
-      let newContactVisual = contacts.map((item) => ( item.contact_id === selectedContact ? {...item, lastMessage: null} : item ));
+      console.log('secondSelectedContactId', secondSelectedContactId)
+
+      let newContactVisual = [...contacts];
+      let indexContactClear = getIndex(newContactVisual, 'contact_id', secondSelectedContactId) 
+      
+      if (indexContactClear !== -1) {
+        newContactVisual[indexContactClear].lastMessage = null;
+      }
+
       setContacts(newContactVisual);
       console.log(message);
     })
     socket.on('clearChatError', (message) => {
       console.log(message);
     })
-  };
-  
+  }, [secondSelectedContactId]);
+
   const handleDeleteContact = () => {
     setShowContextMenu(false);
-    let indexContactDelete = contacts.findIndex(obj => obj.contact_id === selectedContact); // <-- Encontramos el index del contacto que hemos seleccionado
+    let indexContactDelete = contacts.findIndex(obj => obj.contact_id === secondSelectedContactId); // <-- Encontramos el index del contacto que hemos seleccionado
     if (indexContactDelete !== -1) {
       let updateContacts = [...contacts];
       updateContacts.splice(indexContactDelete, 1);
       setContacts(updateContacts);
     }
-    socket.emit('deleteContact', selectedContact);
+    socket.emit('deleteContact', secondSelectedContactId);
     socket.on('deleteContactSuccess', (message) => {
 
-      
+
       console.log(message);
     })
     socket.on('deleteContactError', (message) => {
@@ -484,19 +512,14 @@ const ChatComponent = () => {
   const handleClickMessage = (message, e) => {
     setShowContextMenu(false);
     setMenuVisibility(false);
-    setMessageSelected(message);
     e.stopPropagation();
     e.preventDefault();
 
-    //coordenades message
-    const { width: contextMenuWidth, height: contextMenuHeight } = menuSize;
-    const newX = Math.min(e.clientX, window.innerWidth - contextMenuWidth);
-    const newY = Math.min(e.clientY, window.innerHeight - contextMenuHeight);
-
-    setCoordenades({ x: newX, y: newY });
+    setCoordenades({ x: e.clientX, y: e.clientY });
 
     if (e.button === SECONDARY_CLICK || temporizador) {
       setShowContextMenuMessage(true);
+      setMessageSelected(message);
     }
 
   }
@@ -513,7 +536,7 @@ const ChatComponent = () => {
 
     socket.on('deleteMessageForAllSuccess', (newLastMessage) => {
       setShowContextMenuMessage(false);
-      
+
       let indexMessageAllDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
       if (indexMessageAllDelete !== -1) {
         let updateMessages = [...messages];
@@ -524,7 +547,7 @@ const ChatComponent = () => {
       if (newLastMessage) {
         let newContacts = [...contacts];
         let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
-        
+
         if (indexContact !== -1) {
           newContacts[indexContact].lastMessage = newLastMessage.content;
           setContacts(newContacts);
@@ -535,12 +558,12 @@ const ChatComponent = () => {
     socket.on('deleteMessageForAllError', (error) => {
       console.log(error);
     });
-   
+
     socket.on('deleteMessageForMeSuccess', (newLastMessage) => {
       setShowContextMenuMessage(false);
-      
+
       let indexMessageMeDelete = messages.findIndex(obj => obj.id === messageSelected.id); // <-- Encontramos el index del mensaje que hemos seleccionado
-      
+
       if (indexMessageMeDelete !== -1) {
         let updateMessages = [...messages];
         updateMessages.splice(indexMessageMeDelete, 1);
@@ -550,14 +573,14 @@ const ChatComponent = () => {
        if (newLastMessage) {
          let newContacts = [...contacts];
          let indexContact = newContacts.findIndex(obj => obj.contact_id === messageSelected.sender_id || obj.contact_id === messageSelected.receiver_id);
-         
+
          if (indexContact !== -1) {
            newContacts[indexContact].lastMessage = newLastMessage.content;
            setContacts(newContacts);
          }
        }
 
-    }); 
+    });
     socket.on('deleteMessageForMeError', (message) => {
       console.log(message);
     });
@@ -572,14 +595,35 @@ const ChatComponent = () => {
   }, [messages, messageSelected, contacts]);
 
   useEffect(() => {
+    console.log('messages', messages);
+    socket.on('updateMessageDelete', (messageDeleteInfo) => {
+      let indexMessageDelete = messages.findIndex(obj => obj.id === messageDeleteInfo.id); // <-- Encontramos el index del mensaje que hemos seleccionado
+      console.log('socketdeleteforall',messages, messages[indexMessageDelete], indexMessageDelete)
+      if (indexMessageDelete !== -1) {
+        let updateMessages = [...messages];
+        updateMessages.splice(indexMessageDelete, 1);
+        setMessages(updateMessages);
+      }
+    });
 
-    // if (contextMenuMessageRef) {
-    //   // const { offsetWidth, offsetHeight } = contextMenuMessageRef.current;
-    //   // setMenuSize({ width: offsetWidth, height: offsetHeight });
-    //   console.log(contextMenuMessageRef.current);
-    // }
-    // console.log(contextMenuMessageRef)
+    const handleNewContacts = (newContacts) => {
+      console.log('newContacts', newContacts);
+      setContacts(newContacts);
 
+    };
+
+    socket.emit('newContacts');
+
+    socket.on('newContactsSuccess', handleNewContacts);
+
+    return () => {
+      socket.off('updateMessageDelete');
+      socket.off('newContactsSuccess', handleNewContacts);
+    }
+    
+  }, [messages]);
+
+  useEffect(() => {
 
     if (!showContextMenuMessage) {
       setMessageSelected('');
@@ -591,15 +635,13 @@ const ChatComponent = () => {
     setSelectedContactName(null);
   }
 
-
-
    if (loading) {
      return <div className='loaderContainer'>{SVG_LOADING}</div>
    }
-   
-   
+
+
    return (
-     <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName, messageSelected}}>
+     <MessagesContext.Provider value={{ messages, setMessages, userId, setUserId, isWaitingClick, selectedContact, selectedContactName, messageSelected, username}}>
 
     <div className="chat-container" onClick={handleClickOutside} >
       <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
@@ -628,13 +670,13 @@ const ChatComponent = () => {
           />
           <div className={`${classes.userProfileContainer} no-select`}>
             <ProfilePictureComponent username={username} />
-            
+
           </div>
         </div>
-        
+
       </div>
       <div className='contactsContainer'>
-        <ChatListComponent contacts={contacts} onContactClick={handleContactClick} userId={userId} onTouchStart={(e) => onTouchStart(e, handleHoldTouchContact)} onTouchEnd={onTouchEnd} />
+        <ChatListComponent selectedContact={selectedContact} contacts={contacts} onContactClick={handleContactClick} userId={userId} onTouchStart={(e) => onTouchStart(e, handleHoldTouchContact)} onTouchEnd={onTouchEnd} />
       </div>
       </aside>
       </div>

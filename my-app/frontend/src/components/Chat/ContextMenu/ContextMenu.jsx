@@ -1,16 +1,23 @@
 import React from "react";
 import './ContextMenu.css';
 import { SVG_ICON_TRASH, SVG_ICON_EMPTY } from './svgContextMenu.js';
+import useWindowSize from './useWindowSize.jsx';
 
 const ContextMenu = ({ x, y, showContextMenu, contextMenuRef, handleClearChat, handleDeleteContact }) => {
+
+    const [windowWidth, windowHeight] = useWindowSize();
+
+    const positionX = x > windowWidth/2 ? x-275 : x;
+    const positionY = y > windowHeight/2 ? y-150 : y;
+
     if (!showContextMenu) return null;
 
     const contextMenuStyles = {
         display: 'flex',
         flexDirection: 'column',
         position: 'absolute',
-        top: y,
-        left: x,
+        top: positionY,
+        left: positionX,
         zIndex: 4,
         backgroundColor: '#111111e1',
         borderRadius: '15px',

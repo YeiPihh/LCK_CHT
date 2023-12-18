@@ -23,7 +23,10 @@
 
 .chat-item:hover {
     background-color: #33333385; /* Color principal de index.html */
-    color: #fff;
+}
+
+.chat-item.selected {
+    background-color: #2276bbb6; /* Color principal de index.html */
 }
 
 .contactContainer {
