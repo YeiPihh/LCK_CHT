@@ -71,13 +71,17 @@ module.exports = function(socketio) {
               socket.emit('friendRequestError', 'Ya eres amigo de esta persona');
               return;
              } 
+             else if (existingRequests[0].status === 'rechazado') {
+              socket.emit('friendRequestError', 'Esta persona ya ha rechazado tu solicitud');
+              return;
+             } 
             } else {
               const receiverSocketId = userSockets[receiverId];
               await pool.query('DELETE FROM friend_requests WHERE (sender_id = ? AND receiver_id = ?) OR (sender_id = ? AND receiver_id = ?)', [senderId, receiverId, receiverId, senderId]);
               await pool.query('INSERT INTO friend_requests (sender_id, receiver_id, status) VALUES (?, ?, "pendiente")', [senderId, receiverId]);
               socket.emit('friendRequestSuccess', 'Solicitud enviada exitosamente');
               const [newFriendRequest] = await pool.query('SELECT f.*, u.username AS senderUsername FROM friend_requests f JOIN users u ON f.sender_id = u.id WHERE f.sender_id = ? AND f.receiver_id = ?', [senderId, receiverId]);
-              receiverSocketId.emit('newFriendRequest', newFriendRequest[0]);
+              if (receiverSocketId){receiverSocketId.emit('newFriendRequest', newFriendRequest[0])};
             }
           } catch (error) {
             console.error('Error al enviar la solicitud de amistad:', error);

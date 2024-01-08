@@ -4,12 +4,12 @@ import '../../Chat.css';
 import { MessagesContext } from '../../ChatComponent.jsx';
 
 
-const Message = ({ message, isOwnMessage, isLastMessageGroup, onContextMenu, isSelected }) => {
+const Message = ({ message, isOwnMessage, isLastMessageGroup, onContextMenu, isSelected, onTouchStart, onTouchEnd }) => {
 
   const { username, selectedContactName } = useContext(MessagesContext);
   
   return (
-    <div className={`message ${isSelected ? 'selected' : ''} ${isLastMessageGroup ? ' lastMessageGroup' : ''}`}>
+    <div className={`message ${isSelected ? 'selected' : ''} ${isLastMessageGroup ? ' lastMessageGroup' : ''}`} onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
       
     <div className={`message${isOwnMessage ? 'Right' : 'Left'}`} onContextMenu={onContextMenu} >
     <div className={`titleMessage${isOwnMessage ? 'Right' : 'Left'}`}>{isOwnMessage ? username : selectedContactName}</div>

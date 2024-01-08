@@ -54,12 +54,10 @@ export const MessagesContext = React.createContext({
   messageSelected:'',
   setMessageSelected:() => {},
   username: '',
-  selectedContactName: '',
   secondSelectedContactId: '',
 })
 
 const ChatComponent = () => {
-
 
   const  SECONDARY_CLICK = 2;
   const  PRINCIPAL_CLICK = 0;
@@ -94,7 +92,6 @@ const ChatComponent = () => {
   const [showContextMenuMessage, setShowContextMenuMessage] = useState(false);
   const [messageSelected, setMessageSelected] = useState('');
   const [temporizador, setTemporizador] = useState(null);
-  const [menuSize] = useState({ width: 0, height: 0 });
 
   const redirectLogin = useCallback((tittle, message, icon) => {
     navigate('/Login');
@@ -211,7 +208,7 @@ const ChatComponent = () => {
 
   useEffect(() => {
     const handleNewContacts = (newContacts) => {
-      console.log('newContacts', newContacts);
+
       setContacts(newContacts);
 
     };
@@ -225,6 +222,29 @@ const ChatComponent = () => {
 
   }, []);
 
+   useEffect(() => { 
+
+    // si hay algun contacto seleccionado anular la accion de 
+    if (selectedContactName) {
+      window.history.pushState(null, "");
+    }
+    const handleBackButton = () => {
+       if (selectedContactName) {
+         setSelectedContact(null);
+         setSelectedContactName(null);
+       }
+     };
+
+     // Agregar el listener para el evento popstate
+     window.addEventListener('popstate', handleBackButton);
+
+     // volver a colocar el estado inicial del historial cuando el componente se monta
+     return () => {
+       window.removeEventListener('popstate', handleBackButton);
+   };
+
+   }, [selectedContactName]);
+
   useEffect(() => {
     setTimeout(() => {
       const messagesContainer = document.querySelector('.messagesContainer');
@@ -235,11 +255,8 @@ const ChatComponent = () => {
   }, [messages]);
 
   const sendMessage = (messageData) => {
-    setTimeout(() => {
+      
       socket.emit('sendMessage', messageData);
-    }, 200);
-    
-
   };
 
   const onTouchStart = (e, handler) => {
@@ -307,7 +324,7 @@ const ChatComponent = () => {
       setSelectedContactName(username.toUpperCase());
     }
 
-  }, [windowSize]);
+  }, []);
 
   // useEffect que carga el chat history de la conversacion que hemos seleccionado
   useEffect(() => {
@@ -488,7 +505,7 @@ const ChatComponent = () => {
     socket.on('clearChatError', (message) => {
       console.log(message);
     })
-  }, [secondSelectedContactId]);
+  }, [secondSelectedContactId, contacts, selectedContact]);
 
   const handleDeleteContact = () => {
     setShowContextMenu(false);
@@ -595,7 +612,6 @@ const ChatComponent = () => {
   }, [messages, messageSelected, contacts]);
 
   useEffect(() => {
-    console.log('messages', messages);
     socket.on('updateMessageDelete', (messageDeleteInfo) => {
       let indexMessageDelete = messages.findIndex(obj => obj.id === messageDeleteInfo.id); // <-- Encontramos el index del mensaje que hemos seleccionado
       console.log('socketdeleteforall',messages, messages[indexMessageDelete], indexMessageDelete)
@@ -607,7 +623,7 @@ const ChatComponent = () => {
     });
 
     const handleNewContacts = (newContacts) => {
-      console.log('newContacts', newContacts);
+      
       setContacts(newContacts);
 
     };
@@ -622,6 +638,8 @@ const ChatComponent = () => {
     }
     
   }, [messages]);
+
+
 
   useEffect(() => {
 
@@ -646,7 +664,7 @@ const ChatComponent = () => {
     <div className="chat-container" onClick={handleClickOutside} >
       <ContextMenu x={coordenades.x} y={coordenades.y} showContextMenu={showContextMenu} contextMenuRef={contextMenuRef} handleClearChat={handleClearChat} handleDeleteContact={handleDeleteContact} />
       <ContextMenuMessage x={coordenades.x} y={coordenades.y} showContextMenuMessage={showContextMenuMessage} contextMenuMessageRef={contextMenuMessageRef} handle1={handleDeleteMessageForMe} content1={'Delete message for me'} handle2={messageSelected.sender_id === userId ? handleDeleteMessageForAll : null} content2={messageSelected.sender_id === userId ? 'Delete message for all' : ''} ownMessage={messageSelected.sender_id === userId ? true : false}  />
-      <div className= {`containerSide ${selectedContactName ? '' : 'active'}`} >
+      <div className= {`containerSide ${selectedContactName ? '' : 'active'}`}  >
       <aside className={`chat-sidebar ${selectedContactName ? '' : 'active'}`}>
         <div className="nav-list-chat-heads">
         <div className="menuContainer">

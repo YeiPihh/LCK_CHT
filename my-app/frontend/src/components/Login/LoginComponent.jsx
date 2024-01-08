@@ -110,9 +110,9 @@ const Login = () => {
           <div id="forgot-pass" className="login-link">
           ¿No tienes una cuenta? <br /> <Link to="/register">Regístrate aquí</Link>
           </div>
-          <div id="forgot-pass" className="login-link">
+          {/* <div id="forgot-pass" className="login-link">
           ¿Has olvidado tu contraseña? <Link to="/">Recuperala aquí</Link>
-          </div>
+          </div> */}
         </div>
       </form>
       </div>

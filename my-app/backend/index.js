@@ -7,7 +7,7 @@ const cors = require('cors');
 const server = require('http').Server(app);
 const socketio = require('socket.io')(server, {
   cors: {
-    origin: ["http://192.168.1.54:3001", "http://localhost:3001", "http://localhost:3000", "http://192.168.1.54:3000", "http://172.25.6.178:3000" ],
+    origin: ["http://192.168.1.54:3001", "http://localhost:3001", "http://localhost:3000", "http://192.168.1.54:3000", "http://172.25.6.178:3000", "http://172.25.2.26:3000" ],
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -139,7 +139,7 @@ app.use(session({
 }));
 
 app.use(cors({
-  origin: ["http://192.168.1.54:3001", "http://localhost:3001", "http://localhost:3000", "http://192.168.1.54:3000", "http://172.25.6.178:3000"],
+  origin: ["http://192.168.1.54:3001", "http://localhost:3001", "http://localhost:3000", "http://192.168.1.54:3000", "http://172.25.6.178:3000", "http://172.25.2.26:3000"],
   credentials: true
 }));
 

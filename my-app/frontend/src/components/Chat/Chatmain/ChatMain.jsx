@@ -21,7 +21,7 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchSta
                 };
                 setTimeout(() => {
                     sendMessage(messageData);
-                }, 500);
+                }, 0);
             }
     }
 
@@ -45,7 +45,7 @@ const ChatMain = ({ sendMessage, handleClickMessage, handleClickBack, onTouchSta
                                 
                                     return (
                                         <Message 
-                                            key={message.id}
+                                            key={index}
                                             message={message.content} 
                                             isOwnMessage={handleOwnMessage(message.sender_id)}
                                             isLastMessageGroup={lastMessageGroup}
