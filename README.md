@@ -1,4 +1,32 @@
 # LCK CHT in React
+
+## Descripción del Proyecto
+Este proyecto es una aplicación de chat de texto en tiempo real desarrollada con un enfoque cliente-servidor. Los usuarios pueden intercambiar mensajes instantáneamente, gestionar solicitudes de amistad y mantener conversaciones privadas solo con sus contactos aceptados.
+
+## Tecnologías utilizadas
+Frontend: React.js (interfaz de usuario dinámica y reactiva)
+
+Backend: Node.js con Express (API REST y WebSocket para comunicación en tiempo real)
+
+Base de datos: MySQL (almacenamiento persistente de usuarios, mensajes y relaciones de amistad)
+
+Comunicación en tiempo real: Socket.IO (WebSockets)
+
+## Funcionalidades principales
+Registro e inicio de sesión de usuarios
+
+Envío y recepción de mensajes en tiempo real
+
+Búsqueda de otros usuarios
+
+Envío, aceptación y rechazo de solicitudes de amistad
+
+Listado de contactos (solo se puede chatear con amigos aceptados)
+
+Persistencia de mensajes y relaciones en la base de datos
+
+--- --- --- --- --- --- --- ---- --- --- ---
+
 ## Pre-requisites
 
 Before you start, ensure the following are installed on your system:
