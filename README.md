@@ -68,7 +68,7 @@ Once Node.js and Yarn are installed, follow these steps:
 
 ## Starting the Project
 
-To start the project, from the root directory, run the following command:
+To start the project, from the directory "MY-APP", run the following command:
 
 yarn run start
 
