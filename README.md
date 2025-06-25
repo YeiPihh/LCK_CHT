@@ -8,7 +8,7 @@ Frontend: React.js (interfaz de usuario dinámica y reactiva)
 
 Backend: Node.js con Express (API REST y WebSocket para comunicación en tiempo real)
 
-Base de datos: MySQL (almacenamiento persistente de usuarios, mensajes y relaciones de amistad)
+Base de datos: MySQL (almacenamiento persistente de usuarios, mensajes y solicitudes de amistad)
 
 Comunicación en tiempo real: Socket.IO (WebSockets)
 
