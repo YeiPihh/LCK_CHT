@@ -1,82 +1,103 @@
 # LCK CHT in React
 
-## Descripción del Proyecto
-Este proyecto es una aplicación de chat de texto en tiempo real desarrollada con un enfoque cliente-servidor. Los usuarios pueden intercambiar mensajes instantáneamente, gestionar solicitudes de amistad y mantener conversaciones privadas solo con sus contactos aceptados.
+## Project Description
 
-## Tecnologías utilizadas
-Frontend: React.js (interfaz de usuario dinámica y reactiva)
+This project is a real-time text chat application developed using a client-server architecture. Users can exchange messages instantly, manage friend requests, and maintain private conversations only with accepted contacts.
 
-Backend: Node.js con Express (API REST y WebSocket para comunicación en tiempo real)
+## Technologies Used
 
-Base de datos: MySQL (almacenamiento persistente de usuarios, mensajes y solicitudes de amistad)
+- **Frontend:** React.js (dynamic and responsive UI)
+- **Backend:** Node.js with Express (REST API and WebSocket for real-time communication)
+- **Database:** MySQL (persistent storage of users, messages, and friend requests)
+- **Real-Time Communication:** Socket.IO (WebSockets)
 
-Comunicación en tiempo real: Socket.IO (WebSockets)
+## Main Features
 
-## Funcionalidades principales
-Registro e inicio de sesión de usuarios
+- User registration and login
+- Real-time message sending and receiving
+- Search for other users
+- Sending, accepting, and rejecting friend requests
+- Contacts list (chat only available with accepted friends)
+- Persistent storage of messages and relationships in the database
 
-Envío y recepción de mensajes en tiempo real
+# Project Setup Instructions
 
-Búsqueda de otros usuarios
+## Prerequisites
 
-Envío, aceptación y rechazo de solicitudes de amistad
+Before you start, ensure the following are installed and configured on your system:
 
-Listado de contactos (solo se puede chatear con amigos aceptados)
+### 1. **Node.js (Version 20)**
 
-Persistencia de mensajes y relaciones en la base de datos
+- Download and install Node.js v20 from the official website: [https://nodejs.org/](https://nodejs.org/)
 
---- --- --- --- --- --- --- ---- --- --- ---
+### 2. **Yarn Package Manager**
 
-## Pre-requisites
+- Install Yarn globally using npm:
+  ```bash
+  npm install -g yarn
+  ```
 
-Before you start, ensure the following are installed on your system:
+### 3. **MySQL**
 
-1. **Node.js (Version 20):**
-   - Download and install Node.js version 20 from the [Node.js website](https://nodejs.org/).
+- Install MySQL locally.
+- Create a database on your machine with the following credentials:
+  - **User:** `root`
+  - **Password:** `toor`
+- After creating the database, execute the contents of the `dbchat.sql` file step by step to set up the necessary schema and data.
 
-2. **Yarn Package Manager:**
-   - Install Yarn using npm (Node.js package manager) by running:
-     ```
-     npm install -g yarn
-     ```
-   - This installs Yarn globally on your system.
+---
 
-Once Node.js and Yarn are installed, follow these steps:
+## Installing the Project
 
-1. **Navigate to the Project Root:**
-   - Ensure you are in the root directory of the project.
+1. **Navigate to the Project Root (**``**)**
 
-2. **Install Dependencies:**
-   - **Frontend:**
-     - Navigate to the `frontend` directory from the project root:
-       ```
-       cd frontend
-       ```
-     - Install the necessary packages using Yarn:
-       ```
-       yarn install
-       ```
-   - **Backend:**
-     - Navigate to the `backend` directory from the project root:
-       ```
-       cd ../backend
-       ```
-     - Install the necessary packages using Yarn:
-       ```
-       yarn install
-       ```
+   ```bash
+   cd path/to/my-app
+   ```
+
+2. **Install Dependencies**
+
+### - **Frontend**
+
+```bash
+cd frontend
+yarn install
+```
+
+### - **Backend**
+
+```bash
+cd ../backend
+yarn install
+```
+
+---
+
+## Environment Configuration
+
+If you need to change the database user, password, port, or other settings, edit the `.env` file located in the `backend` directory.
+
+---
 
 ## Starting the Project
 
-To start the project, from the directory "MY-APP", run the following command:
+From the `my-app` root directory, run:
 
+```bash
 yarn run start
+```
 
-This command will start both the frontend and backend parts of your project. Ensure that both are configured to run with this command.
+This command will start both the frontend and backend, provided that both are configured to run under this command.
+
+---
 
 ## Additional Information
 
-- If you encounter any issues with package versions or dependencies, consider running `yarn upgrade` or `yarn install --force` in the respective directories.
-
-
-
+- If you encounter issues with package versions or dependencies, try:
+  ```bash
+  yarn upgrade
+  ```
+  or force reinstall with:
+  ```bash
+  yarn install --force
+  ```
